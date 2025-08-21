@@ -1,0 +1,26 @@
+{
+    "id": "strict/LA_HASH_DRIFT/content_changed",
+    "policy": "strict",
+    "skewSeconds": 120,
+    "stapled": {
+        "payload": {
+            "url": "http://localhost:8081/people/alice/posts/1",
+            "attestation_url": "http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json",
+            "hash": "sha256:original_content_hash_12345678901234567890123456789012",
+            "etag": "W/\"test-etag\"",
+            "iat": 1755658000,
+            "exp": 1755661600,
+            "kid": "test-key"
+        },
+        "resource_key": "will-be-overridden",
+        "sig": "will-be-overridden"
+    },
+    "liveOverrides": {
+        "payload": {
+            "hash": "sha256:updated_content_hash_98765432109876543210987654321098"
+        }
+    },
+    "verifyBytes": "ok",
+    "now": "exp-10",
+    "expect": { "ok": false, "status": "error", "code": "LA_HASH_DRIFT" }
+}

@@ -1,0 +1,10 @@
+{
+    "id": "strict/LA_NO_ATTESTATION/null_input",
+    "policy": "strict",
+    "skewSeconds": 120,
+    "stapled": null,
+    "liveOverrides": {},
+    "verifyBytes": "ok",
+    "now": "1755658150",
+    "expect": { "ok": false, "status": "error", "code": "LA_NO_ATTESTATION" }
+}

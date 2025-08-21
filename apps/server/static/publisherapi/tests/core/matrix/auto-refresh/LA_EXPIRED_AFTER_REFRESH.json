@@ -1,0 +1,31 @@
+{
+    "id": "auto-refresh/LA_EXPIRED_AFTER_REFRESH/refresh_failed",
+    "policy": "auto-refresh",
+    "skewSeconds": 120,
+    "stapled": {
+        "payload": {
+            "url": "http://localhost:8081/people/alice/posts/1",
+            "attestation_url": "http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json",
+            "hash": "sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041",
+            "etag": "W/\"test-etag\"",
+            "iat": 1755658000,
+            "exp": 1755658100,
+            "kid": "test-key"
+        },
+        "resource_key": "will-be-overridden",
+        "sig": "will-be-overridden"
+    },
+    "liveOverrides": {
+        "payload": {
+            "iat": 1755658000,
+            "exp": 1755658100
+        }
+    },
+    "verifyBytes": "ok",
+    "now": "exp+60",
+    "expect": {
+        "ok": false,
+        "status": "error",
+        "code": "LA_EXPIRED_AFTER_REFRESH"
+    }
+}

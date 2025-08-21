@@ -1,0 +1,117 @@
+{
+    "version": 1,
+    "cases": [
+        {
+            "id": "strict/LA_OK/fixture_ra",
+            "policy": "strict",
+            "code": "LA_OK",
+            "path": "/tests/core/matrix/strict/LA_OK.json",
+            "description": "happy path using Go-signed RA fixture from ra-create"
+        },
+        {
+            "id": "graceful/LA_EXPIRED_GRACE/within_60s",
+            "policy": "graceful",
+            "code": "LA_EXPIRED_GRACE",
+            "path": "/tests/core/matrix/graceful/LA_EXPIRED_GRACE.json",
+            "description": "Expired within grace window (60s < 120s skew)"
+        },
+        {
+            "id": "strict/LA_IAT_IN_FUTURE/iat_minus_60",
+            "policy": "strict",
+            "code": "LA_IAT_IN_FUTURE",
+            "path": "/tests/core/matrix/strict/LA_IAT_IN_FUTURE.json",
+            "description": "now before iat by 60s triggers notyet"
+        },
+        {
+            "id": "strict/LA_SIG_INVALID/bad_signature",
+            "policy": "strict",
+            "code": "LA_SIG_INVALID",
+            "path": "/tests/core/matrix/strict/LA_SIG_INVALID.json",
+            "description": "signature does not verify for stapled payload/key"
+        },
+        {
+            "id": "strict/LA_HASH_MISMATCH/content_tampered",
+            "policy": "strict",
+            "code": "LA_HASH_MISMATCH",
+            "path": "/tests/core/matrix/strict/LA_HASH_MISMATCH.json",
+            "description": "Content bytes don't match signed hash - simulates tampered content"
+        },
+        {
+            "id": "strict/LA_FETCH_FAILED/network_error",
+            "policy": "strict",
+            "code": "LA_FETCH_FAILED",
+            "path": "/tests/core/matrix/strict/LA_FETCH_FAILED.json",
+            "description": "Live attestation fetch fails - simulates network/server error"
+        },
+        {
+            "id": "strict/LA_EXPIRED/hard_expired",
+            "policy": "strict",
+            "code": "LA_EXPIRED",
+            "path": "/tests/core/matrix/strict/LA_EXPIRED.json",
+            "description": "Attestation expired outside grace period - hard failure"
+        },
+        {
+            "id": "strict/LA_URL_DRIFT/live_mismatch",
+            "policy": "strict",
+            "code": "LA_URL_DRIFT",
+            "path": "/tests/core/matrix/strict/LA_URL_DRIFT.json",
+            "description": "URL mismatch between stapled and live attestations"
+        },
+        {
+            "id": "strict/LA_ATTESTATION_MALFORMED/missing_payload",
+            "policy": "strict",
+            "code": "LA_ATTESTATION_MALFORMED",
+            "path": "/tests/core/matrix/strict/LA_ATTESTATION_MALFORMED.json",
+            "description": "Malformed attestation structure - missing payload"
+        },
+        {
+            "id": "strict/LA_KID_DRIFT/key_rotation",
+            "policy": "strict",
+            "code": "LA_KID_DRIFT",
+            "path": "/tests/core/matrix/strict/LA_KID_DRIFT.json",
+            "description": "Key ID mismatch between stapled and live attestations"
+        },
+        {
+            "id": "strict/LA_HASH_DRIFT/content_changed",
+            "policy": "strict",
+            "code": "LA_HASH_DRIFT",
+            "path": "/tests/core/matrix/strict/LA_HASH_DRIFT.json",
+            "description": "Content hash mismatch between stapled and live attestations"
+        },
+        {
+            "id": "strict/LA_RESOURCE_KEY_DRIFT/key_substitution",
+            "policy": "strict",
+            "code": "LA_RESOURCE_KEY_DRIFT",
+            "path": "/tests/core/matrix/strict/LA_RESOURCE_KEY_DRIFT.json",
+            "description": "Resource key mismatch - prevents key substitution attacks"
+        },
+        {
+            "id": "strict/LA_ATTESTATION_URL_DRIFT/redirect_attack",
+            "policy": "strict",
+            "code": "LA_ATTESTATION_URL_DRIFT",
+            "path": "/tests/core/matrix/strict/LA_ATTESTATION_URL_DRIFT.json",
+            "description": "Attestation URL mismatch - prevents redirect attacks"
+        },
+        {
+            "id": "strict/LA_NO_ATTESTATION/null_input",
+            "policy": "strict",
+            "code": "LA_NO_ATTESTATION",
+            "path": "/tests/core/matrix/strict/LA_NO_ATTESTATION.json",
+            "description": "Null attestation input - prevents null pointer attacks"
+        },
+        {
+            "id": "offline-fallback/LA_OFFLINE_STALE/network_down",
+            "policy": "offline-fallback",
+            "code": "LA_OFFLINE_STALE",
+            "path": "/tests/core/matrix/offline-fallback/LA_OFFLINE_STALE.json",
+            "description": "Offline fallback with stale cached attestation"
+        },
+        {
+            "id": "auto-refresh/LA_EXPIRED_AFTER_REFRESH/refresh_failed",
+            "policy": "auto-refresh",
+            "code": "LA_EXPIRED_AFTER_REFRESH",
+            "path": "/tests/core/matrix/auto-refresh/LA_EXPIRED_AFTER_REFRESH.json",
+            "description": "Auto-refresh failed to obtain fresh attestation"
+        }
+    ]
+}

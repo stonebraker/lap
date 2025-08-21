@@ -1,0 +1,13 @@
+{
+  "payload": {
+    "url": "http://localhost:8081/people/alice/posts/2",
+    "attestation_url": "http://localhost:8081/people/alice/posts/2/_lap/resource_attestation.json",
+    "hash": "sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380",
+    "etag": "W/\"909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380\"",
+    "iat": 1755757799,
+    "exp": 1755757859,
+    "kid": "key-post-2"
+  },
+  "resource_key": "cfb28f1f4ca9bd559b71a94b7084bbfe4ce22dc98761133ac02c55720276f01d",
+  "sig": "46158eb7d953a31d9cfb835f85d6793eceaee81489c3397377da361d99c80a3e259c2c43d096507170992f0af1ddfde318649bbf9b8490262579661c5d4e7f83"
+}

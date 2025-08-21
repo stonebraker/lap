@@ -1,0 +1,32 @@
+<article id="lap-article"
+  data-lap-spec="https://lap.dev/spec/v0-1"
+  data-lap-profile="fragment"
+  data-lap-attestation-format="div"
+  data-lap-bytes-format="link-data"
+
+  data-lap-url="http://localhost:8081/people/alice/posts/3"
+  data-lap-preview="#lap-preview"
+  data-lap-attestation="#lap-attestation"
+  data-lap-bytes="#lap-bytes">
+
+  <div id="lap-preview" class="lap-preview">
+<article>
+  <header>
+    <h2>Post 3</h2>
+    <p>2 days ago • 11:37 AM</p>
+  </header>
+  <p>
+    Loving plain HTML + Tailwind from a CDN for quick scaffolds. Fast to read, fast to ship.
+  </p>
+</article>
+
+
+
+  </div>
+
+  <link id="lap-bytes" rel="alternate" type="text/html; charset=utf-8" class="lap-bytes" data-hash="sha256:1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7" href="data:text/html;base64,PGFydGljbGU+CiAgPGhlYWRlcj4KICAgIDxoMj5Qb3N0IDM8L2gyPgogICAgPHA+MiBkYXlzIGFnbyDigKIgMTE6MzcgQU08L3A+CiAgPC9oZWFkZXI+CiAgPHA+CiAgICBMb3ZpbmcgcGxhaW4gSFRNTCArIFRhaWx3aW5kIGZyb20gYSBDRE4gZm9yIHF1aWNrIHNjYWZmb2xkcy4gRmFzdCB0byByZWFkLCBmYXN0IHRvIHNoaXAuCiAgPC9wPgo8L2FydGljbGU+CgoK">
+
+  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="c48df4e0d9087601d08dc6e05feab15424333fa99e8e213038e53e70f4e22766" data-lap-sig="d1c57acc3f218707a74cf59a95eac8310821af7c9876543cfc8fd7c771a18c5b1453ffe0c2e4cdf4e76322992c78ae98d4296d1410546e6388018bb8c40e93c3" hidden>
+    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/3" data-lap-attestation-url="http://localhost:8081/people/alice/posts/3/_lap/resource_attestation.json" data-lap-hash="sha256:1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7" data-lap-etag='W/"1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7"' data-lap-iat="1755757799" data-lap-exp="1755757919" data-lap-kid="key-post-3"></div>
+  </div>
+</article>

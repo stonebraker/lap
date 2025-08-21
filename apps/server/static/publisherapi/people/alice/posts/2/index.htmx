@@ -1,0 +1,32 @@
+<article id="lap-article"
+  data-lap-spec="https://lap.dev/spec/v0-1"
+  data-lap-profile="fragment"
+  data-lap-attestation-format="div"
+  data-lap-bytes-format="link-data"
+
+  data-lap-url="http://localhost:8081/people/alice/posts/2"
+  data-lap-preview="#lap-preview"
+  data-lap-attestation="#lap-attestation"
+  data-lap-bytes="#lap-bytes">
+
+  <div id="lap-preview" class="lap-preview">
+<article>
+  <header>
+    <h2>Post 2</h2>
+    <p>Yesterday • 5:02 PM</p>
+  </header>
+  <p>
+    Dark mode all the things. Readability first, fancy later.
+  </p>
+</article>
+
+
+
+  </div>
+
+  <link id="lap-bytes" rel="alternate" type="text/html; charset=utf-8" class="lap-bytes" data-hash="sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380" href="data:text/html;base64,PGFydGljbGU+CiAgPGhlYWRlcj4KICAgIDxoMj5Qb3N0IDI8L2gyPgogICAgPHA+WWVzdGVyZGF5IOKAoiA1OjAyIFBNPC9wPgogIDwvaGVhZGVyPgogIDxwPgogICAgRGFyayBtb2RlIGFsbCB0aGUgdGhpbmdzLiBSZWFkYWJpbGl0eSBmaXJzdCwgZmFuY3kgbGF0ZXIuCiAgPC9wPgo8L2FydGljbGU+CgoK">
+
+  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="cfb28f1f4ca9bd559b71a94b7084bbfe4ce22dc98761133ac02c55720276f01d" data-lap-sig="46158eb7d953a31d9cfb835f85d6793eceaee81489c3397377da361d99c80a3e259c2c43d096507170992f0af1ddfde318649bbf9b8490262579661c5d4e7f83" hidden>
+    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/2" data-lap-attestation-url="http://localhost:8081/people/alice/posts/2/_lap/resource_attestation.json" data-lap-hash="sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380" data-lap-etag='W/"909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380"' data-lap-iat="1755757799" data-lap-exp="1755757859" data-lap-kid="key-post-2"></div>
+  </div>
+</article>

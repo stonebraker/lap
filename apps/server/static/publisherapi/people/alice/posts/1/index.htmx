@@ -1,0 +1,31 @@
+<article id="lap-article"
+  data-lap-spec="https://lap.dev/spec/v0-1"
+  data-lap-profile="fragment"
+  data-lap-attestation-format="div"
+  data-lap-bytes-format="link-data"
+
+  data-lap-url="http://localhost:8081/people/alice/posts/1"
+  data-lap-preview="#lap-preview"
+  data-lap-attestation="#lap-attestation"
+  data-lap-bytes="#lap-bytes">
+
+  <div id="lap-preview" class="lap-preview">
+<article>
+    <header>
+        <h2>Post 1</h2>
+        <p>Today • 9:14 AM</p>
+    </header>
+    <p>
+        Kicking off a new project. Keeping things simple, minimal deps, and lots
+        of clarity.
+    </p>
+</article>
+
+  </div>
+
+  <link id="lap-bytes" rel="alternate" type="text/html; charset=utf-8" class="lap-bytes" data-hash="sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041" href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDE8L2gyPgogICAgICAgIDxwPlRvZGF5IOKAoiA5OjE0IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cD4KICAgICAgICBLaWNraW5nIG9mZiBhIG5ldyBwcm9qZWN0LiBLZWVwaW5nIHRoaW5ncyBzaW1wbGUsIG1pbmltYWwgZGVwcywgYW5kIGxvdHMKICAgICAgICBvZiBjbGFyaXR5LgogICAgPC9wPgo8L2FydGljbGU+Cg==">
+
+  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="bf7f6a521cf088121753b02b57eb2e2e0bfb078bc99c153b8686fb84ffdc4715" data-lap-sig="f9af91a5cd0cc1991ce3e3487d103ca7258585e27873144bb58f5902dbae15fb9f7d2e9b81bd58a2979d4a3b0331ec69e3402dd4c72518edf6a044acba49da0f" hidden>
+    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/1" data-lap-attestation-url="http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json" data-lap-hash="sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041" data-lap-etag='W/"94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041"' data-lap-iat="1755757799" data-lap-exp="1755757809" data-lap-kid="key-post-1"></div>
+  </div>
+</article>

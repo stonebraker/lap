@@ -1,0 +1,17 @@
+Linked Attestations Protocol (LAP)
+Copyright 2025 Jason Stonebraker
+
+This product includes software developed by Jason Stonebraker.
+
+This software contains the following third-party components:
+
+-   noble-secp256k1 (https://github.com/paulmillr/noble-secp256k1)
+    Licensed under the MIT License
+    Used for Schnorr signature verification in JavaScript
+
+-   btcd/btcec (https://github.com/btcsuite/btcd)
+    Licensed under the ISC License  
+    Used for Schnorr signature operations in Go
+
+Additional attributions for any other dependencies may be found in the
+respective go.mod, package.json, or similar dependency files.

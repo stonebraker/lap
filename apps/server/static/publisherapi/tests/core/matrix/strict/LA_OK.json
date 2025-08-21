@@ -1,0 +1,11 @@
+{
+    "id": "strict/LA_OK/fixture_ra",
+    "policy": "strict",
+    "skewSeconds": 120,
+    "stapledFromFixture": "/tests/core/fixtures/LA_OK/post-1.ra.json",
+    "liveOverrides": {},
+    "verifyBytes": "ok",
+    "now": "iat+10",
+    "useTestSig": false,
+    "expect": { "ok": true, "status": "ok", "code": "LA_OK" }
+}

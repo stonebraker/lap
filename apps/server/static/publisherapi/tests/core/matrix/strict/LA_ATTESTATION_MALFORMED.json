@@ -1,0 +1,17 @@
+{
+    "id": "strict/LA_ATTESTATION_MALFORMED/missing_payload",
+    "policy": "strict",
+    "skewSeconds": 120,
+    "stapled": {
+        "resource_key": "90c9b6860712111d744d4115e62ca5a286dbac350bb8dbd453cb5f9d0d95767d",
+        "sig": "invalid_sig_but_payload_missing"
+    },
+    "liveOverrides": { "payload": {} },
+    "verifyBytes": "ok",
+    "now": "1755658150",
+    "expect": {
+        "ok": false,
+        "status": "error",
+        "code": "LA_ATTESTATION_MALFORMED"
+    }
+}

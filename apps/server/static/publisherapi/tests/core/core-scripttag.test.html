@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LAP Verifier Core Tests (Script Tag Version)</title>
+        <style>
+            body {
+                font-family: monospace;
+                margin: 2em;
+            }
+            .result {
+                margin: 0.5em 0;
+            }
+            .pass {
+                color: green;
+            }
+            .fail {
+                color: red;
+            }
+            pre {
+                white-space: pre-wrap;
+            }
+        </style>
+        <!-- Load noble-secp256k1 via script tag -->
+        <script src="/js/vendor/noble-secp256k1-global.js"></script>
+    </head>
+    <body>
+        <h1>LAP Verifier Core Tests (Script Tag Version)</h1>
+        <div id="results"></div>
+
+        <script type="module">
+            import {
+                verifyFragment,
+                nowSecs as realNow,
+                fetchRA as realFetchRA,
+            } from "/js/la/verifier.core.js";
+
+            // Wait for noble to load (since it loads asynchronously)
+            function waitForNoble() {
+                return new Promise((resolve, reject) => {
+                    if (window.NobleSecp256k1?.schnorr) {
+                        resolve(window.NobleSecp256k1.schnorr);
+                        return;
+                    }
+
+                    // Listen for the noble-loaded event
+                    window.addEventListener("noble-loaded", () => {
+                        if (window.NobleSecp256k1?.schnorr) {
+                            resolve(window.NobleSecp256k1.schnorr);
+                        } else {
+                            reject(
+                                new Error(
+                                    "Noble loaded but schnorr not available"
+                                )
+                            );
+                        }
+                    });
+
+                    // Timeout after 5 seconds
+                    setTimeout(() => {
+                        reject(new Error("Timeout waiting for noble to load"));
+                    }, 5000);
+                });
+            }
+
+            let NobleSchnorr;
+            try {
+                NobleSchnorr = await waitForNoble();
+                console.log("NobleSchnorr loaded:", !!NobleSchnorr);
+            } catch (error) {
+                document.getElementById(
+                    "results"
+                ).innerHTML = `<div class="fail">❌ Failed to load noble-secp256k1: ${error.message}</div>`;
+                throw error;
+            }
+
+            // Use a deterministic in-test Schnorr stub so tests don't depend on external crypto bundles
+            function bytesToHex(bytes) {
+                return Array.from(bytes)
+                    .map((b) => b.toString(16).padStart(2, "0"))
+                    .join("");
+            }
+            const TestSchnorr = {
+                async sign(msgU8, privHex) {
+                    return `sig:${bytesToHex(msgU8)}:${privHex}`;
+                },
+                async verify(sigHex, msgU8, pubHex) {
+                    const expected = `sig:${bytesToHex(msgU8)}:${pubHex}`;
+                    return sigHex === expected;
+                },
+            };
+
+            // Test data and infrastructure
+            const TEST_PRIV =
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+
+            async function signStapledInPlace(stapled, privHex) {
+                // Mock signing for test cases
+                stapled.resource_key = privHex;
+                const payload = stapled.payload;
+                if (!payload) return;
+                const json = JSON.stringify({
+                    url: payload.url,
+                    attestation_url: payload.attestation_url,
+                    hash: payload.hash,
+                    etag: payload.etag,
+                    iat: payload.iat,
+                    exp: payload.exp,
+                    kid: payload.kid,
+                });
+                const enc = new TextEncoder();
+                const digest = await crypto.subtle.digest(
+                    "SHA-256",
+                    enc.encode(json)
+                );
+                const msg = new Uint8Array(digest);
+                stapled.sig = await TestSchnorr.sign(msg, privHex);
+            }
+
+            async function runTests() {
+                const results = document.getElementById("results");
+                let output = "";
+
+                // Simple test case
+                const testCases = [
+                    {
+                        name: "script_tag_test",
+                        stapled_json: {
+                            payload: {
+                                url: "http://localhost:8081/people/alice/posts/1",
+                                attestation_url:
+                                    "http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json",
+                                hash: "sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041",
+                                etag: 'W/"94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041"',
+                                iat: Math.floor(Date.now() / 1000) - 60,
+                                exp: Math.floor(Date.now() / 1000) + 3600,
+                                kid: "test-key",
+                            },
+                        },
+                        useTestSig: true,
+                        expect: { ok: true, status: "ok", code: "LA_OK" },
+                    },
+                ];
+
+                for (const testCase of testCases) {
+                    const stapled = JSON.parse(
+                        JSON.stringify(testCase.stapled_json)
+                    );
+
+                    // Sign with test key
+                    await signStapledInPlace(stapled, TEST_PRIV);
+
+                    const result = await verifyFragment({
+                        stapled,
+                        verifyBytes: async () => null, // Pass bytes check
+                        fetchRAImpl: async () => stapled, // Return same stapled as live
+                        nowImpl: () => Math.floor(Date.now() / 1000),
+                        policy: "strict",
+                        verifySigImpl: testCase.useTestSig
+                            ? TestSchnorr
+                            : NobleSchnorr,
+                    });
+
+                    const exp = testCase.expect;
+                    const ok =
+                        result &&
+                        result.ok === exp.ok &&
+                        result.status === exp.status &&
+                        result.code === exp.code;
+
+                    output += `<div class="result ${ok ? "pass" : "fail"}">
+                        ${ok ? "✔" : "✖"} ${testCase.name}: ${
+                        ok
+                            ? "passed"
+                            : `expected ${JSON.stringify(
+                                  exp
+                              )}, got ${JSON.stringify(result)}`
+                    }
+                    </div>`;
+                }
+
+                results.innerHTML = output;
+            }
+
+            runTests().catch(console.error);
+        </script>
+    </body>
+</html>

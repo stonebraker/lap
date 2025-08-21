@@ -1,0 +1,92 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Go module download cache
+/go/pkg/mod/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js dependencies (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Generated keys and sensitive data
+keys/
+*.pem
+*.key
+*.crt
+
+# Build artifacts
+build/
+target/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Coverage reports
+coverage/
+coverage.txt
+coverage.html
+
+# Generated documentation
+docs/generated/
+
+# LAP-specific ignores
+# Ignore generated resource attestations during development
+# (comment out if you want to track them)
+#**/resource_attestation.json
+
+# Ignore generated keys during development
+# (comment out if you want to track test keys)
+#keys/
+
+# Backup files
+*.bak
+*.backup
