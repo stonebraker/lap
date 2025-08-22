@@ -90,3 +90,4 @@ docs/generated/
 # Backup files
 *.bak
 *.backup
+*.mdc
