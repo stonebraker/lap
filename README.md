@@ -1,5 +1,23 @@
 # Linked Attestations Protocol (LAP)
 
+## What is it?
+
+The Linked Attestations Protocol is a lightweight, http-based protocol meant to solve the problem of enabling both association and dissociation between publisher and distributed micro-content on the web. It uses basic http + a bit of cryptography, and requires no intermediary or central coordinator.
+
+### Basic use case
+
+1. Alice posts a self-contained bit of micro-content to her own website and permits cross origin access to Jane.
+2. Jane fetches the micro-content (an html fragment, not a full html doc), and embeds it in a page on her own website.
+3. Eduardo visits Jane's site and is able to verify that the post he sees there actually came from Alice.
+
+**What it does**  
+This protocol concerns itself with linking a publisher to distributed micro-content, and allowing for the verification of that link. Conversely, it allows for the unlinking of a publisher from distributed micro-content, should the publisher choose.
+
+**What it does not do**  
+It does not concern itself with the fetching and embedding of content which can be easily implemented thanks to libraries like HTMX or Datastar, and should one day be part of the HTTP spec.
+
+## The repo
+
 This repository contains:
 
 -   **publisherapi**: static file server for demonstrating LAP protocol with live examples
@@ -11,7 +29,9 @@ There are two Go modules tied together by `go.work` at the repo root:
 -   Root module (servers, CLI): `module lap`
 -   SDK module (libraries): `sdks/go` (module `github.com/stonebraker/lap/sdks/go`)
 
-**LAP Protocol Status**: This is a complete implementation of the Linked Attestations Protocol (LAP) with working cryptographic verification, cross-language support (Go + JavaScript), and comprehensive test coverage. The protocol is ready for production use.
+**LAP Protocol Status**: This is a partial implementation of the Linked Attestations Protocol (LAP) with working cryptographic verification for **Resource Attestations**, cross-language support (Go + JavaScript), and comprehensive test coverage. **Namespace Attestation** verification is a work in progress.
+
+**The protocol is not considered production ready.** The project is currently seeking feedback on all aspects, including _any compelling evidence_ that it cannot perform the function it is meant to perform, the organization and ease of use of the docs and reference implementation, documentation improvements, etc.
 
 📖 **[Read the Complete Protocol Specification →](docs/protocol-overview.md)**
 
@@ -37,6 +57,12 @@ go build -o bin/verifier ./apps/verifier-cli/cmd/verifier
 go build -o bin/lapctl ./apps/tools-cli/cmd/lapctl
 ```
 
+Build all (workspace):
+
+```bash
+go build ./apps/...
+```
+
 Run the demo server (from repo root):
 
 ```bash
@@ -53,12 +79,6 @@ Run the verifier CLI:
 
 ```bash
 go run ./apps/verifier-cli/cmd/verifier -h
-```
-
-Build all (workspace):
-
-```bash
-go build ./...
 ```
 
 ### Repository layout
@@ -140,6 +160,17 @@ bin/lapctl fragment-create \
   -base http://localhost:8081 \
   -window-min 10 \
   -kid key-post-1
+```
+
+Update multiple posts with different freshness windows (useful for testing):
+
+```bash
+bin/lapctl update-posts \
+  -base http://localhost:8081 \
+  -w1 30s \
+  -w2 5m \
+  -w3 10m \
+  -kid-prefix key-post-
 ```
 
 -   Writes fragment to `<dir>/index.htmx` and RA to `<dir>/_lap/resource_attestation.json`
