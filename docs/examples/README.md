@@ -50,6 +50,7 @@ Embeds the complete attestation as JSON within a `<script type="application/lap+
 -   Your application benefits from accessing attestation data via DOM attributes
 -   You prefer avoiding JSON parsing in your verification code
 -   You need maximum compatibility with HTML processing tools
+-   Your users prefer the familiarity of html syntax
 
 ### Use Script Tag JSON When:
 

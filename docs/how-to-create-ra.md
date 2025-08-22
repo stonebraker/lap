@@ -16,11 +16,6 @@ limitations under the License.
 
 # How to Create Resource Attestations
 
-Below is **normative, spec-ready guidance** for constructing and signing a Resource Attestation Object at
-`/<resource>/_lap/resource_attestation`.
-
----
-
 ### Server procedure (MUST / SHOULD)
 
 1. **Select the representation (bytes to attest)**

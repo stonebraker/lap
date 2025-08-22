@@ -16,7 +16,7 @@ limitations under the License.
 
 # Resource Attestation Verification Specification
 
-Below is normative, spec-ready guidance for verifying a Resource Attestation (RA) for an HTML fragment fetched from the web.
+Below is normative guidance for verifying a Resource Attestation (RA) for an HTML fragment fetched from the web.
 
 ---
 

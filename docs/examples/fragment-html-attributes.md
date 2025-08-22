@@ -113,4 +113,4 @@ Verifiers should:
 -   The preview content is for human readability - verification uses the canonical bytes
 -   All URLs must be HTTPS and same-origin between resource and attestation endpoints
 
-This format provides a clean HTML-native way to embed LAP attestations without requiring JSON parsing.
+This format provides a clean HTML-native way to embed LAP attestations without requiring script embeds or JSON parsing.
