@@ -43,37 +43,35 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
 
 ### Concise Example
 
-#### `/_lap/namespace_attestation`
+#### `/_lap/namespace_attestation.json`
 
 ```json
 {
     "payload": {
         "namespace": ["https://example.com/people/alice/"],
-        "nonce": "c8a2c730ba0d4e47a9f3b2f8f6c1df24",
-        "iat": 1754908800,
-        "exp": 1754909400,
-        "kid": "publisher-key-2025-08-12"
+        "attestation_url": "https://example.com/people/alice/_lap/namespace_attestation.json",
+        "iat": 1754908800, // epoch seconds (UTC)
+        "exp": 1754909400, // expiration timestamp (epoch seconds UTC)
+        "kid": "publisher-key-2025-08-12" // identifier for publisher key
     },
     "publisher_key": "f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00",
-    "sig": "4e0f...<128-hex>...9c2a"
+    "sig": "4e0f...<128-hex>...9c2a" // 128 hex chars — Ed25519(sig over SHA256(payload_json))
 }
 ```
 
-#### `/_lap/resource_attestation` (for `https://example.com/people/alice/messages/123`)
+#### `/_lap/resource_attestation.json` (for `https://example.com/people/alice/messages/123`)
 
 ```json
 {
     "payload": {
         "url": "https://example.com/people/alice/messages/123",
-        "attestation_url": "https://example.com/people/alice/messages/123/_lap/resource_attestation",
-        "hash": "sha256:7b0c0d2f3a4b5c6d7e8f90112233445566778899aabbccddeeff001122334455",
-        "etag": "W/\"123-abcde\"",
-        "iat": 1754908800,
-        "exp": 1754909400,
-        "kid": "resource-key-2025-08-12"
+        "attestation_url": "http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json",
+        "hash": "sha256:7b0c...cafe", // SHA-256 of message bytes from 4.2
+        "iat": 1754908800, // epoch seconds (UTC)
+        "exp": 1754909100, // expiration timestamp (epoch seconds UTC)
+        "kid": "msg-123-key" // identifier for per-resource key
     },
-    "resource_key": "aa11bb22cc33dd44ee55ff6600112233445566778899aabbccddeeff00112233",
-    "sig": "bd7a...<128-hex>...51fe"
+    "sig": "deadbeef..." // 128 hex chars — Ed25519(sig over SHA256(payload_json))
 }
 ```
 
@@ -81,21 +79,20 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
 
 ```html
 <article
-    id="lap-article"
+    id="lap-article-123"
     data-lap-spec="https://lap.dev/spec/v0-1"
     data-lap-profile="fragment"
     data-lap-attestation-format="div"
     data-lap-bytes-format="link-data"
-    data-lap-url="http://localhost:8081/people/alice/posts/1"
-    data-lap-preview="#lap-preview"
-    data-lap-attestation="#lap-attestation"
-    data-lap-bytes="#lap-bytes"
+    data-lap-url="http://localhost:8081/people/alice/posts/123"
+    data-lap-preview="#lap-preview-123"
+    data-lap-attestation="#lap-attestation-123"
+    data-lap-bytes="#lap-bytes-123"
 >
-    <div id="lap-preview" class="lap-preview">
+    <div id="lap-preview-123" class="lap-preview">
         <article>
             <header>
                 <h2>Post 1</h2>
-                <p>Today • 9:14 AM</p>
             </header>
             <p>
                 Kicking off a new project. Keeping things simple, minimal deps,
@@ -105,30 +102,30 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
     </div>
 
     <link
-        id="lap-bytes"
+        id="lap-bytes-123"
         rel="alternate"
         type="text/html; charset=utf-8"
         class="lap-bytes"
-        data-hash="sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041"
-        href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDE8L2gyPgogICAgICAgIDxwPlRvZGF5IOKAoiA5OjE0IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cD4KICAgICAgICBLaWNraW5nIG9mZiBhIG5ldyBwcm9qZWN0LiBLZWVwaW5nIHRoaW5ncyBzaW1wbGUsIG1pbmltYWwgZGVwcywgYW5kIGxvdHMKICAgICAgICBvZiBjbGFyaXR5LgogICAgPC9wPgo8L2FydGljbGU+Cg=="
+        data-hash="sha256:7b0c...cafe"
+        href="data:text/html;base64,base64-encoded-resource-content-here"
     />
 
     <div
-        id="lap-attestation"
+        id="lap-attestation-123"
         class="lap-attestation"
-        data-lap-resource-key="90c9b6860712111d744d4115e62ca5a286dbac350bb8dbd453cb5f9d0d95767d"
-        data-lap-sig="428ea29a5dac521db4931a0e5f86ae38b634321b50ab34b82bf9f2073a5b89b3a5c4c5042627b8d0bc241d757c8c5d502f33eb9de9626cb47e5f7d5423c283dd"
+        data-lap-resource-key="secp256k1-public-key-here"
+        data-lap-sig="schnorr-signature-here"
         hidden
     >
         <div
             class="lap-payload"
-            data-lap-url="http://localhost:8081/people/alice/posts/1"
-            data-lap-attestation-url="http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json"
-            data-lap-hash="sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041"
-            data-lap-etag='W/"94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041"'
-            data-lap-iat="1755735270"
-            data-lap-exp="1755735450"
-            data-lap-kid="key-post-1"
+            data-lap-url="https://example.com/people/alice/posts/123"
+            data-lap-attestation-url="https://example.com/people/alice/posts/123/_lap/resource_attestation.json"
+            data-lap-hash="sha256:7b0c...cafe"
+            data-lap-etag='W/\"7b0c...cafe\"'
+            data-lap-iat="1754908800"
+            data-lap-exp="1754909100"
+            data-lap-kid="resource-key-identifier"
         ></div>
     </div>
 </article>
@@ -157,11 +154,11 @@ The association is baked into the Linked Attestations protocol itself—not hand
 
 While publisher-to-content association is valuable, dissociation can be equally valuable.
 
-The ability for a publisher to remove content from their platform and dissociate from it is a necessary feature of any system wishing to support expressiveness for a broad range of participants whose use cases are inumerable, unique, and entirely subjective. From the unfortunate post Bob made from his company's social media account: "Our customers are our greatest asses." That was supposed to be "assets", Bob. To the influencer whose online presence was built representing Brand A, but is now representing Brand B. To the college kid who had a rough night and might have posted some regrettable remarks at 3am. These are just a few situations where someone who published something on the internet might appreciate being able to easily dissociate from it.
+The ability for a publisher to remove content from their platform and dissociate from it is a necessary feature of any system wishing to support expressiveness for a broad range of participants whose use cases are innumerable, unique, and entirely subjective. From the unfortunate post Bob made from his company's social media account: "Our customers are our greatest asses." That was supposed to be "assets", Bob. To the influencer whose online presence was built representing Brand A, but is now representing Brand B. To the college kid who had a rough night and might have posted some regrettable remarks at 3am. These are just a few situations where someone who published something on the internet might appreciate being able to easily dissociate from it.
 
-On the other end of the spectrum from signed content is unsigned content. This is the kind of content that resides on proprietary websites that typically use a username and password to establish identity. In this situation, an intermediary is trusted by participants to faithfully associate a piece of content with a creator. When you see a post from a friend on Facebook, you believe it was your friend who actually posted it, because you trust the intermediary. If that post was just floating around on the internet unsigned, you'd have no way of verifying that it was actually posted by your friend.
+On the other end of the spectrum from signed content is unsigned content. This is the kind of content that resides on proprietary websites that typically use a username and password to establish identity. In this situation, an intermediary is trusted by participants to faithfully associate a piece of content with a creator. When you see a post from a friend on a platform like Facebook, you believe it was your friend who actually posted it, because you trust the intermediary. If that post was just floating around on the internet unsigned, you'd have no way of verifying that it was actually posted by your friend. I suspect this lack of verifiability could be one of those hard-to-see architectural shortcomings of the current web that silently drives vendor lock-in.
 
-In order to enable "Free Range Content", Linked Attestations seek to live in the space between the two extremes of unsigned content and signed content. A linked attestation provides very high plausibility of Publisher <-> Content association while it exists, and very low plausibility of association when the link is removed. Each on their own, Resource Attestations and Namespace Attestations are useful for myriad purposes. When combined, I suspect they have the possiblity of solving a long standing problem space on the web. Providing Proof-of-Publisher. If I am right, this has the potential to enable _the web as social media platform_ among many other use cases.
+In order to enable free-range content, Linked Attestations seek to live in the space between the two extremes of unsigned content and signed content. A linked attestation provides very high plausibility of Publisher <-> Content association while it exists, and very low plausibility of association when the link is removed. Each on their own, Resource Attestations and Namespace Attestations are useful for myriad purposes. When combined, it is possible to provide a retractable proof-of-publisher for portable content, potentially enabling _the web as social media platform_, among other use cases.
 
 | Unsigned Content | Unlinked Attestation  | <---------------> | Linked Attestation      | Signed Content    |
 | :--------------- | :-------------------- | :---------------: | :---------------------- | :---------------- |
@@ -171,79 +168,10 @@ In order to enable "Free Range Content", Linked Attestations seek to live in the
 
 ## Appendix: Vision and Purpose
 
-_Personal thoughts from Jason Stonebraker, creator of the Linked Attestations Protocol_
+_Author's notes_
 
-### Recentering on Purpose
+### Re-centering on Purpose
 
-I've designed the Linked Attestations Protocol with real-world use and adoption in mind. With hopes that by enabling free-range hypermedia content that is HTTP addressable, embeddable, transportable, restful, and live-verifiable, a whole host of new expressivity and interactivity will be unleashed across the web. And The LAP is just the start... There is more to come. With wider adoption of open protocols, human expression will break out of the tech silos, and the echo chambers their algorithms create, and _the entire web can become the world's defacto social media platform_.
+I've designed the Linked Attestations Protocol with real-world use and adoption in mind, utilizing hypermedia technologies like html and http that are simple, familiar, and low-key powerful, with hopes that when micro-content is http addressable, restful, embeddable, transportable, and live-verifiable, a host of new forms of expressivity and interactivity might emerge across the web.
 
-You know what that would be?
-
-```text
-==============+++++++++++++++----------==++++**********++++=+++++++++-=+****+++=---=---=:::+***#####
-==============+++++++++++++++----------==++++***********+++++++++++++-=***+*++=-:------::-=+********
-=============+=++++++++++++++----------====+=*********+++++++++++++++-+*+=+++=-::---::-:--+*********
-==================+++++++++++----------===++=*********+++++=+++++++++-+++====--::--:::-:-=**********
-===================++++++++++----------===+==*******@@@@+++=+++++++++-+++++==-:::-:::---=+**********
-===================++++++++++----------+++===******@@@@@@+==+++++++++-++++===-:::-::----++*****+****
--===--=.=..==.==.+++.+.+.++++----------++++==*******@@@@@@@@@@@++++++-+===---::::::---:=++**++++++++
--=======================+++++----------++++==*********@@@@@@@@@@+++++-+==--::::::-:---=+++++++++++++
---=======================++++----------++++==********@@@@@@@@@@@@++++-==---::--:-----=++++++++++++++
-----:..:-=:+.:.=:==---:+===++----------+++++=*******@@@@@@@@@@@@@@+++-==-:.::-::::--==========++++++
-----===========-==---======++----------+++++=*****@@@*==@@@@@@@@@@@++---:::::::::--=========+===+===
--------==-===-=-------=======-=========+++++@@@@@@@@**==+@@@@@@@@@@@+-:::::::::----================+
-----------===------------====-=========++++@@*@+@@****====-@@@@@@@@@+-::::::::-----================+
----------------:-@@@@----====-=========+++++=**@@*****------@@@@@@@@%-:...:::-@@@@@=================
----------------@@@@@@@@=--===-====-@@@@@@@@+=#@@******----+@@@@@@@@@+-...:::-@@-+-=@================
-----:::-------@@@@@@@:@@@@@@=-====@@-==*+=@@@@@%@*****==-@@@@@@@@@#++-..:::-@@-#*+=@#======@@@@@====
---:::::-----@@@@@@@@@@@@@@--=-===@@==@+*%+@@@@+@+%@+++---@@@@@@++++++-::::--@@-@+@-@@=====@@=#+%@==+
-:::::::::---@@@@@@@@@@@@@@#---===@@=*==@@@@@@@++@++@++--@@@@@@+++++++-::::--@@=@+@@@@@@@%@@@***+@@++
-:::::::::::-@@@@@::....:@#----===@@=+@@@%@%+=@@++@++@++@@@@@+++++++++-:::---=*@@@@--@@@==@@@=@*=@*++
-::::::::::::@@@@@::.::::::----+++@@@++%++#=+@@@++@@@@@@@@@@:+++++++++-::-------@@@@@@%=#@@@@#+*@@+**
-:::::::::::@@@::@@.:::@-:@----++++@@@+%===+=@@====@@@@@@@@=:*********-:::--:@@@@@@@@@@@@@@@@@@@@****
-::@@@@@@@@@@@*-::+@@@+.:@@---++++++@@@@=+=+@@======@@=@@@:..**********:::::-@@@@@@@@@@@@@@++++******
-::@@@@=@@@@@:----@::::.::@@#-********+@@@@@-======#@@@@@@@@@=*********@@@@@-@@@@@@@@=+++++**********
-::@%::::::::::----::::..@:@@@@@*******=----:-------@@@@@@.@*@@********@@@@@--@@@@@@@@+++++++********
-::::---::::::::--::::@@@:=@*#@@@@****+------=====#@@@@@@=@-@*@@*********@@@@=*@@@@@@@++++++++**+++++
-::::----::::::::::::=-@@%*@****@@@***----::===========@@@@:@-+@@******@@@@@@@@@@@@@@@#++++++++++++++
-::::::---::::::::::@@@@@@@@******@@*----::-===========@@@@@@***@*****%@@@@@@@@@@@@@@@+++++++++++++++
-:::::::--::::::::::@=*%#@@*@@*******---:..++++++++++++@@%-:--#@@******@@**@@@@@@@@@@+++===+========+
-::::::::::::::::::-@@+@%#*@********---::.=+++++++++++++@@--%--@@****************=========-=======+++
-:::::::::::::::::*++*@#+*%@@++++++---::..+++++++++++++++@@@@@@@==+++++++++++++++++----------===++++=
-..::.::::::::::*++++++#@@@@+++++++-:::..+++++++++++++++++++------++++++++++++++++++*:---:-=======---
-:....::::::::-+++++++++++++++++++::::...+++++++++++++++++++-------++++++++++.++++++++----=----------
-:.....::::::++++++++++++++++++++-:::...*++++++++++*.:+++++++--------------========+++++-------===--=
-:......:::++++++++++++++++++++++::....:***********::::-+****----::---@%%%%%%*======%+++++---------==
-:.....:.=++++++++++++++++++++++:::::::::*********::::::.***%*--::::-%+++++++++=====%+++++++--=======
-:.....-+++++++++++++++++=+-:::::::::::::::+*****:....:::%*%**--:::::%++++++++====%%+++++++++-======+
-.....+==============+-----:::::::.-%@.:...%****:..@......%****:::::%++++++++---.%%++++++++++++=++++=
-...===============-------:::.:%%*:::-:....%****...%.....:%****-:::.%-:+++++---@@%+++++++++++++++====
-.===============:------:::@%-:::::::....@%%***..@@**.....@@****::::%--%++=---%%++++++++++++++++++===
-===============-----%%@.:::@::::::.....=%****..=@****......****:::.@--=+--:@%++++++++++++++++++++++=
-===========.=%@.=@@%%==-:::%::::......@%***#...%%*.........****::::@==:::%%+++++++++++++++++++++++++
-===============:=======::::%*-:::...@%*****.......+@%%..=...%**.:::::::-%%++++++++++++++++++++++++++
-======================-::::@.:::.=%%@*****... .@%@****#%....=**..::::::%=+++++++++++++++++++++++++++
-------------------------::::::::%%%******#..%%%********...%%.%*..::::@%===++++++++++++++++++++++++++
------------------------:::::::%%@********..:%%**********-..:%***%%%%=======+++++++++++++++++++++++++
-----------------------::::::::::....#***...%%************....%*****========+++++++++++++++++++++++++
------------------------:::::::::.....................#***..%%#*****=========++++++++++++++++++++++++
-----------------------%.::::%%@@%%%%@*@%@@%@%@+%..........+********#==------------:@++@+++++++++++++
-------------------==--::::::%::********************#@%%%@@@%%*#****.:::::---::%%+%++++++++++++++++++
-=====================-::-:::%:#*********************+.***###.::::.#@%%*:#:----++++++++++++++++++++++
-====================.::.--::%-**********************+....:@%%%%#*****--::::---++++++++++++++++++++++
-====================:.-%--::%%***************#*.....@%%%#******.#****#:::::::::+++++++++++++++++++++
-===================-...:.-.-:%************.::..%%%%*******************-::::::::-++++++++++++++++++++
-===================......:@=%*****@***:::#@%%#*:##******+:************#:::::::::++++++++++++++++++++
-==================.......-%-*****+:::%%*#*::::::::::::::#@:=***********=:---:::--+++++++++++++++++++
-==================:::::...%#*#----:::::::::::.+%%%@@%%#%%*##%**********#----:::::-++++++++++++++++++
-+++++++++++++++++.:::....:-***:---#@.@%%%%******:***********************----------++++++++++++++++++
-++++++++++++++++-:::::::::***********************************************----------*+++++++++++++++*
-++++++++++++++++:::::::::=***********************************************----::::::+****************
-+*************+::::::::::*************************************************:::::::::-****************
-```
-
-That'd be rad.
-
-— Jason Stonebraker, 2025
-
-Note - The ascii art for the 80's bmx thriller, Rad, by Tri-star Pictures is non-normative.
+— Jason Stonebraker
