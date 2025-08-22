@@ -18,7 +18,7 @@ It does not concern itself with the fetching and embedding of content which can 
 
 📖 **[Read the Complete Protocol Specification →](docs/protocol-overview.md)**
 
-## The repo
+## Quick Start
 
 This repository contains:
 
