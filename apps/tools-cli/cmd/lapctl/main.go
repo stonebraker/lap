@@ -49,6 +49,8 @@ func main() {
 		fragmentCreateCmd(os.Args[2:])
 	case "update-posts":
 		updatePostsCmd(os.Args[2:])
+	case "na-create":
+		naCreateCmd(os.Args[2:])
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -65,6 +67,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  ra-create   Create a resource attestation for an HTML file\n")
 	fmt.Fprintf(os.Stderr, "  fragment-create   Create an HTML fragment (index.htmx) and matching RA from an index.html\n")
 	fmt.Fprintf(os.Stderr, "  update-posts      Generate fragments for posts 1..3 with independent window-min values\n")
+	fmt.Fprintf(os.Stderr, "  na-create     Create a namespace attestation for a namespace URL\n")
 }
 
 func keygenCmd(args []string) {
@@ -110,7 +113,7 @@ type storedKey struct {
 	CreatedAtUnix int64  `json:"created_at"`
 }
 
-// parseWindowToSeconds parses strings like "30s", "5m", "1d" or plain minutes (e.g. "10") into seconds
+// parseWindowToSeconds parses strings like "30s", "5m", "2h", "1d" or plain minutes (e.g. "10") into seconds
 func parseWindowToSeconds(s string) (int, error) {
 	s = strings.TrimSpace(s)
 	if s == "" {
@@ -133,6 +136,13 @@ func parseWindowToSeconds(s string) (int, error) {
 			return 0, fmt.Errorf("invalid minutes: %s", s)
 		}
 		return v * 60, nil
+	case 'h', 'H':
+		numStr = s[:len(s)-1]
+		v, err := strconv.Atoi(numStr)
+		if err != nil || v < 0 {
+			return 0, fmt.Errorf("invalid hours: %s", s)
+		}
+		return v * 60 * 60, nil
 	case 'd', 'D':
 		numStr = s[:len(s)-1]
 		v, err := strconv.Atoi(numStr)
@@ -702,6 +712,155 @@ func updatePostsCmd(args []string) {
             os.Exit(1)
         }
     }
+}
+
+func naCreateCmd(args []string) {
+	fs := flag.NewFlagSet("na-create", flag.ExitOnError)
+	namespace := fs.String("namespace", "", "namespace URL (e.g. https://example.com/people/alice/)")
+	windowStr := fs.String("window", "1d", "freshness window (e.g. 30s, 5m, 2h, 1d). Plain numbers are minutes")
+	kid := fs.String("kid", "", "key identifier for this namespace attestation")
+	privHexFlag := fs.String("privkey", "", "(optional) hex-encoded publisher private key; if provided, will be used and stored")
+	out := fs.String("out", "", "output directory path (default: current directory)")
+	keysDir := fs.String("keys-dir", "keys", "directory to store per-namespace keys (outside static)")
+	rotate := fs.Bool("rotate", false, "force generating a new keypair even if one exists for this namespace")
+	_ = fs.Parse(args)
+
+	if *namespace == "" || *kid == "" {
+		fmt.Fprintf(os.Stderr, "na-create requires -namespace and -kid\n")
+		fs.Usage()
+		os.Exit(2)
+	}
+
+	// Parse window duration
+	windowSeconds, err := parseWindowToSeconds(*windowStr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "invalid -window: %v\n", err)
+		os.Exit(2)
+	}
+
+	// Calculate timestamps
+	now := time.Now()
+	iat := now.Unix()
+	exp := now.Add(time.Duration(windowSeconds) * time.Second).Unix()
+
+	// Get or generate private key
+	var priv *btcec.PrivateKey
+	var pubHex string
+
+	if *privHexFlag != "" {
+		priv, err = crypto.ParsePrivateKeyHex(*privHexFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid -privkey: %v\n", err)
+			os.Exit(2)
+		}
+		pub := priv.PubKey()
+		pubHex = hex.EncodeToString(schnorr.SerializePubKey(pub))
+	} else {
+		// Try to load existing key from keys directory
+		keyPath := filepath.Join(*keysDir, *kid+".json")
+		if !*rotate {
+			if data, err := os.ReadFile(keyPath); err == nil {
+				var stored storedKey
+				if json.Unmarshal(data, &stored) == nil {
+					priv, err = crypto.ParsePrivateKeyHex(stored.PrivKeyHex)
+					if err == nil {
+						pubHex = stored.PubKeyXOnly
+					}
+				}
+			}
+		}
+
+		// Generate new key if none exists or rotate requested
+		if priv == nil {
+			priv, pubHex, err = crypto.GenerateKeyPair()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "generate keypair: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Store the new key
+			stored := storedKey{
+				KID:           *kid,
+				PrivKeyHex:    hex.EncodeToString(priv.Serialize()),
+				PubKeyXOnly:   pubHex,
+				CreatedAtUnix: now.Unix(),
+			}
+			if err := os.MkdirAll(*keysDir, 0700); err != nil {
+				fmt.Fprintf(os.Stderr, "mkdir %s: %v\n", *keysDir, err)
+				os.Exit(1)
+			}
+			if err := writeJSON0600(keyPath, stored); err != nil {
+				fmt.Fprintf(os.Stderr, "write %s: %v\n", keyPath, err)
+				os.Exit(1)
+			}
+		}
+	}
+
+	// Create canonical payload
+	payload := map[string]interface{}{
+		"namespace":        []string{*namespace},
+		"attestation_path": "_lap/namespace_attestation.json",
+		"iat":              iat,
+		"exp":              exp,
+		"kid":              *kid,
+	}
+
+	// Canonicalize the payload (sort fields in fixed order)
+	canonicalPayload := map[string]interface{}{
+		"namespace":        payload["namespace"],
+		"attestation_path": payload["attestation_path"],
+		"iat":              payload["iat"],
+		"exp":              payload["exp"],
+		"kid":              payload["kid"],
+	}
+
+	// Marshal to JSON for signing
+	payloadBytes, err := json.Marshal(canonicalPayload)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "marshal payload: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Hash the payload
+	digest := crypto.HashSHA256(payloadBytes)
+
+	// Sign the digest
+	sigHex, err := crypto.SignSchnorrHex(priv, digest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "sign: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Create the full attestation object
+	attestation := map[string]interface{}{
+		"payload":      canonicalPayload,
+		"publisher_key": pubHex,
+		"sig":          sigHex,
+	}
+
+	// Determine output path
+	outputDir := *out
+	if outputDir == "" {
+		outputDir = "."
+	}
+
+	// Create _lap directory if it doesn't exist
+	lapDir := filepath.Join(outputDir, "_lap")
+	if err := os.MkdirAll(lapDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "mkdir %s: %v\n", lapDir, err)
+		os.Exit(1)
+	}
+
+	// Write the attestation
+	outputPath := filepath.Join(lapDir, "namespace_attestation.json")
+	if err := writeJSON0600(outputPath, attestation); err != nil {
+		fmt.Fprintf(os.Stderr, "write %s: %v\n", outputPath, err)
+		os.Exit(1)
+	}
+
+	fmt.Fprintf(os.Stderr, "Created namespace attestation at %s\n", outputPath)
+	fmt.Fprintf(os.Stderr, "Valid from %s to %s\n", time.Unix(iat, 0).Format(time.RFC3339), time.Unix(exp, 0).Format(time.RFC3339))
+	fmt.Fprintf(os.Stderr, "Publisher key: %s\n", pubHex)
 }
 
 func writeJSON0600(path string, v any) error {
