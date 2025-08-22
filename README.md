@@ -14,7 +14,9 @@ The Linked Attestations Protocol is a lightweight, http-based protocol meant to 
 This protocol concerns itself with linking a publisher to distributed micro-content, and allowing for the verification of that link. Conversely, it allows for the unlinking of a publisher from distributed micro-content, should the publisher choose.
 
 **What it does not do**  
-It does not concern itself with the fetching and embedding of content which can be easily implemented thanks to libraries like HTMX or Datastar, and should one day be part of the HTTP spec.
+It does not concern itself with the fetching and embedding of content which can be easily implemented thanks to libraries like HTMX or Datastar and should one day be part of the HTTP spec.
+
+📖 **[Read the Complete Protocol Specification →](docs/protocol-overview.md)**
 
 ## The repo
 
@@ -32,8 +34,6 @@ There are two Go modules tied together by `go.work` at the repo root:
 **LAP Protocol Status**: This is a partial implementation of the Linked Attestations Protocol (LAP) with working cryptographic verification for **Resource Attestations**, cross-language support (Go + JavaScript), and comprehensive test coverage. **Namespace Attestation** verification is a work in progress.
 
 **The protocol is not considered production ready.** The project is currently seeking feedback on all aspects, including _any compelling evidence_ that it cannot perform the function it is meant to perform, the organization and ease of use of the docs and reference implementation, documentation improvements, etc.
-
-📖 **[Read the Complete Protocol Specification →](docs/protocol-overview.md)**
 
 ### Requirements
 
