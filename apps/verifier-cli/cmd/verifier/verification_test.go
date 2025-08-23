@@ -554,6 +554,12 @@ func TestVerificationOptionsDefaults(t *testing.T) {
 	if opts.SkewSeconds != 120 {
 		t.Errorf("Default skew = %v, want 120", opts.SkewSeconds)
 	}
+	if opts.Timeout != 10*time.Second {
+		t.Errorf("Default timeout = %v, want 10s", opts.Timeout)
+	}
+	if opts.Verbose != false {
+		t.Errorf("Default verbose = %v, want false", opts.Verbose)
+	}
 }
 
 func TestVerifyContentHashMismatch(t *testing.T) {
