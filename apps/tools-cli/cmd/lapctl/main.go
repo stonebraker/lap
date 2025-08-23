@@ -317,7 +317,7 @@ func raCreateCmd(args []string) {
 	} else {
 		exp = now + 10*60 // default 10 minutes
 	}
-	payload := wire.Payload{
+	payload := wire.ResourcePayload{
 		URL:             payloadURL,
 		Attestation_URL: attestationURL,
 		Hash:            crypto.ComputeContentHashField(body),
@@ -326,7 +326,7 @@ func raCreateCmd(args []string) {
 		EXP:             exp,
 		KID:             *kid,
 	}
-	bytesPayload, err := canonical.MarshalPayloadCanonical(payload.ToCanonical())
+	bytesPayload, err := canonical.MarshalResourcePayloadCanonical(payload.ToCanonical())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "canonical marshal: %v\n", err)
 		os.Exit(1)
@@ -337,7 +337,7 @@ func raCreateCmd(args []string) {
 		fmt.Fprintf(os.Stderr, "sign: %v\n", err)
 		os.Exit(1)
 	}
-	att := wire.Attestation{Payload: payload, ResourceKey: pubHex, Sig: sigHex}
+	att := wire.ResourceAttestation{Payload: payload, ResourceKey: pubHex, Sig: sigHex}
 
 	// Output
 	outPath := *out
@@ -536,7 +536,7 @@ func fragmentCreateCmd(args []string) {
 	} else {
 		exp = now + 10*60 // default 10 minutes
 	}
-	payload := wire.Payload{
+	payload := wire.ResourcePayload{
 		URL:             payloadURL,
 		Attestation_URL: attestationURL,
 		Hash:            crypto.ComputeContentHashField(body),
@@ -545,7 +545,7 @@ func fragmentCreateCmd(args []string) {
 		EXP:             exp,
 		KID:             *kid,
 	}
-	bytesPayload, err := canonical.MarshalPayloadCanonical(payload.ToCanonical())
+	bytesPayload, err := canonical.MarshalResourcePayloadCanonical(payload.ToCanonical())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "canonical marshal: %v\n", err)
 		os.Exit(1)
@@ -556,7 +556,7 @@ func fragmentCreateCmd(args []string) {
 		fmt.Fprintf(os.Stderr, "sign: %v\n", err)
 		os.Exit(1)
 	}
-	att := wire.Attestation{Payload: payload, ResourceKey: pubHex, Sig: sigHex}
+	att := wire.ResourceAttestation{Payload: payload, ResourceKey: pubHex, Sig: sigHex}
 
 	// Write RA JSON alongside (default: <dir>/_lap/resource_attestation.json)
 	raOut := filepath.Join(filepath.Dir(*inPath), "_lap", "resource_attestation.json")
@@ -721,6 +721,7 @@ func naCreateCmd(args []string) {
 	kid := fs.String("kid", "", "key identifier for this namespace attestation")
 	privHexFlag := fs.String("privkey", "", "(optional) hex-encoded publisher private key; if provided, will be used and stored")
 	out := fs.String("out", "", "output directory path (default: current directory)")
+	attestationPath := fs.String("path", "la_namespace.json", "attestation_path field value (default: la_namespace.json)")
 	keysDir := fs.String("keys-dir", "keys", "directory to store per-namespace keys (outside static)")
 	rotate := fs.Bool("rotate", false, "force generating a new keypair even if one exists for this namespace")
 	_ = fs.Parse(args)
@@ -799,7 +800,7 @@ func naCreateCmd(args []string) {
 	// Create canonical payload
 	payload := map[string]interface{}{
 		"namespace":        []string{*namespace},
-		"attestation_path": "_lap/namespace_attestation.json",
+		"attestation_path": *attestationPath,
 		"iat":              iat,
 		"exp":              exp,
 		"kid":              *kid,
@@ -838,21 +839,23 @@ func naCreateCmd(args []string) {
 		"sig":          sigHex,
 	}
 
-	// Determine output path
+	// Determine output directory and path
 	outputDir := *out
 	if outputDir == "" {
 		outputDir = "."
 	}
+	
+	// Create the full output path by joining the directory with the attestation path
+	outputPath := filepath.Join(outputDir, *attestationPath)
 
-	// Create _lap directory if it doesn't exist
-	lapDir := filepath.Join(outputDir, "_lap")
-	if err := os.MkdirAll(lapDir, 0755); err != nil {
-		fmt.Fprintf(os.Stderr, "mkdir %s: %v\n", lapDir, err)
+	// Create parent directory if it doesn't exist
+	parentDir := filepath.Dir(outputPath)
+	if err := os.MkdirAll(parentDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "mkdir %s: %v\n", parentDir, err)
 		os.Exit(1)
 	}
 
 	// Write the attestation
-	outputPath := filepath.Join(lapDir, "namespace_attestation.json")
 	if err := writeJSON0600(outputPath, attestation); err != nil {
 		fmt.Fprintf(os.Stderr, "write %s: %v\n", outputPath, err)
 		os.Exit(1)

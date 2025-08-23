@@ -15,7 +15,7 @@ import (
 // - Confirms body hash and ETag match payload
 // - Confirms signature over canonical payload JSON using the resource key
 // - Confirms exp is in the future
-func VerifyAttestation(att wire.Attestation, resourceKeyHex string, body []byte, etag string, fetchedURL string, now time.Time) error {
+func VerifyAttestation(att wire.ResourceAttestation, resourceKeyHex string, body []byte, etag string, fetchedURL string, now time.Time) error {
 	if att.Payload.URL != fetchedURL {
 		return fmt.Errorf("url mismatch: payload=%s fetched=%s", att.Payload.URL, fetchedURL)
 	}
@@ -30,7 +30,7 @@ func VerifyAttestation(att wire.Attestation, resourceKeyHex string, body []byte,
 		return errors.New("attestation expired")
 	}
 	// Canonical payload bytes
-	bytesPayload, err := canonical.MarshalPayloadCanonical(att.Payload.ToCanonical())
+	bytesPayload, err := canonical.MarshalResourcePayloadCanonical(att.Payload.ToCanonical())
 	if err != nil {
 		return err
 	}

@@ -183,7 +183,7 @@ func VerifyResource(resourceURL string, opts VerificationOptions) (*Verification
 	return evaluateWindowWithPolicy(live, client, AU, U, now, opts)
 }
 
-func fetchAttestation(client *http.Client, attestationURL, resourceURL string, now int64, policy string) (*wire.Attestation, *VerificationResult) {
+func fetchAttestation(client *http.Client, attestationURL, resourceURL string, now int64, policy string) (*wire.ResourceAttestation, *VerificationResult) {
 	resp, err := client.Get(attestationURL)
 	if err != nil {
 		return nil, &VerificationResult{
@@ -218,7 +218,7 @@ func fetchAttestation(client *http.Client, attestationURL, resourceURL string, n
 		}
 	}
 
-	var att wire.Attestation
+	var att wire.ResourceAttestation
 	if err := json.NewDecoder(resp.Body).Decode(&att); err != nil {
 		return nil, &VerificationResult{
 			OK:      false,
@@ -251,7 +251,7 @@ func fetchAttestation(client *http.Client, attestationURL, resourceURL string, n
 	return &att, nil
 }
 
-func verifySignature(att *wire.Attestation, resourceURL string, now int64, policy string) *VerificationResult {
+func verifySignature(att *wire.ResourceAttestation, resourceURL string, now int64, policy string) *VerificationResult {
 	if att.ResourceKey == "" || att.Sig == "" {
 		return &VerificationResult{
 			OK:      false,
@@ -266,7 +266,7 @@ func verifySignature(att *wire.Attestation, resourceURL string, now int64, polic
 	}
 
 	// Canonical payload serialization (matches verifier.core.js canonicalizePayloadForSignature)
-	payloadBytes, err := canonical.MarshalPayloadCanonical(att.Payload.ToCanonical())
+	payloadBytes, err := canonical.MarshalResourcePayloadCanonical(att.Payload.ToCanonical())
 	if err != nil {
 		return &VerificationResult{
 			OK:      false,
@@ -298,7 +298,7 @@ func verifySignature(att *wire.Attestation, resourceURL string, now int64, polic
 	return nil // Success
 }
 
-func verifyContentHash(att *wire.Attestation, content []byte, etag, resourceURL string, now int64, policy string) *VerificationResult {
+func verifyContentHash(att *wire.ResourceAttestation, content []byte, etag, resourceURL string, now int64, policy string) *VerificationResult {
 	// Compute hash of content
 	hasher := sha256.New()
 	hasher.Write(content)
@@ -328,7 +328,7 @@ func verifyContentHash(att *wire.Attestation, content []byte, etag, resourceURL 
 	return nil // Success
 }
 
-func checkDrift(stapled, live *wire.Attestation, resourceURL string, now int64, policy string) *VerificationResult {
+func checkDrift(stapled, live *wire.ResourceAttestation, resourceURL string, now int64, policy string) *VerificationResult {
 	sp := stapled.Payload
 	lp := live.Payload
 
@@ -410,7 +410,7 @@ func checkDrift(stapled, live *wire.Attestation, resourceURL string, now int64, 
 	return nil // No drift detected
 }
 
-func evaluateWindowWithPolicy(live *wire.Attestation, client *http.Client, attestationURL, resourceURL string, now int64, opts VerificationOptions) (*VerificationResult, error) {
+func evaluateWindowWithPolicy(live *wire.ResourceAttestation, client *http.Client, attestationURL, resourceURL string, now int64, opts VerificationOptions) (*VerificationResult, error) {
 	state := evaluateWindow(live.Payload, now)
 	
 	// Handle "notyet" state
@@ -525,7 +525,7 @@ func evaluateWindowWithPolicy(live *wire.Attestation, client *http.Client, attes
 }
 
 // evaluateWindow matches the JavaScript version exactly
-func evaluateWindow(p wire.Payload, now int64) string {
+func evaluateWindow(p wire.ResourcePayload, now int64) string {
 	if p.IAT != 0 && now < p.IAT {
 		return "notyet"
 	}
@@ -535,7 +535,7 @@ func evaluateWindow(p wire.Payload, now int64) string {
 	return "fresh"
 }
 
-func buildTelemetry(payload wire.Payload, url string, now int64, policy string) Telemetry {
+func buildTelemetry(payload wire.ResourcePayload, url string, now int64, policy string) Telemetry {
 	var iat, exp *int64
 	if payload.IAT != 0 {
 		iat = &payload.IAT

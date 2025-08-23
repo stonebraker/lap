@@ -30,13 +30,13 @@ func TestEvaluateWindow(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		payload  wire.Payload
+		payload  wire.ResourcePayload
 		now      int64
 		expected string
 	}{
 		{
 			name: "fresh attestation",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 900,  // 100 seconds ago
 				EXP: 1100, // 100 seconds in future
 			},
@@ -45,7 +45,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "expired attestation",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 800, // 200 seconds ago
 				EXP: 900, // 100 seconds ago
 			},
@@ -54,7 +54,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "not yet valid",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 1100, // 100 seconds in future
 				EXP: 1200, // 200 seconds in future
 			},
@@ -63,7 +63,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "exactly at IAT",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 1000, // exactly now
 				EXP: 1100,
 			},
@@ -72,7 +72,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "exactly at EXP",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 900,
 				EXP: 1000, // exactly now
 			},
@@ -81,7 +81,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "one second past EXP",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 900,
 				EXP: 999, // one second ago
 			},
@@ -90,7 +90,7 @@ func TestEvaluateWindow(t *testing.T) {
 		},
 		{
 			name: "zero timestamps (always fresh)",
-			payload: wire.Payload{
+			payload: wire.ResourcePayload{
 				IAT: 0,
 				EXP: 0,
 			},
@@ -110,7 +110,7 @@ func TestEvaluateWindow(t *testing.T) {
 }
 
 func TestBuildTelemetry(t *testing.T) {
-	payload := wire.Payload{
+	payload := wire.ResourcePayload{
 		URL: "https://example.com/test",
 		KID: "test-key-123",
 		IAT: 1000,
@@ -141,7 +141,7 @@ func TestBuildTelemetry(t *testing.T) {
 }
 
 func TestBuildTelemetryWithZeroTimestamps(t *testing.T) {
-	payload := wire.Payload{
+	payload := wire.ResourcePayload{
 		URL: "https://example.com/test",
 		KID: "test-key-123",
 		IAT: 0, // zero timestamp
@@ -271,8 +271,8 @@ func TestBuildAttestationURL(t *testing.T) {
 
 func TestFetchAttestationSuccess(t *testing.T) {
 	// Create a test attestation
-	testAttestation := wire.Attestation{
-		Payload: wire.Payload{
+	testAttestation := wire.ResourceAttestation{
+		Payload: wire.ResourcePayload{
 			URL:             "https://example.com/test",
 			Attestation_URL: "https://example.com/test/_lap/resource_attestation.json",
 			Hash:            "sha256:abc123",
@@ -430,7 +430,7 @@ func TestVerificationResultJSONMarshaling(t *testing.T) {
 }
 
 func TestCheckDrift(t *testing.T) {
-	basePayload := wire.Payload{
+	basePayload := wire.ResourcePayload{
 		URL:             "https://example.com/test",
 		Attestation_URL: "https://example.com/test/_lap/resource_attestation.json",
 		Hash:            "sha256:abc123",
@@ -439,7 +439,7 @@ func TestCheckDrift(t *testing.T) {
 		EXP:             2000,
 	}
 
-	stapled := &wire.Attestation{
+	stapled := &wire.ResourceAttestation{
 		Payload:     basePayload,
 		ResourceKey: "pubkey123",
 		Sig:         "sig123",
@@ -447,13 +447,13 @@ func TestCheckDrift(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		live       *wire.Attestation
+		live       *wire.ResourceAttestation
 		expectCode string
 		expectNil  bool
 	}{
 		{
 			name: "no drift",
-			live: &wire.Attestation{
+			live: &wire.ResourceAttestation{
 				Payload:     basePayload,
 				ResourceKey: "pubkey123",
 				Sig:         "different-sig", // signature can differ
@@ -462,8 +462,8 @@ func TestCheckDrift(t *testing.T) {
 		},
 		{
 			name: "URL drift",
-			live: &wire.Attestation{
-				Payload: wire.Payload{
+			live: &wire.ResourceAttestation{
+				Payload: wire.ResourcePayload{
 					URL:             "https://evil.com/test", // Different URL
 					Attestation_URL: basePayload.Attestation_URL,
 					Hash:            basePayload.Hash,
@@ -478,8 +478,8 @@ func TestCheckDrift(t *testing.T) {
 		},
 		{
 			name: "hash drift",
-			live: &wire.Attestation{
-				Payload: wire.Payload{
+			live: &wire.ResourceAttestation{
+				Payload: wire.ResourcePayload{
 					URL:             basePayload.URL,
 					Attestation_URL: basePayload.Attestation_URL,
 					Hash:            "sha256:different", // Different hash
@@ -494,7 +494,7 @@ func TestCheckDrift(t *testing.T) {
 		},
 		{
 			name: "resource key drift",
-			live: &wire.Attestation{
+			live: &wire.ResourceAttestation{
 				Payload:     basePayload,
 				ResourceKey: "different-key", // Different resource key
 				Sig:         "sig123",
@@ -503,8 +503,8 @@ func TestCheckDrift(t *testing.T) {
 		},
 		{
 			name: "KID drift",
-			live: &wire.Attestation{
-				Payload: wire.Payload{
+			live: &wire.ResourceAttestation{
+				Payload: wire.ResourcePayload{
 					URL:             basePayload.URL,
 					Attestation_URL: basePayload.Attestation_URL,
 					Hash:            basePayload.Hash,
@@ -557,8 +557,8 @@ func TestVerificationOptionsDefaults(t *testing.T) {
 }
 
 func TestVerifyContentHashMismatch(t *testing.T) {
-	att := &wire.Attestation{
-		Payload: wire.Payload{
+	att := &wire.ResourceAttestation{
+		Payload: wire.ResourcePayload{
 			Hash: "sha256:expected_hash",
 			ETag: "W/\"test\"",
 		},
@@ -580,8 +580,8 @@ func TestVerifyContentHashMismatch(t *testing.T) {
 }
 
 func TestVerifyContentHashETagMismatch(t *testing.T) {
-	att := &wire.Attestation{
-		Payload: wire.Payload{
+	att := &wire.ResourceAttestation{
+		Payload: wire.ResourcePayload{
 			Hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", // Empty string hash
 			ETag: "W/\"expected\"",
 		},

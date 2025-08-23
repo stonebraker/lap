@@ -15,22 +15,22 @@ func TestVerifyAttestation_Negatives(t *testing.T) {
 	url := "https://example.com/people/alice/messages/123"
 	iat := time.Now().Unix()
 	exp := iat + 600
-	att, pubHex, err := func() (wire.Attestation, string, error) {
+	att, pubHex, err := func() (wire.ResourceAttestation, string, error) {
 		priv, pub, err := crypto.GenerateKeyPair()
 		if err != nil {
-			return wire.Attestation{}, "", err
+			return wire.ResourceAttestation{}, "", err
 		}
-		payload := wire.Payload{URL: url, Hash: crypto.ComputeContentHashField(body), ETag: etag, IAT: iat, EXP: exp, KID: "kid"}
-		bytesPayload, err := canonical.MarshalPayloadCanonical(payload.ToCanonical())
+		payload := wire.ResourcePayload{URL: url, Hash: crypto.ComputeContentHashField(body), ETag: etag, IAT: iat, EXP: exp, KID: "kid"}
+		bytesPayload, err := canonical.MarshalResourcePayloadCanonical(payload.ToCanonical())
 		if err != nil {
-			return wire.Attestation{}, "", err
+			return wire.ResourceAttestation{}, "", err
 		}
 		digest := crypto.HashSHA256(bytesPayload)
 		sigHex, err := crypto.SignSchnorrHex(priv, digest)
 		if err != nil {
-			return wire.Attestation{}, "", err
+			return wire.ResourceAttestation{}, "", err
 		}
-		return wire.Attestation{Payload: payload, Sig: sigHex}, pub, nil
+		return wire.ResourceAttestation{Payload: payload, Sig: sigHex}, pub, nil
 	}()
 	if err != nil {
 		t.Fatal(err)
