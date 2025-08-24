@@ -171,7 +171,7 @@ func raCreateCmd(args []string) {
 	// Timebox flags: prefer window-min if provided; fallback to ttl seconds; else default 10 minutes
 	expSeconds := fs.Int("ttl", -1, "(optional) seconds until expiration; deprecated, prefer -window-min")
 	windowStr := fs.String("window-min", "10m", "freshness window (e.g. 30s, 5m, 1d). Plain numbers are minutes")
-	out := fs.String("out", "", "output file path (default: <dir>/_lap/resource_attestation.json)")
+	out := fs.String("out", "", "output file path (default: <dir>/_la_resource.json)")
 	keysDir := fs.String("keys-dir", "keys", "directory to store per-resource keys (outside static)")
 	rotate := fs.Bool("rotate", false, "force generating a new keypair even if one exists for this resource")
 	_ = fs.Parse(args)
@@ -231,7 +231,7 @@ func raCreateCmd(args []string) {
 	u.Host = hu
 	payloadURL := u.String()
 
-	// attestation_url: same origin, path (strip trailing /index.html or /index.json), then add /_lap/resource_attestation.json; no query/fragment
+	// attestation_url: same origin, path (strip trailing /index.html or /index.json), then add /_la_resource.json; no query/fragment
 	uAtt := u
 	uAtt.RawQuery = ""
 	uAtt.Fragment = ""
@@ -239,7 +239,7 @@ func raCreateCmd(args []string) {
 	p = strings.TrimSuffix(p, "/index.html")
 	p = strings.TrimSuffix(p, "/index.json")
 	p = strings.TrimSuffix(p, "/")
-	uAtt.Path = p + "/_lap/resource_attestation.json"
+	uAtt.Path = p + "/_la_resource.json"
 	attestationURL := uAtt.String()
 
 	// Keys: reuse or generate per-resource key stored under keysDir mirroring the input path
@@ -343,7 +343,7 @@ func raCreateCmd(args []string) {
 	outPath := *out
 	if outPath == "" {
 		dir := filepath.Dir(*inPath)
-		outPath = filepath.Join(dir, "_lap", "resource_attestation.json")
+		outPath = filepath.Join(dir, "_la_resource.json")
 	}
 	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "mkdir: %v\n", err)
@@ -448,7 +448,7 @@ func fragmentCreateCmd(args []string) {
 	u.Host = hu
 	payloadURL := u.String()
 
-	// attestation_url: same origin, path (strip trailing /index.html or /index.json), then add /_lap/resource_attestation.json; no query/fragment
+	// attestation_url: same origin, path (strip trailing /index.html or /index.json), then add /_la_resource.json; no query/fragment
 	uAtt := u
 	uAtt.RawQuery = ""
 	uAtt.Fragment = ""
@@ -456,7 +456,7 @@ func fragmentCreateCmd(args []string) {
 	p = strings.TrimSuffix(p, "/index.html")
 	p = strings.TrimSuffix(p, "/index.json")
 	p = strings.TrimSuffix(p, "/")
-	uAtt.Path = p + "/_lap/resource_attestation.json"
+	uAtt.Path = p + "/_la_resource.json"
 	attestationURL := uAtt.String()
 
 	// Keys: reuse or generate per-resource key stored under keysDir mirroring the input path
@@ -558,8 +558,8 @@ func fragmentCreateCmd(args []string) {
 	}
 	att := wire.ResourceAttestation{Payload: payload, ResourceKey: pubHex, Sig: sigHex}
 
-	// Write RA JSON alongside (default: <dir>/_lap/resource_attestation.json)
-	raOut := filepath.Join(filepath.Dir(*inPath), "_lap", "resource_attestation.json")
+	// Write RA JSON alongside (default: <dir>/_la_resource.json)
+	raOut := filepath.Join(filepath.Dir(*inPath), "_la_resource.json")
 	if err := os.MkdirAll(filepath.Dir(raOut), 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "mkdir: %v\n", err)
 		os.Exit(1)
@@ -582,7 +582,7 @@ func fragmentCreateCmd(args []string) {
 	}
 
 	// Write the exact canonical payload bytes that were signed
-	bytesOut := filepath.Join(filepath.Dir(*inPath), "_lap", "bytes.txt")
+	bytesOut := filepath.Join(filepath.Dir(*inPath), "bytes.txt")
 	if err := os.WriteFile(bytesOut, bytesPayload, 0644); err != nil {
 		fmt.Fprintf(os.Stderr, "write %s: %v\n", bytesOut, err)
 		os.Exit(1)

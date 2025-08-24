@@ -28,7 +28,7 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
    _Example:_ Serve a signed document at `https://example.com/people/alice/_la_namespace.json` asserting control of `https://example.com/people/alice/` during a specified time window.
 
 2. **Resource Attestation** — proves specific bytes originate from a URL.  
-   _Example:_ For `https://example.com/people/alice/messages/123`, publish `…/messages/123/_lap/resource_attestation` signed by a server generated and controlled, **per-resource key** over `{ url, attestation_url, hash, etag, iat, exp }` for the fragment’s exact bytes.
+   _Example:_ For `https://example.com/people/alice/messages/123`, publish `…/messages/123/_la_resource.json` signed by a server generated and controlled, **per-resource key** over `{ url, attestation_url, hash, etag, iat, exp }` for the fragment's exact bytes.
 
 3. **Live Verification (Resource Attestation + Namespace Attestation) = Proof of Publisher** — links content to the publisher **right now**.  
    _Example:_ Verify the resource attestation for `…/messages/123`, then verify the namespace attestation from `…/people/alice/_la_namespace.json`; because the URL sits under Alice’s namespace, the fragment can be reasonably associated with Alice at fetch time.
@@ -59,13 +59,13 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
 }
 ```
 
-#### `/_lap/resource_attestation.json` (for `https://example.com/people/alice/messages/123`)
+#### `/_la_resource.json` (for `https://example.com/people/alice/messages/123`)
 
 ```json
 {
     "payload": {
         "url": "https://example.com/people/alice/messages/123",
-        "attestation_url": "http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json",
+        "attestation_url": "http://localhost:8081/people/alice/posts/1/_la_resource.json",
         "hash": "sha256:7b0c...cafe", // SHA-256 of message bytes from 4.2
         "iat": 1754908800, // epoch seconds (UTC)
         "exp": 1754909100, // expiration timestamp (epoch seconds UTC)
@@ -120,7 +120,7 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
         <div
             class="lap-payload"
             data-lap-url="https://example.com/people/alice/posts/123"
-            data-lap-attestation-url="https://example.com/people/alice/posts/123/_lap/resource_attestation.json"
+            data-lap-attestation-url="https://example.com/people/alice/posts/123/_la_resource.json"
             data-lap-hash="sha256:7b0c...cafe"
             data-lap-etag='W/\"7b0c...cafe\"'
             data-lap-iat="1754908800"

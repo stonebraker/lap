@@ -51,7 +51,7 @@ This approach embeds the complete attestation object as JSON within a script tag
         {
             "payload": {
                 "url": "https://example.com/people/alice/messages/123",
-                "attestation_url": "https://example.com/people/alice/messages/123/_lap/resource_attestation",
+                "attestation_url": "https://example.com/people/alice/messages/123/_la_resource.json",
                 "hash": "sha256:7b0c0d2f3a4b5c6d7e8f90112233445566778899aabbccddeeff001122334455",
                 "etag": "W/\"123-abcde\"",
                 "iat": 1754908800,

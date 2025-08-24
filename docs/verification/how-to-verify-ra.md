@@ -41,7 +41,7 @@ Verifier procedure (MUST / SHOULD)
 
 -   Construct the canonical attestation URL AU by taking U and replacing the path suffix as follows:
     -   Remove any trailing /index.html or /index.json from the path
-    -   Append /\_lap/resource_attestation.json
+    -   Append /\_la_resource.json
 -   Perform GET AU (same-origin). Response body must be a JSON object with fields described below.
 
 4. Parse the attestation object

@@ -109,16 +109,6 @@ Access-Control-Expose-Headers: Namespace-Attestation
 
 ---
 
-## Security properties (answers baked in)
-
--   **Q1 (control proof):** Yes. A valid signature by `publisher_key` over the canonical payload is a durable assertion of control for the listed namespaces during `[iat,exp]`. With optional key discovery at `/_lap/keys/pub`, verifiers can also confirm the namespace itself exposes (or agrees with) that key.
-
--   **Q2 (loss of control):** `iat/exp` bound the **intended** validity window. Verifiers that require `now ∈ [iat,exp]` won't treat an old attestation as current. The signature remains verifiable forever (by design), but only as a **historical** claim.
-
--   **Q3 (no binding to content):** Correct. This does **not** bind the publisher to any specific resource or bytes. RAs can be minted by arbitrary resource keys; without a live `/_lap/resource_proof` for the content, there's no cryptographic chain from `publisher_key` → content.
-
----
-
 ## JSON Schema (concise)
 
 ```json

@@ -38,7 +38,7 @@ limitations under the License.
 
 4. **Construct the canonical attestation URL (`attestation_url`)**
 
-    - Append `/_lap/resource_attestation` to the resource path of `payload.url` (no query, no fragment).
+    - Append `/_la_resource.json` to the resource path of `payload.url` (no query, no fragment).
     - Use the same scheme/host/port as `payload.url`.
     - The resulting absolute URL string is `payload.attestation_url`.
 
