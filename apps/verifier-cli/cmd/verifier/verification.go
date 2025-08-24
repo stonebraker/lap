@@ -583,7 +583,7 @@ func buildAttestationURL(U string) string {
 	p = strings.TrimSuffix(p, "/index.html")
 	p = strings.TrimSuffix(p, "/index.json")
 	p = strings.TrimSuffix(p, "/")
-	u.Path = p + "/_lap/resource_attestation.json"
+	u.Path = p + "/_la_resource.json"
 	u.RawQuery = ""
 	u.Fragment = ""
 	return u.String()

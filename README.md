@@ -143,7 +143,7 @@ bin/lapctl ra-create \
   -kid v1
 ```
 
--   Writes RA JSON to `<dir>/_lap/resource_attestation.json` by default
+-   Writes RA JSON to `<dir>/_la_resource.json` by default
 -   Stores/reads per-resource keys under `keys/<input-path>/resource_key.json` (override with `-keys-dir`)
 -   Freshness window: `-window-min` (default 10); optional `-ttl` seconds
 -   Optional: `-etag`, `-privkey`, `-rotate`, `-out`  
@@ -173,7 +173,7 @@ bin/lapctl update-posts \
   -kid-prefix key-post-
 ```
 
--   Writes fragment to `<dir>/index.htmx` and RA to `<dir>/_lap/resource_attestation.json`
+-   Writes fragment to `<dir>/index.htmx` and RA to `<dir>/_la_resource.json`
 -   Same key handling and timebox flags as `ra-create`
 
 Show help:

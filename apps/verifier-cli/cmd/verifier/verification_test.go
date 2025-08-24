@@ -230,32 +230,32 @@ func TestBuildAttestationURL(t *testing.T) {
 		{
 			name:     "basic path",
 			input:    "https://example.com/posts/1",
-			expected: "https://example.com/posts/1/_lap/resource_attestation.json",
+			expected: "https://example.com/posts/1/_la_resource.json",
 		},
 		{
 			name:     "path with index.html",
 			input:    "https://example.com/posts/1/index.html",
-			expected: "https://example.com/posts/1/_lap/resource_attestation.json",
+			expected: "https://example.com/posts/1/_la_resource.json",
 		},
 		{
 			name:     "path with index.json",
 			input:    "https://example.com/posts/1/index.json",
-			expected: "https://example.com/posts/1/_lap/resource_attestation.json",
+			expected: "https://example.com/posts/1/_la_resource.json",
 		},
 		{
 			name:     "path with trailing slash",
 			input:    "https://example.com/posts/1/",
-			expected: "https://example.com/posts/1/_lap/resource_attestation.json",
+			expected: "https://example.com/posts/1/_la_resource.json",
 		},
 		{
 			name:     "root path",
 			input:    "https://example.com/",
-			expected: "https://example.com/_lap/resource_attestation.json",
+			expected: "https://example.com/_la_resource.json",
 		},
 		{
 			name:     "query and fragment stripped",
 			input:    "https://example.com/posts/1?foo=bar#section",
-			expected: "https://example.com/posts/1/_lap/resource_attestation.json",
+			expected: "https://example.com/posts/1/_la_resource.json",
 		},
 	}
 
@@ -274,7 +274,7 @@ func TestFetchAttestationSuccess(t *testing.T) {
 	testAttestation := wire.ResourceAttestation{
 		Payload: wire.ResourcePayload{
 			URL:             "https://example.com/test",
-			Attestation_URL: "https://example.com/test/_lap/resource_attestation.json",
+			Attestation_URL: "https://example.com/test/_la_resource.json",
 			Hash:            "sha256:abc123",
 			ETag:            "W/\"abc123\"",
 			IAT:             1000,
@@ -432,7 +432,7 @@ func TestVerificationResultJSONMarshaling(t *testing.T) {
 func TestCheckDrift(t *testing.T) {
 	basePayload := wire.ResourcePayload{
 		URL:             "https://example.com/test",
-		Attestation_URL: "https://example.com/test/_lap/resource_attestation.json",
+		Attestation_URL: "https://example.com/test/_la_resource.json",
 		Hash:            "sha256:abc123",
 		KID:             "test-key",
 		IAT:             1000,
