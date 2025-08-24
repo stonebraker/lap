@@ -104,7 +104,7 @@ func TestNaCreate_DefaultBehavior(t *testing.T) {
 	}
 	
 	// Check that the default file was created (using the default path from the command)
-	expectedPath := "la_namespace.json"
+	expectedPath := "_la_namespace.json"
 	if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
 		t.Errorf("Expected file %s was not created", expectedPath)
 	}
@@ -123,9 +123,9 @@ func TestNaCreate_DefaultBehavior(t *testing.T) {
 			attestation.Payload.Namespace[0])
 	}
 	
-	if attestation.Payload.AttestationPath != "la_namespace.json" {
+	if attestation.Payload.AttestationPath != "_la_namespace.json" {
 		t.Errorf("Expected attestation_path %s, got %s",
-			"la_namespace.json",
+			"_la_namespace.json",
 			attestation.Payload.AttestationPath)
 	}
 	
@@ -244,7 +244,7 @@ func TestNaCreate_CustomWindow(t *testing.T) {
 	}
 	
 	// Check that the file was created (using the default path)
-	expectedPath := "la_namespace.json"
+	expectedPath := "_la_namespace.json"
 	if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
 		t.Errorf("Expected file %s was not created", expectedPath)
 	}
@@ -336,7 +336,7 @@ func TestNaCreate_KeyRotation(t *testing.T) {
 	}
 	
 	// Read first attestation
-	attestation1 := readNamespaceAttestation(t, "la_namespace.json")
+	attestation1 := readNamespaceAttestation(t, "_la_namespace.json")
 	firstKey := attestation1.PublisherKey
 	
 	// Create second attestation with rotate flag
@@ -351,7 +351,7 @@ func TestNaCreate_KeyRotation(t *testing.T) {
 	}
 	
 	// Read second attestation
-	attestation2 := readNamespaceAttestation(t, "la_namespace.json")
+	attestation2 := readNamespaceAttestation(t, "_la_namespace.json")
 	secondKey := attestation2.PublisherKey
 	
 	// Keys should be different due to rotation

@@ -25,13 +25,13 @@ Linked Attestations Protocol delivers portable, time-boxed proof of content orig
 A tiny, HTTP-friendly way to provide **Live Verification** that:
 
 1. **Namespace Attestation** — proves a publisher controls a namespace.  
-   _Example:_ Serve a signed document at `https://example.com/people/alice/_lap/namespace_attestation` asserting control of `https://example.com/people/alice/` during a specified time window.
+   _Example:_ Serve a signed document at `https://example.com/people/alice/_la_namespace.json` asserting control of `https://example.com/people/alice/` during a specified time window.
 
 2. **Resource Attestation** — proves specific bytes originate from a URL.  
    _Example:_ For `https://example.com/people/alice/messages/123`, publish `…/messages/123/_lap/resource_attestation` signed by a server generated and controlled, **per-resource key** over `{ url, attestation_url, hash, etag, iat, exp }` for the fragment’s exact bytes.
 
 3. **Live Verification (Resource Attestation + Namespace Attestation) = Proof of Publisher** — links content to the publisher **right now**.  
-   _Example:_ Verify the resource attestation for `…/messages/123`, then verify the namespace attestation from `…/people/alice/`; because the URL sits under Alice’s namespace, the fragment can be reasonably associated with Alice at fetch time.
+   _Example:_ Verify the resource attestation for `…/messages/123`, then verify the namespace attestation from `…/people/alice/_la_namespace.json`; because the URL sits under Alice’s namespace, the fragment can be reasonably associated with Alice at fetch time.
 
 4. **Dissociation** — removing either attestation severs the live link.  
    _Example:_  
@@ -43,13 +43,13 @@ A tiny, HTTP-friendly way to provide **Live Verification** that:
 
 ### Concise Example
 
-#### `/_lap/namespace_attestation.json`
+#### `/_la_namespace.json`
 
 ```json
 {
     "payload": {
         "namespace": ["https://example.com/people/alice/"],
-        "attestation_url": "https://example.com/people/alice/_lap/namespace_attestation.json",
+        "attestation_url": "https://example.com/people/alice/_la_namespace.json",
         "iat": 1754908800, // epoch seconds (UTC)
         "exp": 1754909400, // expiration timestamp (epoch seconds UTC)
         "kid": "publisher-key-2025-08-12" // identifier for publisher key

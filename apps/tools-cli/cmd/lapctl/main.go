@@ -721,7 +721,7 @@ func naCreateCmd(args []string) {
 	kid := fs.String("kid", "", "key identifier for this namespace attestation")
 	privHexFlag := fs.String("privkey", "", "(optional) hex-encoded publisher private key; if provided, will be used and stored")
 	out := fs.String("out", "", "output directory path (default: current directory)")
-	attestationPath := fs.String("path", "la_namespace.json", "attestation_path field value (default: la_namespace.json)")
+	attestationPath := fs.String("path", "_la_namespace.json", "attestation_path field value (default: _la_namespace.json)")
 	keysDir := fs.String("keys-dir", "keys", "directory to store per-namespace keys (outside static)")
 	rotate := fs.Bool("rotate", false, "force generating a new keypair even if one exists for this namespace")
 	_ = fs.Parse(args)

@@ -12,10 +12,10 @@ No deniability or privacy is expected.
 
 ## Canonical endpoint
 
-Serve the attestation **inside** each asserted namespace:
+Serve the attestation **at the root** of each asserted namespace:
 
 ```
-GET /…/alice/_lap/namespace_attestation.json
+GET /…/alice/_la_namespace.json
 → 200 application/json
 ```
 
@@ -38,7 +38,7 @@ Access-Control-Expose-Headers: Namespace-Attestation
         "https://example.com/people/alice/",
         "https://www.example.com/people/alice/"
     ],
-    "attestation_path": "_lap/namespace_attestation.json",
+    "attestation_path": "_la_namespace.json",
     "iat": 1754908800,
     "exp": 1754909400,
     "kid": "publisher-key-2025-08-12"
@@ -73,7 +73,7 @@ Access-Control-Expose-Headers: Namespace-Attestation
             "https://example.com/people/alice/",
             "https://www.example.com/people/alice/"
         ],
-        "attestation_path": "_lap/namespace_attestation.json",
+        "attestation_path": "_la_namespace.json",
         "iat": 1754908800,
         "exp": 1754909400,
         "kid": "publisher-key-2025-08-12"
