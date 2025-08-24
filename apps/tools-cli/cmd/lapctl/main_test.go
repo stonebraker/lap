@@ -293,13 +293,13 @@ func TestNaCreate_InvalidInput(t *testing.T) {
 	}
 	
 	// Test missing namespace
-	_, stderr, err = runLapctl(t, "na-create", "-kid", "test-key")
+	_, _, err = runLapctl(t, "na-create", "-kid", "test-key")
 	if err == nil {
 		t.Error("Expected na-create to fail with missing namespace")
 	}
 	
 	// Test missing kid
-	_, stderr, err = runLapctl(t, "na-create", "-namespace", "https://example.com/")
+	_, _, err = runLapctl(t, "na-create", "-namespace", "https://example.com/")
 	if err == nil {
 		t.Error("Expected na-create to fail with missing kid")
 	}
