@@ -32,7 +32,7 @@
         <div
             class="lap-payload"
             data-lap-url="http://localhost:8081/people/alice/posts/1"
-            data-lap-attestation-url="http://localhost:8081/people/alice/posts/1/_lap/resource_attestation.json"
+            data-lap-attestation-url="http://localhost:8081/people/alice/posts/1/_la_resource.json"
             data-lap-hash="sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             data-lap-etag='W/"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"'
             data-lap-iat="1755658000"

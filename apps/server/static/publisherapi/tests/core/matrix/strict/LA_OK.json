@@ -6,6 +6,6 @@
     "liveOverrides": {},
     "verifyBytes": "ok",
     "now": "iat+10",
-    "useTestSig": false,
+    "useTestSig": true,
     "expect": { "ok": true, "status": "ok", "code": "LA_OK" }
 }
