@@ -26,7 +26,7 @@
 
   <link id="lap-bytes" rel="alternate" type="text/html; charset=utf-8" class="lap-bytes" data-hash="sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380" href="data:text/html;base64,PGFydGljbGU+CiAgPGhlYWRlcj4KICAgIDxoMj5Qb3N0IDI8L2gyPgogICAgPHA+WWVzdGVyZGF5IOKAoiA1OjAyIFBNPC9wPgogIDwvaGVhZGVyPgogIDxwPgogICAgRGFyayBtb2RlIGFsbCB0aGUgdGhpbmdzLiBSZWFkYWJpbGl0eSBmaXJzdCwgZmFuY3kgbGF0ZXIuCiAgPC9wPgo8L2FydGljbGU+CgoK">
 
-  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="cfb28f1f4ca9bd559b71a94b7084bbfe4ce22dc98761133ac02c55720276f01d" data-lap-sig="46158eb7d953a31d9cfb835f85d6793eceaee81489c3397377da361d99c80a3e259c2c43d096507170992f0af1ddfde318649bbf9b8490262579661c5d4e7f83" hidden>
-    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/2" data-lap-attestation-url="http://localhost:8081/people/alice/posts/2/_lap/resource_attestation.json" data-lap-hash="sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380" data-lap-etag='W/"909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380"' data-lap-iat="1755757799" data-lap-exp="1755757859" data-lap-kid="key-post-2"></div>
+  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="cfb28f1f4ca9bd559b71a94b7084bbfe4ce22dc98761133ac02c55720276f01d" data-lap-sig="f93149dda261fb2f6d4bc5b3786c4928583d60e37f0479f8db3b0b3e625be5ba9473a16b6eb8f9b823622c7f7544b5a98d57ebfc87a20d66f0c74942ff984d0c" hidden>
+    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/2" data-lap-attestation-url="http://localhost:8081/people/alice/posts/2/_la_resource.json" data-lap-hash="sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380" data-lap-etag='W/"909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380"' data-lap-iat="1756007316" data-lap-exp="1756007376" data-lap-kid="key-post-2"></div>
   </div>
 </article>
