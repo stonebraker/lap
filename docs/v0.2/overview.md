@@ -1,5 +1,8 @@
 # LAP Protocol Overview
 
+> ⚠️ **UNSTABLE SPECIFICATION** ⚠️  
+> This is LAP v0.2 preview documentation. The protocol is under active development and **subject to breaking changes**. Do not use in production.
+
 ## Overview
 
 The LAP (Linked Attestation Protocol) provides reasonable proof of content integrity, origination, and freshness, as well as publisher authenticity for peer-to-peer, distributed micro-content. It **_associates_** distributed Content with its original Publisher, regardless of where the Content appears on the web. Just as importantly, it allows a Publisher to **_dissociate_** from Content should they choose to do so. Dissociation leaves **_no durable evidence_** of a prior Publisher <-> Content association.
