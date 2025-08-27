@@ -36,23 +36,19 @@ It does not concern itself with the fetching and embedding of content which can 
 
 Association and Dissociation are technical terms used to describe state within the confines of the Linked Attestations Protocol. They carry **no legal meaning** or implication as used for describing the protocol.
 
-## Four Verification Goals
+## Three Verification Goals
 
-### 1. Resource Integrity
+### 1. Resource Presence
 
-The content bytes match what was attested.
+The Resource Attestation is accessible at the expected endpoint, demonstrating intent to distribute.
 
-### 2. Resource Origination
+### 2. Resource Integrity
 
-The resource came from the claimed URL and the Resource Attestation is served from the same origin.
+The content bytes match what was attested by comparing SHA-256 hashes.
 
-### 3. Resource Freshness
+### 3. Publisher Association
 
-The resource attestation is present and accessible, indicating ongoing publisher commitment.
-
-### 4. Publisher Resource Association
-
-The publisher controls the namespace containing the resource.
+The publisher controls the namespace containing the resource through a valid Namespace Attestation.
 
 ## Protocol artifacts
 
@@ -69,7 +65,7 @@ For role definitions and responsibilities, see [roles-spec.md](roles-spec.md).
 #### Verification Scenarios
 
 -   **Inbound verification**: When fetching content directly from the publisher, only Publisher Resource Association needs verification via the Namespace Attestation. If the Namespace Attestation is cached, zero network calls are needed. Typically initiated by clients using verifiers.
--   **At-rest verification**: When verifying embedded content, all four checks are performed using both Resource and Namespace Attestations. Namespace Attestations can be cached for optimization. Typically initiated by users to verify content from untrusted sources.
+-   **At-rest verification**: When verifying embedded content, all three checks are performed using both Resource and Namespace Attestations. Namespace Attestations can be cached for optimization. Typically initiated by users to verify content from untrusted sources.
 
 ### Fragment
 
@@ -147,25 +143,21 @@ A cryptographically signed declaration of publisher authority over a namespace a
 
 ## Verification Flow
 
-LAP verification establishes publisher-resource association through four sequential checks:
+LAP verification establishes publisher-resource association through three sequential checks:
 
-### 1. Resource Integrity
+### 1. Resource Presence
+
+Confirms the Resource Attestation is accessible at the expected endpoint, demonstrating intent to distribute. Validates same-origin serving and URL matching.
+
+### 2. Resource Integrity
 
 Verifies that the content bytes match what was attested by comparing SHA-256 hashes.
 
-### 2. Resource Origination
-
-Validates that the Resource Attestation comes from the same origin as the resource and matches the claimed URL.
-
-### 3. Resource Freshness
-
-Confirms the Resource Attestation is present and accessible, demonstrating ongoing server commitment.
-
-### 4. Publisher Resource Association
+### 3. Publisher Association
 
 Proves publisher control over the namespace containing the resource through a valid Namespace Attestation.
 
-**Verification succeeds** only when all four checks pass, providing proof of publisher-resource association.
+**Verification succeeds** only when all three checks pass, providing proof of publisher-resource association.
 
 **Verification fails** at the first failed check, with remaining checks skipped for efficiency.
 

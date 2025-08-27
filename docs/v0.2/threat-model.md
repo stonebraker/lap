@@ -4,12 +4,11 @@ This document analyzes potential security threats to the LAP (Linked Attestation
 
 ## Overview
 
-LAP provides reasonable proof of publisher-resource association through cryptographic attestations and live verification. This threat model examines attacks against the protocol's four verification goals:
+LAP provides reasonable proof of publisher-resource association through cryptographic attestations and live verification. This threat model examines attacks against the protocol's three verification goals:
 
-1. **Resource Integrity** - Content bytes match what was attested
-2. **Resource Origination** - Resource came from claimed URL via same origin
-3. **Resource Freshness** - Resource attestation is still accessible
-4. **Publisher Resource Association** - Publisher controls the namespace
+1. **Resource Presence** - Resource Attestation is accessible, demonstrating intent to distribute
+2. **Resource Integrity** - Content bytes match what was attested
+3. **Publisher Association** - Publisher controls the namespace
 
 ## Threat Categories
 

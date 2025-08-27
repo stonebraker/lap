@@ -6,12 +6,11 @@ For cryptographic specifications, see [crypto-spec.md](crypto-spec.md). For role
 
 ## Overview
 
-LAP verification establishes publisher-resource association through four proofs:
+LAP verification establishes publisher-resource association through three proofs:
 
-1. **Resource Integrity** - The content bytes match what was attested
-2. **Resource Origination** - The resource came from the claimed URL via valid signature
-3. **Resource Freshness** - The resource attestation has not expired
-4. **Publisher Resource Association** - The publisher controls the namespace containing the resource
+1. **Resource Presence** - The Resource Attestation is accessible, demonstrating intent to distribute
+2. **Resource Integrity** - The content bytes match what was attested
+3. **Publisher Association** - The publisher controls the namespace containing the resource
 
 ## Protocol Artifacts
 
@@ -124,22 +123,19 @@ A JSON document that asserts publisher control over a namespace. Cryptographical
 
 ## Verification Requirements
 
-### Resource Integrity
+### Resource Presence
 
--   SHA-256 hash of fragment's canonical content bytes (from `<link>` data URL) must match `hash` in fetched RA
-
-### Resource Origination
-
+-   RA must be present and accessible at the expected URL (demonstrates intent to distribute)
 -   Fetched RA must be well-formed JSON
 -   RA's `url` must match fragment's claimed resource URL
 -   RA must be fetched from the URL specified in fragment's `data-la-resource-attestation-url`
 -   RA URL must be served from the same origin as the resource URL
 
-### Resource Freshness
+### Resource Integrity
 
--   RA must be present and accessible at the expected URL (demonstrates ongoing server commitment)
+-   SHA-256 hash of fragment's canonical content bytes (from `<link>` data URL) must match `hash` in fetched RA
 
-### Publisher Resource Association
+### Publisher Association
 
 -   Fragment's `data-la-publisher-claim` must match the `key` in the fetched NA
 -   Fetched NA must be well-formed JSON

@@ -103,7 +103,7 @@ The Verifier performs cryptographic verification of publisher-resource associati
 
 **Verification Process:**
 
--   Verifiers MUST perform all four verification checks: Resource Integrity, Resource Origination, Resource Freshness, and Publisher Resource Association
+-   Verifiers MUST perform all three verification checks: Resource Presence, Resource Integrity, and Publisher Association
 -   Verifiers MUST validate Resource Attestation signatures against the resource's public key
 -   Verifiers MUST validate Namespace Attestation signatures against the publisher's public key
 -   Verifiers MUST confirm the fragment's `data-la-publisher-claim` (from `<link>` element) matches the Namespace Attestation's `key`

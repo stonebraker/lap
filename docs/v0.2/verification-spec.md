@@ -22,10 +22,9 @@ This v0.2 contract focuses on the core purpose of Linked Attestations: proving p
 
 The verification establishes:
 
-1. **Resource Integrity** - The content bytes match what was attested
-2. **Resource Origination** - The resource attestation comes from the same origin as the claimed URL
-3. **Resource Freshness** - The resource attestation is still being served (live verification)
-4. **Publisher Resource Association** - The publisher controls the namespace containing the resource
+1. **Resource Presence** - The Resource Attestation is accessible, demonstrating intent to distribute
+2. **Resource Integrity** - The content bytes match what was attested
+3. **Publisher Association** - The publisher controls the namespace containing the resource
 
 When all checks pass, we have proof of publisher-resource association.
 
@@ -67,10 +66,9 @@ Every verifier MUST return a single object with these fields:
 ```json
 {
     "verified": true,
+    "resource_presence": "pass",
     "resource_integrity": "pass",
-    "resource_origination": "pass",
-    "resource_freshness": "pass",
-    "publisher_resource_association": "pass",
+    "publisher_association": "pass",
     "failure": null,
     "context": {
         "resource_attestation_url": "https://example.com/people/alice/posts/123/_la_resource.json",
@@ -83,10 +81,9 @@ Every verifier MUST return a single object with these fields:
 ### Core Fields
 
 -   **verified**: MUST be `true` only when all checks pass and publisher-resource association is proven
+-   **resource_presence**: Status of Resource Attestation accessibility and same-origin validation
 -   **resource_integrity**: Status of content hash verification
--   **resource_origination**: Status of resource attestation signature verification
--   **resource_freshness**: Status of resource attestation time window validation
--   **publisher_resource_association**: Status of namespace attestation and URL association
+-   **publisher_association**: Status of namespace attestation and URL association
 -   **failure**: Details about the first check that failed (null if verified=true)
 -   **context**: Essential metadata for debugging including resource URL, attestation URLs, and verification timestamp
 
@@ -116,6 +113,26 @@ When `verified=false`, the `failure` field MUST contain:
 
 ## Check Definitions
 
+### Resource Presence
+
+**Check code:** `resource_presence`
+
+Verifies the Resource Attestation is accessible and properly configured, demonstrating intent to distribute.
+
+**Pass conditions:**
+
+-   Resource Attestation is successfully fetched from the expected URL (live verification)
+-   Fetched RA is well-formed JSON
+-   Fetched RA URL has the same origin as the fragment's claimed resource URL
+-   Fetched RA's `url` field matches fragment's claimed resource URL
+
+**Failure reasons:**
+
+-   `fetch_failed` - Could not retrieve resource attestation from network (indicates dissociation)
+-   `malformed` - Fetched RA JSON is invalid or missing required fields
+-   `origin_mismatch` - Fetched RA URL origin differs from resource URL origin
+-   `content_url_mismatch` - Fetched RA's `url` differs from fragment's claimed resource URL
+
 ### Resource Integrity
 
 **Check code:** `resource_integrity`
@@ -130,42 +147,9 @@ Verifies the fragment's canonical content bytes match the hash in the fetched re
 
 -   `hash_mismatch` - SHA-256 of fragment's canonical content bytes differs from fetched RA's `hash`
 
-### Resource Origination
+### Publisher Association
 
-**Check code:** `resource_origination`
-
-Verifies the resource attestation comes from the server that controls the resource URL.
-
-**Pass conditions:**
-
--   Fetched RA is well-formed JSON
--   Fetched RA URL has the same origin as the fragment's claimed resource URL
--   Fetched RA's `url` field matches fragment's claimed resource URL
-
-**Failure reasons:**
-
--   `malformed` - Fetched RA JSON is invalid or missing required fields
--   `origin_mismatch` - Fetched RA URL origin differs from resource URL origin
--   `content_url_mismatch` - Fetched RA's `url` differs from fragment's claimed resource URL
--   `fetch_failed` - Could not retrieve resource attestation from network
-
-### Resource Freshness
-
-**Check code:** `resource_freshness`
-
-Verifies the resource attestation is still being served, indicating ongoing publisher commitment to the association claim.
-
-**Pass conditions:**
-
--   Resource Attestation is successfully fetched from the expected URL (live verification)
-
-**Failure reasons:**
-
--   `fetch_failed` - Could not retrieve resource attestation from network (indicates dissociation)
-
-### Publisher Resource Association
-
-**Check code:** `publisher_resource_association`
+**Check code:** `publisher_association`
 
 Verifies the publisher controls the namespace containing the resource.
 
@@ -193,10 +177,9 @@ Verifies the publisher controls the namespace containing the resource.
 ```json
 {
     "verified": true,
+    "resource_presence": "pass",
     "resource_integrity": "pass",
-    "resource_origination": "pass",
-    "resource_freshness": "pass",
-    "publisher_resource_association": "pass",
+    "publisher_association": "pass",
     "failure": null,
     "context": {
         "resource_attestation_url": "https://example.com/people/alice/posts/123/_la_resource.json",
@@ -211,10 +194,9 @@ Verifies the publisher controls the namespace containing the resource.
 ```json
 {
     "verified": false,
+    "resource_presence": "pass",
     "resource_integrity": "fail",
-    "resource_origination": "skip",
-    "resource_freshness": "skip",
-    "publisher_resource_association": "skip",
+    "publisher_association": "skip",
     "failure": {
         "check": "resource_integrity",
         "reason": "hash_mismatch",
@@ -237,12 +219,11 @@ Verifies the publisher controls the namespace containing the resource.
 ```json
 {
     "verified": false,
+    "resource_presence": "pass",
     "resource_integrity": "pass",
-    "resource_origination": "pass",
-    "resource_freshness": "pass",
-    "publisher_resource_association": "fail",
+    "publisher_association": "fail",
     "failure": {
-        "check": "publisher_resource_association",
+        "check": "publisher_association",
         "reason": "url_not_under_namespace",
         "message": "Resource URL is not under the attested namespace",
         "details": {
@@ -264,7 +245,7 @@ This simplified design provides:
 
 1. **Clear Purpose** - Directly maps to LAP's core goal of proving publisher-resource association
 2. **Fail Fast** - Stop at first failure, skip remaining checks
-3. **Logical Flow** - Integrity → Origination → Freshness → Association
+3. **Logical Flow** - Presence → Integrity → Association
 4. **Clean Dissociation** - When attestations are removed, verification clearly fails
 5. **Minimal Complexity** - No policies, grace periods, or unnecessary features
 
