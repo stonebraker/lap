@@ -174,7 +174,7 @@ Verifiers can be implemented as:
 The LAP protocol's security relies on:
 
 -   **Cryptographic signatures** for authenticity
--   **Live attestations** for freshness and dissociation
+-   **Live attestations** for presence and dissociation
 -   **Namespace control** for publisher association
 -   **Client conformance** for content integrity (weakest link)
 

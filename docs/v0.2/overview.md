@@ -5,7 +5,7 @@
 
 ## Overview
 
-The LAP (Linked Attestation Protocol) provides reasonable proof of content integrity, origination, and freshness, as well as publisher authenticity for peer-to-peer, distributed micro-content. It **_associates_** distributed Content with its original Publisher, regardless of where the Content appears on the web. Just as importantly, it allows a Publisher to **_dissociate_** from Content should they choose to do so. Dissociation leaves **_no durable evidence_** of a prior Publisher <-> Content association.
+The LAP (Linked Attestation Protocol) provides reasonable proof of content integrity and publisher authenticity for peer-to-peer, distributed micro-content. It **_associates_** distributed Content with its original Publisher, regardless of where the Content appears on the web. Just as importantly, it allows a Publisher to **_dissociate_** from Content should they choose to do so. Dissociation leaves **_no durable evidence_** of a prior Publisher <-> Content association.
 
 The Linked Attestation Protocol uses basic HTTP + a bit of cryptography, and requires no intermediary, central coordinator, blockchain, or token. It is designed to be very easy for developers and non-developers to implement utilizing lightweight libraries and SDKs.
 
@@ -64,7 +64,7 @@ For role definitions and responsibilities, see [roles-spec.md](roles-spec.md).
 
 #### Verification Scenarios
 
--   **Inbound verification**: When fetching content directly from the publisher, only Publisher Resource Association needs verification via the Namespace Attestation. If the Namespace Attestation is cached, zero network calls are needed. Typically initiated by clients using verifiers.
+-   **Inbound verification**: When fetching content directly from the publisher, only Publisher Association needs verification via the Namespace Attestation. If the Namespace Attestation is cached, zero network calls are needed. Typically initiated by clients using verifiers.
 -   **At-rest verification**: When verifying embedded content, all three checks are performed using both Resource and Namespace Attestations. Namespace Attestations can be cached for optimization. Typically initiated by users to verify content from untrusted sources.
 
 ### Fragment
@@ -116,7 +116,7 @@ A self-contained HTML fragment that embeds both human-readable content and crypt
 
 ## Resource Attestation (RA)
 
-An unsigned JSON document that serves as the bridge between a specific resource and its publisher. The Resource Attestation contains a content hash for integrity verification and points to a Namespace Attestation that establishes publisher authority. Its presence at the expected endpoint demonstrates ongoing publisher commitment to the content association, while its removal enables clean dissociation.
+An unsigned JSON document that serves as the bridge between a specific resource and its publisher. The Resource Attestation contains a content hash for integrity verification and points to a Namespace Attestation that establishes publisher authority. Its presence at the expected endpoint demonstrates intent to distribute, while its removal enables clean dissociation.
 
 ```json
 {

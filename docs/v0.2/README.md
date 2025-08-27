@@ -20,7 +20,7 @@
 
 -   **Fragment Structure**: Simplified with `data-la-fragment-url` and consolidated verification metadata
 -   **Cryptography**: Migration from Ed25519 to Schnorr signatures (BIP-340) with secp256k1
--   **Verification**: Streamlined four-check model (Integrity, Origination, Freshness, Association)
+-   **Verification**: Streamlined three-check model (Presence, Integrity, Association)
 -   **Security**: Enhanced threat model and mitigation analysis
 
 ## Specification Documents

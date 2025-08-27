@@ -10,171 +10,80 @@ LAP provides reasonable proof of publisher-resource association through cryptogr
 2. **Resource Integrity** - Content bytes match what was attested
 3. **Publisher Association** - Publisher controls the namespace
 
-## Threat Categories
+## Core Verification Goals Analysis
 
-### Content Integrity Threats
+LAP's primary purpose is to establish publisher-resource association through three verification checks. This section analyzes how well LAP achieves its stated goals.
 
-#### T1: Content Tampering
+### 1. Resource Presence Verification
 
-**Description**: Attacker modifies fragment content after it's been signed but before verification.
+**Goal**: Verify the Resource Attestation is accessible, demonstrating intent to distribute.
 
-**Attack Vector**: Malicious client or intermediary alters the canonical content bytes in the `<link>` element's data URL.
+#### ✅ **SUCCESS: Live Verification**
 
-**LAP Mitigation**: ✅ **MITIGATED**
+-   **T8: Replay Attack Prevention**: Live verification requires attestations to be accessible at time of verification, preventing reuse of old attestations after dissociation
+-   **T10: Namespace Authority**: Namespace Attestation must be served from the claimed namespace, proving server control
 
--   SHA-256 hash verification in Resource Attestation detects any content modification
--   Verification fails immediately on hash mismatch
--   Canonical content bytes are cryptographically protected
+#### ❌ **LIMITATIONS: Infrastructure Dependencies**
 
-**Status**: ✅ Pass - Strong cryptographic protection
+-   **T5: DNS Hijacking**: Protocol relies on DNS integrity for origin verification
+-   **T7: Man-in-the-Middle**: Depends on HTTPS for secure transport during attestation fetching
 
-#### T2: Preview Content Spoofing
+### 2. Resource Integrity Verification
 
-**Description**: Attacker modifies the preview section (`class="la-preview"`) to misrepresent the canonical content.
+**Goal**: Verify content bytes match what was attested.
 
-**Attack Vector**: Malicious client changes preview HTML while keeping canonical content intact.
+#### ✅ **SUCCESS: Cryptographic Protection**
 
-**LAP Mitigation**: ❌ **NOT MITIGATED**
+-   **T1: Content Tampering Prevention**: SHA-256 hash verification detects any modification to canonical content bytes
+-   **T15: Hash Collision Resistance**: SHA-256 provides strong protection against collision attacks
 
--   Preview content is explicitly NOT cryptographically verified
--   Protocol relies on client conformance to replace preview with canonical content
--   Verification passes even with modified preview content
+#### ❌ **LIMITATIONS: Client Responsibility**
 
-**Status**: ❌ Fail - Acknowledged weakness, client responsibility
+-   **T2: Preview Content Spoofing**: Preview content is explicitly not verified (acknowledged design trade-off)
 
-### Publisher Authentication Threats
+### 3. Publisher Association Verification
 
-#### T3: Publisher Impersonation
+**Goal**: Verify the publisher controls the namespace containing the resource.
 
-**Description**: Attacker claims to be a different publisher by forging signatures or keys.
+#### ✅ **SUCCESS: Cryptographic Authentication**
 
-**Attack Vector**: Creating fake Namespace Attestations with forged signatures or stolen keys.
+-   **T3: Publisher Authentication**: Schnorr signatures provide strong cryptographic proof of publisher identity
+-   **T6: Cross-Origin Protection**: Same-origin requirements prevent attestation injection attacks
+-   **T16: Signature Security**: BIP-340 Schnorr signatures are cryptographically secure
 
-**LAP Mitigation**: ✅ **MITIGATED**
+#### ✅ **SUCCESS: Temporal Protection**
 
--   Schnorr signatures (BIP-340) provide strong cryptographic authentication
--   X-only public keys prevent key substitution attacks
--   Signature verification ensures only the private key holder can create valid attestations
+-   **T11: Subdomain Takeover Mitigation**: NA expiration timestamps limit the window of vulnerability - even if an attacker gains subdomain control, they cannot create new valid attestations without the publisher's private key, and existing attestations expire
 
-**Status**: ✅ Pass - Strong cryptographic protection
+#### ❌ **LIMITATIONS: Operational Security**
 
-#### T4: Key Compromise
+-   **T4: Key Compromise**: Protocol cannot prevent private key theft (operational security issue)
 
-**Description**: Attacker obtains publisher's private key and creates malicious attestations.
+**Summary**: LAP successfully achieves its three core verification goals through strong cryptographic methods and live verification, with limitations primarily in areas outside the protocol's scope (infrastructure security and operational practices).
 
-**Attack Vector**: Private key theft, weak key generation, or social engineering.
+---
 
-**LAP Mitigation**: ❌ **NOT MITIGATED**
+## Extended Threat Analysis
 
--   Protocol cannot prevent private key compromise
--   No key revocation mechanism
--   Compromised keys remain valid until expiration
+The following sections analyze additional threats that help implementers understand what LAP does and does not protect against.
 
-**Status**: ❌ Fail - Outside protocol scope, operational security issue
-
-### Network and Origin Threats
-
-#### T5: DNS Hijacking
-
-**Description**: Attacker controls DNS to redirect attestation fetches to malicious servers.
-
-**Attack Vector**: DNS poisoning or domain takeover to serve fake attestations.
-
-**LAP Mitigation**: ❌ **NOT MITIGATED**
-
--   Protocol relies on DNS and HTTPS for origin verification
--   No additional protection against DNS attacks
--   Same-origin requirements provide limited protection
-
-**Status**: ❌ Fail - Relies on external infrastructure security
-
-#### T6: Cross-Origin Attestation Injection
-
-**Description**: Attacker serves Resource Attestations from different origins than the resource.
-
-**Attack Vector**: Pointing `data-la-resource-attestation-url` to attacker-controlled domain.
-
-**LAP Mitigation**: ✅ **MITIGATED**
-
--   Same-origin requirement for Resource Attestation URLs
--   Verification fails if RA URL origin differs from resource URL origin
--   Prevents cross-origin attestation attacks
-
-**Status**: ✅ Pass - Strong origin enforcement
-
-#### T7: Man-in-the-Middle Attacks
-
-**Description**: Attacker intercepts and modifies network traffic during attestation fetching.
-
-**Attack Vector**: Network interception to serve fake attestations or modify responses.
-
-**LAP Mitigation**: ❌ **NOT MITIGATED**
-
--   Protocol relies on HTTPS for transport security
--   No additional protection against MITM attacks
--   Assumes secure transport layer
-
-**Status**: ❌ Fail - Relies on external transport security
-
-### Temporal and Freshness Threats
-
-#### T8: Replay Attacks
-
-**Description**: Attacker reuses old valid attestations after publisher has dissociated.
-
-**Attack Vector**: Caching and replaying expired or revoked attestations.
-
-**LAP Mitigation**: ✅ **MITIGATED**
-
--   Live verification requires attestations to be accessible at time of verification
--   Expiration timestamps prevent indefinite reuse
--   Dissociation removes attestations from endpoints
-
-**Status**: ✅ Pass - Live verification prevents replay
-
-#### T9: Clock Manipulation
-
-**Description**: Attacker manipulates system clocks to bypass expiration checks.
-
-**Attack Vector**: Setting system time backwards to make expired attestations appear valid.
-
-**LAP Mitigation**: ❌ **NOT MITIGATED**
-
--   Protocol relies on accurate system clocks
--   No protection against clock manipulation
--   Verification depends on local time validation
-
-**Status**: ❌ Fail - Relies on system clock integrity
-
-### Namespace and Authority Threats
-
-#### T10: Namespace Confusion
-
-**Description**: Attacker creates attestations for resources outside their controlled namespace.
-
-**Attack Vector**: Claiming control over broader namespaces than actually controlled.
-
-**LAP Mitigation**: ✅ **MITIGATED**
-
--   Namespace Attestation must be served from the claimed namespace
--   URL hierarchy validation ensures resource falls under attested namespace
--   Server control verification through live attestation serving
-
-**Status**: ✅ Pass - Strong namespace enforcement
+### Domain and Infrastructure Threats
 
 #### T11: Subdomain Takeover
 
-**Description**: Attacker gains control of subdomain and creates malicious attestations.
+**Description**: Attacker gains control of subdomain and attempts to create malicious attestations.
 
-**Attack Vector**: Taking over abandoned subdomains to serve fake attestations.
+**Attack Vector**: Taking over abandoned subdomains to serve fake attestations for resources under that namespace.
 
-**LAP Mitigation**: ❌ **NOT MITIGATED**
+**LAP Mitigation**: ✅ **PARTIALLY MITIGATED**
 
--   Protocol cannot prevent subdomain takeover
--   Namespace attestations cover entire subdomain trees
--   Relies on proper domain management
+-   **Expiration Protection**: Namespace Attestations have `exp` timestamps that limit the validity window
+-   **Key Requirement**: Attacker needs both subdomain control AND the publisher's private key to create valid new attestations
+-   **Time-Limited Risk**: Even with subdomain control, existing attestations expire and cannot be renewed without the private key
 
-**Status**: ❌ Fail - Outside protocol scope, operational security issue
+**Remaining Risk**: If subdomain takeover occurs before NA expiration and the attacker also compromises the private key
+
+**Status**: ✅ Significantly mitigated by temporal controls
 
 ### Implementation and Client Threats
 
@@ -220,49 +129,45 @@ LAP provides reasonable proof of publisher-resource association through cryptogr
 
 **Status**: ⚠️ Partial - Requires client-side sanitization
 
-### Cryptographic Threats
+### Additional Infrastructure Threats
 
-#### T15: Hash Collision Attacks
+#### T9: Clock Manipulation
 
-**Description**: Attacker finds SHA-256 collision to create different content with same hash.
+**Description**: Attacker manipulates system clocks to bypass expiration checks.
 
-**Attack Vector**: Creating malicious content that produces the same SHA-256 hash as legitimate content.
+**Attack Vector**: Setting system time backwards to make expired attestations appear valid.
 
-**LAP Mitigation**: ✅ **MITIGATED**
+**LAP Mitigation**: ❌ **NOT MITIGATED**
 
--   SHA-256 provides 128-bit security level against collision attacks
--   Computationally infeasible with current technology
--   Strong cryptographic foundation
+-   Protocol relies on accurate system clocks
+-   No protection against clock manipulation
+-   Verification depends on local time validation
 
-**Status**: ✅ Pass - Strong cryptographic protection
-
-#### T16: Signature Forgery
-
-**Description**: Attacker forges Schnorr signatures without access to private key.
-
-**Attack Vector**: Mathematical attack against secp256k1 Schnorr signature scheme.
-
-**LAP Mitigation**: ✅ **MITIGATED**
-
--   BIP-340 Schnorr signatures provide strong security guarantees
--   secp256k1 curve is well-established and secure
--   Cryptographically infeasible with current technology
-
-**Status**: ✅ Pass - Strong cryptographic protection
+**Status**: ❌ Fail - Relies on system clock integrity
 
 ## Threat Summary
 
+### Core Verification Goals
+
+| Verification Goal     | Success | Limitations |
+| --------------------- | ------- | ----------- |
+| Resource Presence     | 2       | 2           |
+| Resource Integrity    | 2       | 1           |
+| Publisher Association | 4       | 1           |
+
+**Core Goals Total**: 8 Successes ✅ | 4 Limitations ❌
+
+### Extended Threat Categories
+
 | Category                  | Mitigated | Partial | Not Mitigated |
 | ------------------------- | --------- | ------- | ------------- |
-| Content Integrity         | 1         | 0       | 1             |
-| Publisher Authentication  | 1         | 0       | 1             |
-| Network and Origin        | 1         | 0       | 2             |
-| Temporal and Freshness    | 1         | 0       | 1             |
-| Namespace and Authority   | 1         | 0       | 1             |
+| Domain and Infrastructure | 1         | 0       | 0             |
 | Implementation and Client | 0         | 1       | 2             |
-| Cryptographic             | 2         | 0       | 0             |
+| Additional Infrastructure | 0         | 0       | 1             |
 
-**Total**: 7 Mitigated ✅ | 1 Partial ⚠️ | 8 Not Mitigated ❌
+**Extended Total**: 1 Mitigated ✅ | 1 Partial ⚠️ | 3 Not Mitigated ❌
+
+**Overall Assessment**: LAP successfully achieves its three core verification goals with strong cryptographic protection, while acknowledging limitations in areas outside the protocol's scope.
 
 ## Security Recommendations
 
@@ -290,12 +195,19 @@ LAP provides reasonable proof of publisher-resource association through cryptogr
 
 ## Conclusion
 
-LAP provides strong protection against content tampering, publisher impersonation, and replay attacks through cryptographic verification and live attestation serving. However, the protocol explicitly relies on external security mechanisms (HTTPS, DNS, system clocks) and client conformance for complete security.
+**LAP Successfully Achieves Its Core Goals**: The protocol provides strong cryptographic protection for its three verification objectives - Resource Presence, Resource Integrity, and Publisher Association. Through SHA-256 hashing, Schnorr signatures, and live verification, LAP delivers reliable proof of publisher-resource association.
 
-The most significant limitations are:
+**Key Strengths**:
 
-1. **Preview content spoofing** - Acknowledged design trade-off for usability
-2. **Client implementation trust** - Cannot force proper verification or sanitization
-3. **Infrastructure dependencies** - Relies on DNS, HTTPS, and system clock security
+-   Strong cryptographic foundation (SHA-256, BIP-340 Schnorr signatures)
+-   Live verification prevents replay attacks and enables clean dissociation
+-   Same-origin enforcement prevents cross-origin attestation injection
+-   Namespace validation ensures proper publisher authority
 
-These limitations are largely by design, as LAP focuses on providing reasonable proof of publisher-resource association rather than comprehensive security against all possible attacks.
+**Acknowledged Limitations**:
+
+1. **Infrastructure Dependencies** - Relies on DNS, HTTPS, and system clock security (by design)
+2. **Preview Content** - Explicitly not verified (usability trade-off)
+3. **Client Implementation** - Cannot force proper verification or sanitization (trust boundary)
+
+These limitations are largely intentional design decisions. LAP focuses on providing reasonable proof of publisher-resource association through cryptographic means, while relying on established web infrastructure and client conformance for broader security concerns.
