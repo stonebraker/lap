@@ -75,8 +75,7 @@ A self-contained HTML fragment that embeds both human-readable content and crypt
 ```html
 <article
     data-la-spec="v0-2"
-    data-la-url="https://example.com/people/alice/posts/123"
-    data-la-publisher-claim="f1a2d3c4e5f607..."
+    data-la-fragment-url="https://example.com/people/alice/posts/123"
 >
     <section class="la-preview">
         <h2>Post 123</h2>
@@ -89,6 +88,7 @@ A self-contained HTML fragment that embeds both human-readable content and crypt
     <link
         rel="canonical"
         type="text/html"
+        data-la-publisher-claim="f1a2d3c4e5f607..."
         data-la-resource-attestation-url="https://example.com/people/alice/posts/123/_la_resource.json"
         data-la-namespace-attestation-url="https://example.com/people/alice/_la_namespace.json"
         href="data:text/html;base64,base64-encoded-resource-content-here"
@@ -99,9 +99,9 @@ A self-contained HTML fragment that embeds both human-readable content and crypt
 
 #### Fragment Structure
 
--   **Root `<article>`**: Contains LAP protocol metadata including spec version, resource URL, and publisher's public key claim
+-   **Root `<article>`**: Contains LAP protocol metadata including spec version and fragment URL
 -   **Preview `<section class="la-preview">`**: Human-readable content for display (NOT cryptographically verified)
--   **Canonical `<link>`**: Contains the verified content bytes and pointer to Resource Attestation
+-   **Canonical `<link>`**: Contains the verified content bytes, publisher claim, and attestation URLs
 
 #### Security Considerations
 

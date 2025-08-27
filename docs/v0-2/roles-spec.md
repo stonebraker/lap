@@ -26,7 +26,7 @@ The Server generates, signs, and serves LAP protocol artifacts.
 -   Servers MUST embed canonical content bytes in the fragment's `<link>` element using `href="data:text/html;base64,..."`
 -   Servers MUST include the SHA-256 hash of canonical content bytes in the `<link>` element's `data-hash` attribute
 -   Servers MUST embed Resource Attestation data in the `<link>` element's data attributes
--   Servers MUST include the publisher's public key in the fragment's `data-la-publisher-claim` attribute
+-   Servers MUST include the publisher's public key in the fragment's `<link>` element's `data-la-publisher-claim` attribute
 -   Servers MUST specify the Resource Attestation URL in the `<link>` element's `data-la-resource-attestation-url` attribute
 -   Servers MUST specify the Namespace Attestation URL in the `<link>` element's `data-la-namespace-attestation-url` attribute
 -   Servers MUST ensure the Resource Attestation URL is served from the same origin as the resource URL
@@ -106,7 +106,7 @@ The Verifier performs cryptographic verification of publisher-resource associati
 -   Verifiers MUST perform all four verification checks: Resource Integrity, Resource Origination, Resource Freshness, and Publisher Resource Association
 -   Verifiers MUST validate Resource Attestation signatures against the resource's public key
 -   Verifiers MUST validate Namespace Attestation signatures against the publisher's public key
--   Verifiers MUST confirm the fragment's `data-la-publisher-claim` matches the Namespace Attestation's `key`
+-   Verifiers MUST confirm the fragment's `data-la-publisher-claim` (from `<link>` element) matches the Namespace Attestation's `key`
 
 **Network Operations:**
 

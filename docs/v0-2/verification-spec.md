@@ -39,7 +39,7 @@ An HTML fragment containing:
 
 -   **Canonical content bytes**: Embedded in a `<link>` element's `data:` URL (e.g., `href="data:text/html;base64,..."`)
 -   **Resource URL**: The fragment's claimed resource URL (derived from context)
--   **Publisher claim**: Publisher's public key (from `data-la-publisher-claim` attribute)
+-   **Publisher claim**: Publisher's public key (from `data-la-publisher-claim` attribute in the `<link>` element)
 -   **Resource Attestation URL**: URL where Resource Attestation can be fetched (from `data-la-resource-attestation-url` attribute)
 -   **Namespace Attestation URL**: URL where Namespace Attestation can be fetched (from `data-la-namespace-attestation-url` attribute)
 
@@ -171,7 +171,7 @@ Verifies the publisher controls the namespace containing the resource.
 
 **Pass conditions:**
 
--   Fragment's `data-la-publisher-claim` matches the `key` in the fetched NA
+-   Fragment's `data-la-publisher-claim` (from `<link>` element) matches the `key` in the fetched NA
 -   Fetched NA is well-formed JSON
 -   Fetched NA's `sig` validates against its `key`
 -   Fragment's resource URL falls under the namespace in fetched NA's `payload.namespace`
@@ -179,7 +179,7 @@ Verifies the publisher controls the namespace containing the resource.
 
 **Failure reasons:**
 
--   `publisher_claim_mismatch` - Fragment's `data-la-publisher-claim` differs from fetched NA's `key`
+-   `publisher_claim_mismatch` - Fragment's `data-la-publisher-claim` (from `<link>` element) differs from fetched NA's `key`
 -   `malformed` - Fetched NA JSON is invalid or missing required fields
 -   `signature_invalid` - Fetched NA's `sig` does not validate against its `key`
 -   `fetch_failed` - Could not retrieve namespace attestation from network

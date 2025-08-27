@@ -30,8 +30,7 @@ An HTML fragment containing embedded attestation data and canonical content byte
 ```html
 <article
     data-la-spec="v0-2"
-    data-la-url="https://example.com/people/alice/posts/123"
-    data-la-publisher-claim="f1a2d3c4e5f607..."
+    data-la-fragment-url="https://example.com/people/alice/posts/123"
 >
     <section class="la-preview">
         <h2>Post 123</h2>
@@ -44,6 +43,7 @@ An HTML fragment containing embedded attestation data and canonical content byte
     <link
         rel="canonical"
         type="text/html"
+        data-la-publisher-claim="f1a2d3c4e5f607..."
         data-la-resource-attestation-url="https://example.com/people/alice/posts/123/_la_resource.json"
         data-la-namespace-attestation-url="https://example.com/people/alice/_la_namespace.json"
         href="data:text/html;base64,base64-encoded-resource-content-here"
@@ -54,10 +54,11 @@ An HTML fragment containing embedded attestation data and canonical content byte
 
 ### Key Elements
 
--   **Root `<article>`**: Contains LAP protocol metadata including spec version, resource URL, and publisher's public key claim
--   **Publisher claim**: `data-la-publisher-claim` contains the claimed publisher's secp256k1 X-only public key (64 hex chars) for cache optimization
+-   **Root `<article>`**: Contains LAP protocol metadata including spec version and fragment URL
+-   **Fragment URL**: `data-la-fragment-url` contains the canonical web address of this LAP fragment
 -   **Preview `<section class="la-preview">`**: Human-readable content display (NOT cryptographically verified)
--   **Canonical `<link>`**: Contains verified content bytes in `href="data:text/html;base64,..."` and pointers to Resource and Namespace Attestations
+-   **Canonical `<link>`**: Contains verified content bytes in `href="data:text/html;base64,..."`, publisher claim, and pointers to Resource and Namespace Attestations
+-   **Publisher claim**: `data-la-publisher-claim` contains the claimed publisher's secp256k1 X-only public key (64 hex chars) for cache optimization
 -   **Resource Attestation URL**: `data-la-resource-attestation-url` specifies the complete URL where the Resource Attestation JSON can be fetched
 -   **Namespace Attestation URL**: `data-la-namespace-attestation-url` specifies the complete URL where the Namespace Attestation JSON can be fetched
 
