@@ -10,7 +10,7 @@
 
 ## Documentation
 
--   **[v0.2 Specification](docs/v0.2/)** - Complete specification, open to use and feedback
+-   **[v0.2 Specification](docs/v0.2/overview.md)** - Complete specification, open to use and feedback
 -   **[v0.1 Legacy Documentation](docs/v0.1/)** - Archived, no longer maintained
 
 ## Status
@@ -43,7 +43,7 @@ This protocol concerns itself with linking a publisher to distributed micro-cont
 **What it does not do**  
 It does not concern itself with the fetching and embedding of content which can be easily implemented thanks to libraries like HTMX or Datastar and may one day be part of the HTTP spec.
 
-📖 **[Read the Complete Protocol Specification →](docs/protocol-overview.md)**
+📖 **[Read the Complete Protocol Specification →](docs/v0.2/overview.md)**
 
 ## Quick Start
 
