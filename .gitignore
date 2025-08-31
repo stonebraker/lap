@@ -23,6 +23,8 @@ go.work
 /go/pkg/mod/
 
 # IDE and editor files
+.cursor/
+.kiro/
 .vscode/
 .idea/
 *.swp
