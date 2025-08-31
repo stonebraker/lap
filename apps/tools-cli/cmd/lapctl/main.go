@@ -835,7 +835,7 @@ func resetArtifactsCmd(args []string) {
 	}
 	
 	// Step 3: Update the host file with all three fragments
-	hostPath := filepath.Join(*root, "index.html")
+	hostPath := filepath.Join(*root, "posts", "index.html")
 	if _, err := os.Stat(hostPath); err == nil {
 		fmt.Fprintf(os.Stderr, "updating host file %s...\n", hostPath)
 		
@@ -866,6 +866,12 @@ func resetArtifactsCmd(args []string) {
 			} else {
 				fmt.Fprintf(os.Stderr, "warning: could not find post %d in host file\n", postNum)
 			}
+		}
+		
+		// Create backup before writing updated host file
+		if err := os.WriteFile(hostPath+".bak", hostHTML, 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "error creating backup: %v\n", err)
+			os.Exit(1)
 		}
 		
 		// Write updated host file
