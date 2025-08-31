@@ -7,7 +7,7 @@ import (
 	"mime"
 	"net/http"
 
-	"lap/apps/server/internal/httpx"
+	"github.com/stonebraker/lap/apps/server/internal/httpx"
 
 	"github.com/go-chi/chi/v5"
 )

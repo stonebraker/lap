@@ -28,15 +28,20 @@ An HTML fragment containing embedded attestation data and canonical content byte
 
 ```html
 <article
-    data-la-spec="v0-2"
+    data-la-spec="v0.2"
     data-la-fragment-url="https://example.com/people/alice/posts/123"
 >
     <section class="la-preview">
-        <h2>Post 123</h2>
-        <p>
-            Kicking off a new project. Keeping things simple, minimal deps, and
-            lots of clarity.
-        </p>
+        <article>
+            <header>
+                <h2>Post 1</h2>
+                <p>Today • 9:14 AM</p>
+            </header>
+            <p>
+                Kicking off a new project. Keeping things simple, minimal deps,
+                and lots of clarity.
+            </p>
+        </article>
     </section>
 
     <link
@@ -85,16 +90,18 @@ An unsigned JSON document that verifies content integrity and points to a Namesp
 
 ```json
 {
-    "url": "https://example.com/people/alice/posts/123",
+    "fragment_url": "https://example.com/people/alice/posts/123",
     "hash": "sha256:7b0c...cafe",
+    "publisher_claim": "f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00",
     "namespace_attestation_url": "https://example.com/people/alice/_la_namespace.json"
 }
 ```
 
 ### Fields
 
--   **`url`**: The resource URL this attestation covers
+-   **`fragment_url`**: The LAP fragment URL this attestation covers
 -   **`hash`**: SHA-256 hash of the canonical content bytes
+-   **`publisher_claim`**: Publisher's secp256k1 X-only public key (64 hex chars) for triangulation
 -   **`namespace_attestation_url`**: URL pointing to the Namespace Attestation (required)
 
 ## Namespace Attestation (NA)
@@ -127,7 +134,8 @@ A JSON document that asserts publisher control over a namespace. Cryptographical
 
 -   RA must be present and accessible at the expected URL (demonstrates intent to distribute)
 -   Fetched RA must be well-formed JSON
--   RA's `url` must match fragment's claimed resource URL
+-   RA's `fragment_url` must match fragment's `data-la-fragment-url`
+-   RA's `publisher_claim` must match fragment's `data-la-publisher-claim`
 -   RA must be fetched from the URL specified in fragment's `data-la-resource-attestation-url`
 -   RA URL must be served from the same origin as the resource URL
 

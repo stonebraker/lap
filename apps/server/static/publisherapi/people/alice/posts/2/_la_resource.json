@@ -1,13 +1,6 @@
 {
-  "payload": {
-    "url": "http://localhost:8081/people/alice/posts/2",
-    "attestation_url": "http://localhost:8081/people/alice/posts/2/_la_resource.json",
-    "hash": "sha256:909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380",
-    "etag": "W/\"909d9e3fa51e0e29ace816fb43b7930b8e2ea2f0c8f680984d81f43f50b58380\"",
-    "iat": 1756007316,
-    "exp": 1756007376,
-    "kid": "key-post-2"
-  },
-  "resource_key": "cfb28f1f4ca9bd559b71a94b7084bbfe4ce22dc98761133ac02c55720276f01d",
-  "sig": "f93149dda261fb2f6d4bc5b3786c4928583d60e37f0479f8db3b0b3e625be5ba9473a16b6eb8f9b823622c7f7544b5a98d57ebfc87a20d66f0c74942ff984d0c"
+  "fragment_url": "http://localhost:8081/people/alice/posts/2",
+  "hash": "sha256:52643d8e6ecd6f3c29503c11ae40d3e677312096fc8f9bf8a6ade20670093b29",
+  "publisher_claim": "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
+  "namespace_attestation_url": "http://localhost:8081/people/alice/_la_namespace.json"
 }

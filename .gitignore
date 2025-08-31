@@ -93,3 +93,8 @@ docs/generated/
 *.bak
 *.backup
 *.mdc
+/.kiro
+
+# Prevent test folders from accumulating in root directory
+test-*/
+tests/integration/*/keys/

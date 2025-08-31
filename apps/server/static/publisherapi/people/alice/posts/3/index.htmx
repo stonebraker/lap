@@ -1,32 +1,29 @@
-<article id="lap-article"
-  data-lap-spec="https://lap.dev/spec/v0-1"
-  data-lap-profile="fragment"
-  data-lap-attestation-format="div"
-  data-lap-bytes-format="link-data"
+<article
+  data-la-spec="v0.2"
+  data-la-fragment-url="http://localhost:8081/people/alice/posts/3"
+>
 
-  data-lap-url="http://localhost:8081/people/alice/posts/3"
-  data-lap-preview="#lap-preview"
-  data-lap-attestation="#lap-attestation"
-  data-lap-bytes="#lap-bytes">
-
-  <div id="lap-preview" class="lap-preview">
+  <section class="la-preview">
 <article>
-  <header>
-    <h2>Post 3</h2>
-    <p>2 days ago • 11:37 AM</p>
-  </header>
-  <p>
-    Loving plain HTML + Tailwind from a CDN for quick scaffolds. Fast to read, fast to ship.
-  </p>
+    <header>
+        <h2>Post 3</h2>
+        <p>2 days ago • 11:37 AM</p>
+    </header>
+    <p>
+        Loving plain HTML + Tailwind from a CDN for quick scaffolds. Fast to
+        read, fast to ship.
+    </p>
 </article>
 
+  </section>
 
-
-  </div>
-
-  <link id="lap-bytes" rel="alternate" type="text/html; charset=utf-8" class="lap-bytes" data-hash="sha256:1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7" href="data:text/html;base64,PGFydGljbGU+CiAgPGhlYWRlcj4KICAgIDxoMj5Qb3N0IDM8L2gyPgogICAgPHA+MiBkYXlzIGFnbyDigKIgMTE6MzcgQU08L3A+CiAgPC9oZWFkZXI+CiAgPHA+CiAgICBMb3ZpbmcgcGxhaW4gSFRNTCArIFRhaWx3aW5kIGZyb20gYSBDRE4gZm9yIHF1aWNrIHNjYWZmb2xkcy4gRmFzdCB0byByZWFkLCBmYXN0IHRvIHNoaXAuCiAgPC9wPgo8L2FydGljbGU+CgoK">
-
-  <div id="lap-attestation" class="lap-attestation" data-lap-resource-key="c48df4e0d9087601d08dc6e05feab15424333fa99e8e213038e53e70f4e22766" data-lap-sig="094524915757fb690c8aa46cbbea2842f5b31e4651a67e6d4d5d72d53357a99d4be3432a011eb4bb4c4dca569317404c51eda8093fd6af2199047dbf95beecb0" hidden>
-    <div class="lap-payload" data-lap-url="http://localhost:8081/people/alice/posts/3" data-lap-attestation-url="http://localhost:8081/people/alice/posts/3/_la_resource.json" data-lap-hash="sha256:1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7" data-lap-etag='W/"1873b46b1769ee9c604fc392e568c510094202e5011231717d7075e4c14d69c7"' data-lap-iat="1756007316" data-lap-exp="1756007436" data-lap-kid="key-post-3"></div>
-  </div>
+  <link
+    rel="canonical"
+    type="text/html"
+    data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+    data-la-resource-attestation-url="http://localhost:8081/people/alice/posts/3/_la_resource.json"
+    data-la-namespace-attestation-url="http://localhost:8081/people/alice/_la_namespace.json"
+    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDM8L2gyPgogICAgICAgIDxwPjIgZGF5cyBhZ28g4oCiIDExOjM3IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cD4KICAgICAgICBMb3ZpbmcgcGxhaW4gSFRNTCArIFRhaWx3aW5kIGZyb20gYSBDRE4gZm9yIHF1aWNrIHNjYWZmb2xkcy4gRmFzdCB0bwogICAgICAgIHJlYWQsIGZhc3QgdG8gc2hpcC4KICAgIDwvcD4KPC9hcnRpY2xlPgo="
+    hidden
+  />
 </article>

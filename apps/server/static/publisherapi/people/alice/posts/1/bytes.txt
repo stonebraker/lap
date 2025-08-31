@@ -1,1 +1,0 @@
-{"url":"http://localhost:8081/people/alice/posts/1","attestation_url":"http://localhost:8081/people/alice/posts/1/_la_resource.json","hash":"sha256:94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041","etag":"W/\"94d1afccc58958f3be1daac3c46b6b12761d80f21e3997b7fd3ce12bdcaeb041\"","iat":1756007316,"exp":1756007326,"kid":"key-post-1"}

@@ -1,4 +1,4 @@
-module lap
+module github.com/stonebraker/lap
 
 go 1.21
 

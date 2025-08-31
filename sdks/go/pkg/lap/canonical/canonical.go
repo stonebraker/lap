@@ -4,71 +4,38 @@ import (
 	"encoding/json"
 )
 
-// ResourcePayloadCanonical mirrors the wire.ResourcePayload but locks the key order in JSON output
-// by using struct field order. Keys: url, attestation_url, hash, etag, iat, exp, kid
-type ResourcePayloadCanonical struct {
-	URL             string `json:"url"`
-	Attestation_URL string `json:"attestation_url"`
-	Hash            string `json:"hash"`
-	ETag            string `json:"etag"`
-	IAT             int64  `json:"iat"`
-	EXP             int64  `json:"exp"`
-	KID             string `json:"kid"`
-}
-
-// ResourceAttestationCanonical maintains key order: payload, resource_key, sig
+// ResourceAttestationCanonical for v0.2 maintains key order: fragment_url, hash, publisher_claim, namespace_attestation_url
 type ResourceAttestationCanonical struct {
-	Payload     ResourcePayloadCanonical `json:"payload"`
-	ResourceKey string                   `json:"resource_key"`
-	Sig         string                   `json:"sig"`
+	FragmentURL             string `json:"fragment_url"`
+	Hash                    string `json:"hash"`
+	PublisherClaim          string `json:"publisher_claim"`
+	NamespaceAttestationURL string `json:"namespace_attestation_url"`
 }
 
-
-
-// BundleCanonical maintains key order: attestation, resource_key, publisher_signature, publisher_key
-type BundleCanonical struct {
-	Attestation        ResourceAttestationCanonical `json:"attestation"`
-	ResourceKey        string                       `json:"resource_key"`
-	PublisherSignature string                       `json:"publisher_signature"`
-	PublisherKey       string                       `json:"publisher_key"`
-}
-
-// MarshalResourcePayloadCanonical returns the compact JSON bytes for the payload with deterministic key order.
-func MarshalResourcePayloadCanonical(p ResourcePayloadCanonical) ([]byte, error) {
-	return json.Marshal(p)
-}
-
-// MarshalResourceAttestationCanonical returns compact JSON for {payload, resource_key, sig}.
-func MarshalResourceAttestationCanonical(a ResourceAttestationCanonical) ([]byte, error) {
-	return json.Marshal(a)
-}
-
-
-
-func MarshalBundleCanonical(b BundleCanonical) ([]byte, error) {
-	return json.Marshal(b)
-}
-
-// Namespace payload canonical: namespace, attestation_path, iat, exp, kid
+// NamespacePayloadCanonical for v0.2 maintains key order: namespace, exp
 type NamespacePayloadCanonical struct {
-	Namespace        []string `json:"namespace"`
-	AttestationPath string   `json:"attestation_path"`
-	IAT             int64    `json:"iat"`
-	EXP             int64    `json:"exp"`
-	KID             string   `json:"kid"`
+	Namespace string `json:"namespace"`
+	Exp       int64  `json:"exp"`
 }
 
-// Namespace attestation canonical: payload, publisher_key, sig
+// NamespaceAttestationCanonical for v0.2 maintains key order: payload, key, sig
 type NamespaceAttestationCanonical struct {
-	Payload      NamespacePayloadCanonical `json:"payload"`
-	PublisherKey string                    `json:"publisher_key"`
-	Sig          string                    `json:"sig"`
+	Payload NamespacePayloadCanonical `json:"payload"`
+	Key     string                    `json:"key"`
+	Sig     string                    `json:"sig"`
 }
 
+// MarshalResourceAttestationCanonical returns compact JSON for v0.2 ResourceAttestation with deterministic key order.
+func MarshalResourceAttestationCanonical(ra ResourceAttestationCanonical) ([]byte, error) {
+	return json.Marshal(ra)
+}
+
+// MarshalNamespacePayloadCanonical returns compact JSON for v0.2 NamespacePayload with deterministic key order.
 func MarshalNamespacePayloadCanonical(p NamespacePayloadCanonical) ([]byte, error) {
 	return json.Marshal(p)
 }
 
-func MarshalNamespaceAttestationCanonical(a NamespaceAttestationCanonical) ([]byte, error) {
-	return json.Marshal(a)
+// MarshalNamespaceAttestationCanonical returns compact JSON for v0.2 NamespaceAttestation with deterministic key order.
+func MarshalNamespaceAttestationCanonical(na NamespaceAttestationCanonical) ([]byte, error) {
+	return json.Marshal(na)
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Verification Result Contract v2
+# Verification Result Contract v0.2
 
 ## Design Philosophy
 
@@ -46,8 +46,9 @@ An HTML fragment containing:
 
 An unsigned JSON document fetched from the network containing:
 
--   **`url`**: The resource URL this attestation covers
+-   **`fragment_url`**: The LAP fragment URL this attestation covers
 -   **`hash`**: SHA-256 hash of the canonical content bytes
+-   **`publisher_claim`**: Publisher's secp256k1 X-only public key for triangulation
 -   **`namespace_attestation_url`**: URL pointing to the Namespace Attestation (required)
 
 ### Namespace Attestation (NA)
@@ -124,14 +125,16 @@ Verifies the Resource Attestation is accessible and properly configured, demonst
 -   Resource Attestation is successfully fetched from the expected URL (live verification)
 -   Fetched RA is well-formed JSON
 -   Fetched RA URL has the same origin as the fragment's claimed resource URL
--   Fetched RA's `url` field matches fragment's claimed resource URL
+-   Fetched RA's `fragment_url` field matches fragment's `data-la-fragment-url`
+-   Fetched RA's `publisher_claim` field matches fragment's `data-la-publisher-claim`
 
 **Failure reasons:**
 
 -   `fetch_failed` - Could not retrieve resource attestation from network (indicates dissociation)
 -   `malformed` - Fetched RA JSON is invalid or missing required fields
 -   `origin_mismatch` - Fetched RA URL origin differs from resource URL origin
--   `content_url_mismatch` - Fetched RA's `url` differs from fragment's claimed resource URL
+-   `fragment_url_mismatch` - Fetched RA's `fragment_url` differs from fragment's `data-la-fragment-url`
+-   `publisher_claim_mismatch` - Fetched RA's `publisher_claim` differs from fragment's `data-la-publisher-claim`
 
 ### Resource Integrity
 
@@ -251,7 +254,7 @@ This simplified design provides:
 
 ## Removed Complexity
 
-This v2 eliminates several features from v1 that don't serve the core LAP purpose:
+This v0.2 eliminates several features from v1 that don't serve the core LAP purpose:
 
 -   **Policies** - Verification either works or it doesn't
 -   **Grace periods** - Expired attestations fail, period

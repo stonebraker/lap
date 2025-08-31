@@ -31,8 +31,8 @@ func main() {
 	switch os.Args[1] {
 	case "help", "-h", "--help":
 		usage()
-	case "ra-verify":
-		raVerifyCmd(os.Args[2:])
+	case "verify":
+		verifyCmd(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -43,30 +43,30 @@ func usage() {
 	exe := filepath.Base(os.Args[0])
 	fmt.Fprintf(os.Stderr, "Usage: %s <command> [options]\n", exe)
 	fmt.Fprintf(os.Stderr, "\nCommands:\n")
-	fmt.Fprintf(os.Stderr, "  ra-verify   Verify a resource attestation for a fetched HTML file\n")
+	fmt.Fprintf(os.Stderr, "  verify      Verify a LAP v0.2 fragment located at the specified URL\n")
+	fmt.Fprintf(os.Stderr, "\nVerification follows the v0.2 three-step process:\n")
+	fmt.Fprintf(os.Stderr, "  1. Resource Presence - Check attestation accessibility and same-origin validation\n")
+	fmt.Fprintf(os.Stderr, "  2. Resource Integrity - Verify content hash matches attestation\n")
+	fmt.Fprintf(os.Stderr, "  3. Publisher Association - Validate namespace control and signature\n")
 }
 
-func raVerifyCmd(args []string) {
-	fs := flag.NewFlagSet("ra-verify", flag.ExitOnError)
+func verifyCmd(args []string) {
+	fs := flag.NewFlagSet("verify", flag.ExitOnError)
 	urlFlag := fs.String("url", "", "absolute resource URL to verify")
 	timeout := fs.Duration("timeout", 10*time.Second, "HTTP timeout")
 	verbose := fs.Bool("v", false, "verbose output")
-	policy := fs.String("policy", "strict", "verification policy: strict, graceful, offline-fallback, auto-refresh")
-	skewSeconds := fs.Int("skew", 120, "grace period in seconds for graceful policy")
-	jsonOutput := fs.Bool("json", false, "output structured JSON result")
+	jsonOutput := fs.Bool("json", false, "output structured JSON result matching v0.2 specification")
 	_ = fs.Parse(args)
 	
 	if *urlFlag == "" {
-		fmt.Fprintln(os.Stderr, "ra-verify requires -url")
+		fmt.Fprintln(os.Stderr, "verify requires -url")
 		fs.Usage()
 		os.Exit(2)
 	}
 
 	opts := VerificationOptions{
-		Policy:      *policy,
-		SkewSeconds: *skewSeconds,
-		Timeout:     *timeout,
-		Verbose:     *verbose,
+		Timeout: *timeout,
+		Verbose: *verbose,
 	}
 
 	result, err := VerifyResource(*urlFlag, opts)
@@ -76,7 +76,7 @@ func raVerifyCmd(args []string) {
 	}
 
 	if *jsonOutput {
-		// Output structured JSON matching JavaScript verifier.core.js format
+		// Output structured JSON matching v0.2 normative specification
 		output, err := json.MarshalIndent(result, "", "  ")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "json marshal error: %v\n", err)
@@ -84,37 +84,33 @@ func raVerifyCmd(args []string) {
 		}
 		fmt.Println(string(output))
 	} else {
-		// Human-readable output
-		if result.OK {
-			fmt.Printf("✅ %s: %s\n", result.Code, result.Message)
-			if result.Status == "warn" {
-				fmt.Printf("⚠️  Warning: %s\n", result.Message)
-			}
+		// Human-readable output following v0.2 simplified approach
+		if result.Verified {
+			fmt.Printf("✅ Verification successful\n")
+			fmt.Printf("  Resource Presence: %s\n", result.ResourcePresence)
+			fmt.Printf("  Resource Integrity: %s\n", result.ResourceIntegrity)
+			fmt.Printf("  Publisher Association: %s\n", result.PublisherAssociation)
 		} else {
-			fmt.Printf("❌ %s: %s\n", result.Code, result.Message)
+			fmt.Printf("❌ Verification failed\n")
+			if result.Failure != nil {
+				fmt.Printf("  Failed at: %s\n", result.Failure.Check)
+				fmt.Printf("  Reason: %s\n", result.Failure.Reason)
+				fmt.Printf("  Message: %s\n", result.Failure.Message)
+			}
 		}
 		
-		if *verbose {
-			fmt.Printf("\nTelemetry:\n")
-			fmt.Printf("  URL: %s\n", result.Telemetry.URL)
-			fmt.Printf("  Policy: %s\n", result.Telemetry.Policy) 
-			fmt.Printf("  Kid: %s\n", result.Telemetry.Kid)
-			if result.Telemetry.IAT != nil {
-				fmt.Printf("  IAT: %d\n", *result.Telemetry.IAT)
-			}
-			if result.Telemetry.EXP != nil {
-				fmt.Printf("  EXP: %d\n", *result.Telemetry.EXP)
-			}
-			fmt.Printf("  Now: %d\n", result.Telemetry.Now)
+		if *verbose && result.Context != nil {
+			fmt.Printf("\nContext:\n")
+			fmt.Printf("  Resource Attestation URL: %s\n", result.Context.ResourceAttestationURL)
+			fmt.Printf("  Namespace Attestation URL: %s\n", result.Context.NamespaceAttestationURL)
+			fmt.Printf("  Verified At: %d\n", result.Context.VerifiedAt)
 		}
 	}
 
-	// Exit with appropriate code
-	if result.OK {
+	// Exit with appropriate code - simplified v0.2 approach
+	if result.Verified {
 		os.Exit(0)
 	} else {
-		os.Exit(1) 
+		os.Exit(1)
 	}
 }
-
-// Helpers are now in verification.go

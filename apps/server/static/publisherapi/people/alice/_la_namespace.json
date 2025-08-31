@@ -1,13 +1,8 @@
 {
   "payload": {
-    "attestation_path": "_la_namespace.json",
-    "exp": 1756090442,
-    "iat": 1756004042,
-    "kid": "alice-namespace-2025",
-    "namespace": [
-      "http://localhost:8081/people/alice/"
-    ]
+    "namespace": "http://localhost:8081/people/alice/",
+    "exp": 1788141098
   },
-  "publisher_key": "5ec3aa85e9f989b27ec9f72d3916979677adbd34ed88e7accb47dc0de335e82f",
-  "sig": "33e07f049f8dda6dee567e5a9a42a84461df39dcbf73dae07344ffd66ab0a48f91b2a8150c0d29a98ce39635de89f37a712f9e2c376506630d4d04f6b53645d7"
+  "key": "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
+  "sig": "0ceb3a7b8f8bc6eb1270f7e101cce9fb8d9623856e9fb7468bdd746d5ada2b4e0fa92d422c304173cdb27077444aae7d56a7d200e94322070ff1c6a397fe30c0"
 }

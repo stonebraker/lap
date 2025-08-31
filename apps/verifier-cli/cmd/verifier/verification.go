@@ -15,64 +15,43 @@
 package main
 
 import (
-	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 	"time"
 
-	"github.com/stonebraker/lap/sdks/go/pkg/lap/canonical"
-	"github.com/stonebraker/lap/sdks/go/pkg/lap/crypto"
+	"github.com/stonebraker/lap/sdks/go/pkg/lap/verify"
 	"github.com/stonebraker/lap/sdks/go/pkg/lap/wire"
 )
 
-// VerificationResult matches the JavaScript verifier.core.js return format
-type VerificationResult struct {
-	OK        bool                   `json:"ok"`
-	Status    string                 `json:"status"` // "ok", "warn", "error"
-	Code      string                 `json:"code"`   // LA_OK, LA_SIG_INVALID, etc.
-	Message   string                 `json:"message"`
-	Details   map[string]interface{} `json:"details,omitempty"`
-	Telemetry Telemetry              `json:"telemetry"`
-}
-
-type Telemetry struct {
-	URL    string `json:"url"`
-	Kid    string `json:"kid"`
-	IAT    *int64 `json:"iat"`
-	EXP    *int64 `json:"exp"`
-	Now    int64  `json:"now"`
-	Policy string `json:"policy"`
-}
-
+// VerificationOptions contains configuration for verification
 type VerificationOptions struct {
-	Policy       string        // "strict", "graceful", "offline-fallback", "auto-refresh"
-	SkewSeconds  int           // Grace period for expiration (default 120)
-	LastKnownAt  *int64        // For offline-fallback policy
-	Timeout      time.Duration // HTTP timeout
-	Verbose      bool          // Debug output
+	Timeout time.Duration // HTTP timeout
+	Verbose bool          // Debug output
 }
 
-// VerifyResource performs comprehensive LAP verification matching verifier.core.js logic
-func VerifyResource(resourceURL string, opts VerificationOptions) (*VerificationResult, error) {
-	now := time.Now().Unix()
-	
+// VerifyResource performs v0.2 LAP verification using the three-step process
+func VerifyResource(resourceURL string, opts VerificationOptions) (*verify.VerificationResult, error) {
 	// Parse and validate URL
 	origURL, err := url.Parse(resourceURL)
 	if err != nil || origURL.Scheme == "" || origURL.Host == "" {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_ATTESTATION_MALFORMED",
-			Message: "invalid resource URL",
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: opts.Policy,
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "malformed",
+				Message: "invalid resource URL",
+				Details: map[string]interface{}{
+					"url": resourceURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				VerifiedAt: time.Now().Unix(),
 			},
 		}, nil
 	}
@@ -94,18 +73,22 @@ func VerifyResource(resourceURL string, opts VerificationOptions) (*Verification
 		},
 	}
 
-	// Step 1: Fetch resource content
+	// Step 1: Fetch the resource content to extract the fragment
 	resp, err := client.Get(origURL.String())
 	if err != nil {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_FETCH_FAILED",
-			Message: fmt.Sprintf("fetch failed: %v", err),
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: opts.Policy,
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "fetch_failed",
+				Message: fmt.Sprintf("failed to fetch resource: %v", err),
+				Details: map[string]interface{}{
+					"url": resourceURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				VerifiedAt: time.Now().Unix(),
 			},
 		}, nil
 	}
@@ -113,478 +96,338 @@ func VerifyResource(resourceURL string, opts VerificationOptions) (*Verification
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_FETCH_FAILED",
-			Message: "failed to read response body",
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: opts.Policy,
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "fetch_failed",
+				Message: "failed to read response body",
+				Details: map[string]interface{}{
+					"url": resourceURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				VerifiedAt: time.Now().Unix(),
 			},
 		}, nil
 	}
 
-	finalURL := resp.Request.URL
-	etag := resp.Header.Get("ETag")
-
-	// Step 2: Canonicalize URLs
-	U := canonicalizeURL(finalURL)
-	AU := buildAttestationURL(U)
-
-	if opts.Verbose {
-		fmt.Printf("Canonical URL: %s\n", U)
-		fmt.Printf("Attestation URL: %s\n", AU)
-	}
-
-	// Step 3: Fetch stapled attestation (simulate - in real usage this would come from HTML)
-	// For CLI, we'll fetch the live attestation and use it as both stapled and live
-	stapled, result := fetchAttestation(client, AU, U, now, opts.Policy)
-	if result != nil {
-		return result, nil
-	}
-
-	// Step 4: Signature verification (matches verifier.core.js verifySignatureSchnorr)
-	if result := verifySignature(stapled, U, now, opts.Policy); result != nil {
-		return result, nil
-	}
-
-	// Step 5: Content hash verification (matches verifier.core.js verifyBytes)
-	if result := verifyContentHash(stapled, body, etag, U, now, opts.Policy); result != nil {
-		return result, nil
-	}
-
-	// Step 6: Fetch live attestation
-	live, result := fetchAttestation(client, AU, U, now, opts.Policy)
-	if result != nil {
-		// Handle offline-fallback policy
-		if opts.Policy == "offline-fallback" && opts.LastKnownAt != nil {
-			return &VerificationResult{
-				OK:     true,
-				Status: "warn",
-				Code:   "LA_OFFLINE_STALE",
-				Message: "offline; showing last known good result",
+	// Ensure valid HTTP status
+	if resp.StatusCode >= 400 {
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "fetch_failed",
+				Message: fmt.Sprintf("failed to fetch fragment: HTTP Status Code %d: %s", resp.StatusCode, resp.Status),
 				Details: map[string]interface{}{
-					"cached_at": *opts.LastKnownAt,
+					"url": resourceURL,
+					"status_code": resp.StatusCode,
+					"status": resp.Status,
 				},
-				Telemetry: buildTelemetry(stapled.Payload, U, now, opts.Policy),
-			}, nil
-		}
-		return result, nil
+			},
+			Context: &verify.VerificationContext{
+				VerifiedAt: time.Now().Unix(),
+			},
+		}, nil
 	}
 
-	// Step 7: Cross-attestation drift checks (matches verifier.core.js compareStapledVsFetched)
-	if result := checkDrift(stapled, live, U, now, opts.Policy); result != nil {
-		return result, nil
+	// Step 2: Parse the fragment from the HTML content
+	fragment, err := parseFragmentFromHTML(string(body), resourceURL)
+	if err != nil {
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "malformed",
+				Message: fmt.Sprintf("failed to parse fragment: %v", err),
+				Details: map[string]interface{}{
+					"url": resourceURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				VerifiedAt: time.Now().Unix(),
+			},
+		}, nil
 	}
 
-	// Step 8: Freshness validation with policy handling (matches verifier.core.js evaluateWindow)
-	return evaluateWindowWithPolicy(live, client, AU, U, now, opts)
+	// Step 3: Fetch the Resource Attestation
+	resourceAttestation, err := fetchResourceAttestation(client, fragment.ResourceAttestationURL)
+	if err != nil {
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "fetch_failed",
+				Message: fmt.Sprintf("failed to fetch resource attestation: %v", err),
+				Details: map[string]interface{}{
+					"resource_attestation_url": fragment.ResourceAttestationURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				ResourceAttestationURL:  fragment.ResourceAttestationURL,
+				NamespaceAttestationURL: fragment.NamespaceAttestationURL,
+				VerifiedAt:             time.Now().Unix(),
+			},
+		}, nil
+	}
+
+	// Ensure Resource Attestation has required fields
+	resourceAttestation, err = validateRequiredResourceAttestationFields(*resourceAttestation) 
+	if err != nil {
+		return &verify.VerificationResult{
+			Verified:         false,
+			ResourcePresence: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "resource_presence",
+				Reason:  "malformed",
+				Message: fmt.Sprintf("failed to validate resource attestation fields: %v", err),
+				Details: map[string]interface{}{
+					"resource_attestation_url": fragment.ResourceAttestationURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				ResourceAttestationURL:  fragment.ResourceAttestationURL,
+				NamespaceAttestationURL: fragment.NamespaceAttestationURL,
+				VerifiedAt:             time.Now().Unix(),
+			},
+		}, nil
+	}
+	
+
+	// Step 4: Fetch the Namespace Attestation
+	namespaceAttestation, err := fetchNamespaceAttestation(client, fragment.NamespaceAttestationURL)
+	if err != nil {
+		return &verify.VerificationResult{
+			Verified:             false,
+			ResourcePresence:     "pass",
+			ResourceIntegrity:    "pass",
+			PublisherAssociation: "fail",
+			Failure: &verify.FailureDetails{
+				Check:   "publisher_association",
+				Reason:  "fetch_failed",
+				Message: fmt.Sprintf("failed to fetch namespace attestation: %v", err),
+				Details: map[string]interface{}{
+					"namespace_attestation_url": fragment.NamespaceAttestationURL,
+				},
+			},
+			Context: &verify.VerificationContext{
+				ResourceAttestationURL:  fragment.ResourceAttestationURL,
+				NamespaceAttestationURL: fragment.NamespaceAttestationURL,
+				VerifiedAt:             time.Now().Unix(),
+			},
+		}, nil
+	}
+
+	// Step 5: Perform v0.2 verification using the verify package
+	result := verify.VerifyFragment(*fragment, *resourceAttestation, *namespaceAttestation)
+	
+	// Update context with URLs
+	result.Context.ResourceAttestationURL = fragment.ResourceAttestationURL
+	result.Context.NamespaceAttestationURL = fragment.NamespaceAttestationURL
+
+	return &result, nil
 }
 
-func fetchAttestation(client *http.Client, attestationURL, resourceURL string, now int64, policy string) (*wire.ResourceAttestation, *VerificationResult) {
-	resp, err := client.Get(attestationURL)
-	if err != nil {
-		return nil, &VerificationResult{
-			OK:      false,
-			Status:  "error", 
-			Code:    "LA_FETCH_FAILED",
-			Message: fmt.Sprintf("fetch failed: %v", err),
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: policy,
-			},
+// parseFragmentFromHTML extracts a LAP fragment from HTML content
+func parseFragmentFromHTML(htmlContent, resourceURL string) (*wire.Fragment, error) {
+	// Look for any fragment in the HTML (we'll use the first one found)
+	needle := `data-la-fragment-url="`
+	idx := strings.Index(htmlContent, needle)
+	if idx < 0 {
+		return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
+	}
+
+	// Extract the actual fragment URL from the HTML
+	fragmentURLStart := idx + len(needle)
+	fragmentURLEnd := strings.Index(htmlContent[fragmentURLStart:], `"`)
+	if fragmentURLEnd < 0 {
+		return nil, fmt.Errorf("fragment structure malformed: incomplete data-la-fragment-url attribute")
+	}
+	fragmentURL := htmlContent[fragmentURLStart : fragmentURLStart+fragmentURLEnd]
+
+	// Find the start of the article element
+	start := strings.LastIndex(htmlContent[:idx], "<article")
+	if start < 0 {
+		return nil, fmt.Errorf("fragment structure malformed: no <article> tag found")
+	}
+
+	// Find the end of the article element
+	rest := htmlContent[start:]
+	depth := 0
+	i := 0
+	for i < len(rest) {
+		if rest[i] == '<' {
+			if strings.HasPrefix(rest[i:], "<article") {
+				depth++
+			} else if strings.HasPrefix(rest[i:], "</article") {
+				depth--
+				endTag := strings.Index(rest[i:], ">")
+				if endTag >= 0 {
+					i += endTag + 1
+				} else {
+					break
+				}
+				if depth == 0 {
+					endAbs := start + i
+					articleHTML := htmlContent[start:endAbs]
+					return parseFragmentFromArticle(articleHTML, fragmentURL)
+				}
+				continue
+			}
+			end := strings.Index(rest[i:], ">")
+			if end >= 0 {
+				i += end + 1
+				continue
+			}
+			break
 		}
+		i++
+	}
+
+	return nil, fmt.Errorf("fragment structure malformed: incomplete <article> tag")
+}
+
+// parseFragmentFromArticle parses a fragment from an article HTML element
+func parseFragmentFromArticle(articleHTML, resourceURL string) (*wire.Fragment, error) {
+	fragment := &wire.Fragment{
+		Spec:        "v0.2",
+		FragmentURL: resourceURL,
+	}
+
+	// Extract publisher claim
+	if idx := strings.Index(articleHTML, `data-la-publisher-claim="`); idx >= 0 {
+		start := idx + len(`data-la-publisher-claim="`)
+		end := strings.Index(articleHTML[start:], `"`)
+		if end >= 0 {
+			fragment.PublisherClaim = articleHTML[start : start+end]
+		}
+	}
+
+	// Extract resource attestation URL
+	if idx := strings.Index(articleHTML, `data-la-resource-attestation-url="`); idx >= 0 {
+		start := idx + len(`data-la-resource-attestation-url="`)
+		end := strings.Index(articleHTML[start:], `"`)
+		if end >= 0 {
+			fragment.ResourceAttestationURL = articleHTML[start : start+end]
+		}
+	}
+
+	// Extract namespace attestation URL
+	if idx := strings.Index(articleHTML, `data-la-namespace-attestation-url="`); idx >= 0 {
+		start := idx + len(`data-la-namespace-attestation-url="`)
+		end := strings.Index(articleHTML[start:], `"`)
+		if end >= 0 {
+			fragment.NamespaceAttestationURL = articleHTML[start : start+end]
+		}
+	}
+
+	// Extract canonical content from href
+	if idx := strings.Index(articleHTML, `href="data:text/html;base64,`); idx >= 0 {
+		start := idx + len(`href="data:text/html;base64,`)
+		end := strings.Index(articleHTML[start:], `"`)
+		if end >= 0 {
+			base64Content := articleHTML[start : start+end]
+			canonicalBytes, err := base64.StdEncoding.DecodeString(base64Content)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode base64 content: %v", err)
+			}
+			fragment.CanonicalContent = canonicalBytes
+			fragment.PreviewContent = string(canonicalBytes)
+		}
+	}
+
+	// Validate required fields
+	if fragment.PublisherClaim == "" {
+		return nil, fmt.Errorf("missing data-la-publisher-claim")
+	}
+	if fragment.ResourceAttestationURL == "" {
+		return nil, fmt.Errorf("missing data-la-resource-attestation-url")
+	}
+	if fragment.NamespaceAttestationURL == "" {
+		return nil, fmt.Errorf("missing data-la-namespace-attestation-url")
+	}
+	if len(fragment.CanonicalContent) == 0 {
+		return nil, fmt.Errorf("missing canonical content in href")
+	}
+
+	return fragment, nil
+}
+
+// fetchResourceAttestation fetches and parses a Resource Attestation
+func fetchResourceAttestation(client *http.Client, url string) (*wire.ResourceAttestation, error) {
+	resp, err := client.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("fetch failed: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_FETCH_FAILED", 
-			Message: fmt.Sprintf("fetch failed: %d", resp.StatusCode),
-			Details: map[string]interface{}{
-				"http_status": resp.StatusCode,
-				"phase":       "bundle",
-			},
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: policy,
-			},
-		}
+		return nil, fmt.Errorf("fetch failed with status %d", resp.StatusCode)
 	}
 
-	var att wire.ResourceAttestation
-	if err := json.NewDecoder(resp.Body).Decode(&att); err != nil {
-		return nil, &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_ATTESTATION_MALFORMED",
-			Message: "invalid JSON in attestation",
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: policy,
-			},
-		}
+	var attestation wire.ResourceAttestation
+	if err := json.NewDecoder(resp.Body).Decode(&attestation); err != nil {
+		return nil, fmt.Errorf("invalid JSON in attestation: %v", err)
 	}
 
-	// Check for malformed attestation (missing payload)
-	if att.Payload.URL == "" {
-		return nil, &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_ATTESTATION_MALFORMED", 
-			Message: "malformed stapled object",
-			Telemetry: Telemetry{
-				URL:    resourceURL,
-				Now:    now,
-				Policy: policy,
-			},
-		}
-	}
-
-	return &att, nil
+	return &attestation, nil
 }
 
-func verifySignature(att *wire.ResourceAttestation, resourceURL string, now int64, policy string) *VerificationResult {
-	if att.ResourceKey == "" || att.Sig == "" {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_SIG_INVALID",
-			Message: "signature verification failed",
-			Details: map[string]interface{}{
-				"kid": att.Payload.KID,
-			},
-			Telemetry: buildTelemetry(att.Payload, resourceURL, now, policy),
-		}
+func validateRequiredResourceAttestationFields(attestation wire.ResourceAttestation) (*wire.ResourceAttestation, error) {
+	// Validate required fields
+	if attestation.FragmentURL == "" {
+		return nil, fmt.Errorf("malformed attestation: missing fragment_url field")
+	}
+	if attestation.Hash == "" {
+		return nil, fmt.Errorf("malformed attestation: missing hash field")
+	}
+	if attestation.PublisherClaim == "" {
+		return nil, fmt.Errorf("malformed attestation: missing publisher_claim field")
+	}
+	if attestation.NamespaceAttestationURL == "" {
+		return nil, fmt.Errorf("malformed attestation: missing namespace_attestation_url field")
 	}
 
-	// Canonical payload serialization (matches verifier.core.js canonicalizePayloadForSignature)
-	payloadBytes, err := canonical.MarshalResourcePayloadCanonical(att.Payload.ToCanonical())
+	return &attestation, nil
+}
+
+// fetchNamespaceAttestation fetches and parses a Namespace Attestation
+func fetchNamespaceAttestation(client *http.Client, url string) (*wire.NamespaceAttestation, error) {
+	resp, err := client.Get(url)
 	if err != nil {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error", 
-			Code:    "LA_SIG_INVALID",
-			Message: "signature verification failed",
-			Details: map[string]interface{}{
-				"kid": att.Payload.KID,
-			},
-			Telemetry: buildTelemetry(att.Payload, resourceURL, now, policy),
-		}
+		return nil, fmt.Errorf("fetch failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("fetch failed with status %d", resp.StatusCode)
 	}
 
-	digest := crypto.HashSHA256(payloadBytes)
-	ok, err := crypto.VerifySchnorrHex(att.ResourceKey, att.Sig, digest)
-	if err != nil || !ok {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_SIG_INVALID", 
-			Message: "signature verification failed",
-			Details: map[string]interface{}{
-				"kid": att.Payload.KID,
-			},
-			Telemetry: buildTelemetry(att.Payload, resourceURL, now, policy),
-		}
+	var attestation wire.NamespaceAttestation
+	if err := json.NewDecoder(resp.Body).Decode(&attestation); err != nil {
+		return nil, fmt.Errorf("invalid JSON in attestation: %v", err)
 	}
 
-	return nil // Success
+	// Validate required fields
+	if attestation.Payload.Namespace == "" {
+		return nil, fmt.Errorf("malformed attestation: missing payload.namespace field")
+	}
+	if attestation.Key == "" {
+		return nil, fmt.Errorf("malformed attestation: missing key field")
+	}
+	if attestation.Sig == "" {
+		return nil, fmt.Errorf("malformed attestation: missing sig field")
+	}
+
+	return &attestation, nil
 }
 
-func verifyContentHash(att *wire.ResourceAttestation, content []byte, etag, resourceURL string, now int64, policy string) *VerificationResult {
-	// Compute hash of content
-	hasher := sha256.New()
-	hasher.Write(content)
-	computedHash := fmt.Sprintf("sha256:%x", hasher.Sum(nil))
-
-	if att.Payload.Hash != computedHash {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_HASH_MISMATCH",
-			Message: "hash mismatch",
-			Telemetry: buildTelemetry(att.Payload, resourceURL, now, policy),
-		}
-	}
-
-	// Optional ETag validation
-	if etag != "" && att.Payload.ETag != etag {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_HASH_MISMATCH",
-			Message: "etag mismatch", 
-			Telemetry: buildTelemetry(att.Payload, resourceURL, now, policy),
-		}
-	}
-
-	return nil // Success
-}
-
-func checkDrift(stapled, live *wire.ResourceAttestation, resourceURL string, now int64, policy string) *VerificationResult {
-	sp := stapled.Payload
-	lp := live.Payload
-
-	// URL drift check
-	if lp.URL != sp.URL {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_URL_DRIFT",
-			Message: "payload.url mismatch (live vs stapled)",
-			Details: map[string]interface{}{
-				"expected": sp.URL,
-				"actual":   lp.URL,
-			},
-			Telemetry: buildTelemetry(sp, resourceURL, now, policy),
-		}
-	}
-
-	// Attestation URL drift check  
-	if lp.Attestation_URL != sp.Attestation_URL {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_ATTESTATION_URL_DRIFT",
-			Message: "attestation_url mismatch (live vs stapled)",
-			Details: map[string]interface{}{
-				"expected": sp.Attestation_URL,
-				"actual":   lp.Attestation_URL,
-			},
-			Telemetry: buildTelemetry(sp, resourceURL, now, policy),
-		}
-	}
-
-	// Hash drift check
-	if lp.Hash != sp.Hash {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_HASH_DRIFT",
-			Message: "hash mismatch (live vs stapled)",
-			Details: map[string]interface{}{
-				"expected_sha256": strings.TrimPrefix(sp.Hash, "sha256:"),
-				"actual_sha256":   strings.TrimPrefix(lp.Hash, "sha256:"),
-			},
-			Telemetry: buildTelemetry(sp, resourceURL, now, policy),
-		}
-	}
-
-	// Resource key drift check
-	if live.ResourceKey != stapled.ResourceKey {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_RESOURCE_KEY_DRIFT",
-			Message: "resource_key mismatch (live vs stapled)",
-			Details: map[string]interface{}{
-				"expected": stapled.ResourceKey,
-				"actual":   live.ResourceKey,
-			},
-			Telemetry: buildTelemetry(sp, resourceURL, now, policy),
-		}
-	}
-
-	// KID drift check
-	if lp.KID != sp.KID {
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_KID_DRIFT",
-			Message: "kid mismatch (live vs stapled)",
-			Details: map[string]interface{}{
-				"expected": sp.KID,
-				"actual":   lp.KID,
-			},
-			Telemetry: buildTelemetry(sp, resourceURL, now, policy),
-		}
-	}
-
-	return nil // No drift detected
-}
-
-func evaluateWindowWithPolicy(live *wire.ResourceAttestation, client *http.Client, attestationURL, resourceURL string, now int64, opts VerificationOptions) (*VerificationResult, error) {
-	state := evaluateWindow(live.Payload, now)
-	
-	// Handle "notyet" state
-	if state == "notyet" {
-		if opts.Policy == "auto-refresh" {
-			// Try to refresh
-			refreshed, result := fetchAttestation(client, attestationURL, resourceURL, now, opts.Policy)
-			if result != nil {
-				return result, nil
-			}
-			
-			refreshState := evaluateWindow(refreshed.Payload, now)
-			if refreshState == "fresh" {
-				return &VerificationResult{
-					OK:      true,
-					Status:  "ok",
-					Code:    "LA_OK",
-					Message: "verified",
-					Details: map[string]interface{}{
-						"fresh_until": refreshed.Payload.EXP,
-					},
-					Telemetry: buildTelemetry(refreshed.Payload, resourceURL, now, opts.Policy),
-				}, nil
-			}
-			
-			return &VerificationResult{
-				OK:      false,
-				Status:  "error",
-				Code:    "LA_EXPIRED_AFTER_REFRESH",
-				Message: "attestation not yet valid after refresh",
-				Telemetry: buildTelemetry(refreshed.Payload, resourceURL, now, opts.Policy),
-			}, nil
-		}
-		
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error", 
-			Code:    "LA_IAT_IN_FUTURE",
-			Message: "live attestation not yet valid",
-			Telemetry: buildTelemetry(live.Payload, resourceURL, now, opts.Policy),
-		}, nil
-	}
-
-	// Handle "expired" state
-	if state == "expired" {
-		// Graceful policy with skew tolerance
-		if opts.Policy == "graceful" && now <= live.Payload.EXP+int64(opts.SkewSeconds) {
-			return &VerificationResult{
-				OK:     true,
-				Status: "warn",
-				Code:   "LA_EXPIRED_GRACE",
-				Message: "attestation slightly expired (grace)",
-				Details: map[string]interface{}{
-					"expired_at": live.Payload.EXP,
-					"skew":       opts.SkewSeconds,
-				},
-				Telemetry: buildTelemetry(live.Payload, resourceURL, now, opts.Policy),
-			}, nil
-		}
-
-		// Auto-refresh policy
-		if opts.Policy == "auto-refresh" {
-			refreshed, result := fetchAttestation(client, attestationURL, resourceURL, now, opts.Policy)
-			if result != nil {
-				return result, nil
-			}
-			
-			refreshState := evaluateWindow(refreshed.Payload, now)
-			if refreshState == "fresh" {
-				return &VerificationResult{
-					OK:      true,
-					Status:  "ok",
-					Code:    "LA_OK",
-					Message: "verified",
-					Details: map[string]interface{}{
-						"fresh_until": refreshed.Payload.EXP,
-					},
-					Telemetry: buildTelemetry(refreshed.Payload, resourceURL, now, opts.Policy),
-				}, nil
-			}
-			
-			return &VerificationResult{
-				OK:      false,
-				Status:  "error",
-				Code:    "LA_EXPIRED_AFTER_REFRESH",
-				Message: "attestation expired after refresh",
-				Telemetry: buildTelemetry(refreshed.Payload, resourceURL, now, opts.Policy),
-			}, nil
-		}
-
-		// Hard expiration
-		return &VerificationResult{
-			OK:      false,
-			Status:  "error",
-			Code:    "LA_EXPIRED",
-			Message: "live attestation expired",
-			Telemetry: buildTelemetry(live.Payload, resourceURL, now, opts.Policy),
-		}, nil
-	}
-
-	// Success - fresh attestation
-	return &VerificationResult{
-		OK:      true,
-		Status:  "ok",
-		Code:    "LA_OK",
-		Message: "verified",
-		Details: map[string]interface{}{
-			"fresh_until": live.Payload.EXP,
-		},
-		Telemetry: buildTelemetry(live.Payload, resourceURL, now, opts.Policy),
-	}, nil
-}
-
-// evaluateWindow matches the JavaScript version exactly
-func evaluateWindow(p wire.ResourcePayload, now int64) string {
-	if p.IAT != 0 && now < p.IAT {
-		return "notyet"
-	}
-	if p.EXP != 0 && now > p.EXP {
-		return "expired" 
-	}
-	return "fresh"
-}
-
-func buildTelemetry(payload wire.ResourcePayload, url string, now int64, policy string) Telemetry {
-	var iat, exp *int64
-	if payload.IAT != 0 {
-		iat = &payload.IAT
-	}
-	if payload.EXP != 0 {
-		exp = &payload.EXP
-	}
-	
-	return Telemetry{
-		URL:    url,
-		Kid:    payload.KID,
-		IAT:    iat,
-		EXP:    exp,
-		Now:    now,
-		Policy: policy,
-	}
-}
-
-// Helper functions (keep existing implementations)
+// Helper functions
 func sameOrigin(a, b *url.URL) bool {
 	return strings.EqualFold(a.Scheme, b.Scheme) && strings.EqualFold(a.Host, b.Host)
-}
-
-func canonicalizeURL(u *url.URL) string {
-	c := *u
-	c.Scheme = strings.ToLower(c.Scheme)
-	host := strings.ToLower(c.Host)
-	if (c.Scheme == "http" && strings.HasSuffix(host, ":80")) || (c.Scheme == "https" && strings.HasSuffix(host, ":443")) {
-		host = strings.Split(host, ":")[0]
-	}
-	c.Host = host
-	c.Path = path.Clean("/" + c.Path)
-	if u.RawQuery == "" {
-		return c.Scheme + "://" + c.Host + c.Path
-	}
-	return c.Scheme + "://" + c.Host + c.Path + "?" + c.RawQuery
-}
-
-func buildAttestationURL(U string) string {
-	u, err := url.Parse(U)
-	if err != nil {
-		return U
-	}
-	p := u.Path
-	p = strings.TrimSuffix(p, "/index.html")
-	p = strings.TrimSuffix(p, "/index.json")
-	p = strings.TrimSuffix(p, "/")
-	u.Path = p + "/_la_resource.json"
-	u.RawQuery = ""
-	u.Fragment = ""
-	return u.String()
 }

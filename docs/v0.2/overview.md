@@ -73,15 +73,20 @@ A self-contained HTML fragment that embeds both human-readable content and crypt
 
 ```html
 <article
-    data-la-spec="v0-2"
+    data-la-spec="v0.2"
     data-la-fragment-url="https://example.com/people/alice/posts/123"
 >
     <section class="la-preview">
-        <h2>Post 123</h2>
-        <p>
-            Kicking off a new project. Keeping things simple, minimal deps, and
-            lots of clarity.
-        </p>
+        <article>
+            <header>
+                <h2>Post 1</h2>
+                <p>Today • 9:14 AM</p>
+            </header>
+            <p>
+                Kicking off a new project. Keeping things simple, minimal deps,
+                and lots of clarity.
+            </p>
+        </article>
     </section>
 
     <link
@@ -122,6 +127,7 @@ An unsigned JSON document that serves as the bridge between a specific resource 
 {
     "url": "https://example.com/people/alice/posts/123",
     "hash": "sha256:7b0c...cafe",
+    "publisher_claim": "f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00",
     "namespace_attestation_url": "https://example.com/people/alice/_la_namespace.json"
 }
 ```
