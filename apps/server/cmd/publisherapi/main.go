@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	addr := flag.String("addr", ":8081", "address to listen on")
+	addr := flag.String("addr", ":8080", "address to listen on")
 	dir := flag.String("dir", "apps/server/static/publisherapi", "directory to serve")
 	flag.Parse()
 

@@ -1,6 +1,6 @@
 {
-  "fragment_url": "http://localhost:8081/people/alice/posts/3",
+  "fragment_url": "http://localhost:8080/people/alice/posts/3",
   "hash": "sha256:0f916e1ddcbbc8ec4b717579b697a03f0e2e57ac501831c8ae1e77fabc6a84cf",
   "publisher_claim": "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
-  "namespace_attestation_url": "http://localhost:8081/people/alice/_la_namespace.json"
+  "namespace_attestation_url": "http://localhost:8080/people/alice/_la_namespace.json"
 }

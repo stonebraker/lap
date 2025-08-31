@@ -1,6 +1,6 @@
 <article
   data-la-spec="v0.2"
-  data-la-fragment-url="http://localhost:8081/people/alice/posts/2"
+  data-la-fragment-url="http://localhost:8080/people/alice/posts/2"
 >
 
   <section class="la-preview">
@@ -18,8 +18,8 @@
     rel="canonical"
     type="text/html"
     data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
-    data-la-resource-attestation-url="http://localhost:8081/people/alice/posts/2/_la_resource.json"
-    data-la-namespace-attestation-url="http://localhost:8081/people/alice/_la_namespace.json"
+    data-la-resource-attestation-url="http://localhost:8080/people/alice/posts/2/_la_resource.json"
+    data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
     href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDI8L2gyPgogICAgICAgIDxwPlllc3RlcmRheSDigKIgNTowMiBQTTwvcD4KICAgIDwvaGVhZGVyPgogICAgPHA+RGFyayBtb2RlIGFsbCB0aGUgdGhpbmdzLiBSZWFkYWJpbGl0eSBmaXJzdCwgZmFuY3kgbGF0ZXIuPC9wPgo8L2FydGljbGU+Cg=="
     hidden
   />

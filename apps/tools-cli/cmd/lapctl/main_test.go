@@ -520,17 +520,17 @@ func TestUpdatePosts_CompleteWorkflow(t *testing.T) {
 	
 	// Create test HTML files for each post
 	post1HTML := `<article><h1>Post 1</h1><p>First post content</p></article>`
-	if err := os.WriteFile("posts/1/index.html", []byte(post1HTML), 0644); err != nil {
+	if err := os.WriteFile("posts/1/content.htmx", []byte(post1HTML), 0644); err != nil {
 		t.Fatalf("Failed to create post 1 HTML: %v", err)
 	}
 	
 	post2HTML := `<article><h1>Post 2</h1><p>Second post content</p></article>`
-	if err := os.WriteFile("posts/2/index.html", []byte(post2HTML), 0644); err != nil {
+	if err := os.WriteFile("posts/2/content.htmx", []byte(post2HTML), 0644); err != nil {
 		t.Fatalf("Failed to create post 2 HTML: %v", err)
 	}
 	
 	post3HTML := `<article><h1>Post 3</h1><p>Third post content</p></article>`
-	if err := os.WriteFile("posts/3/index.html", []byte(post3HTML), 0644); err != nil {
+	if err := os.WriteFile("posts/3/content.htmx", []byte(post3HTML), 0644); err != nil {
 		t.Fatalf("Failed to create post 3 HTML: %v", err)
 	}
 	

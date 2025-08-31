@@ -121,7 +121,7 @@ func raCreateCmd(args []string) {
 	fs := flag.NewFlagSet("ra-create", flag.ExitOnError)
 	inPath := fs.String("in", "", "path to input HTML file")
 	resURL := fs.String("url", "", "absolute resource URL or path (e.g. https://example.com/path or /people/alice/posts/1)")
-	base := fs.String("base", "", "optional base (scheme://host[:port]) to resolve -url against, e.g. http://localhost:8081")
+	base := fs.String("base", "", "optional base (scheme://host[:port]) to resolve -url against, e.g. http://localhost:8080")
 	publisherClaim := fs.String("publisher-claim", "", "publisher's secp256k1 X-only public key (64 hex chars) for triangulation")
 	namespaceAttestationURL := fs.String("namespace-attestation-url", "", "URL pointing to the Namespace Attestation (required)")
 	out := fs.String("out", "", "output file path (default: <dir>/_la_resource.json)")
@@ -215,7 +215,7 @@ func fragmentCreateCmd(args []string) {
 	fs := flag.NewFlagSet("fragment-create", flag.ExitOnError)
 	inPath := fs.String("in", "", "path to input content.htmx file")
 	resURL := fs.String("url", "", "absolute resource URL or path (e.g. https://example.com/path or /people/alice/messages/1)")
-	base := fs.String("base", "", "optional base (scheme://host[:port]) to resolve -url against, e.g. http://localhost:8081")
+	base := fs.String("base", "", "optional base (scheme://host[:port]) to resolve -url against, e.g. http://localhost:8080")
 	publisherClaim := fs.String("publisher-claim", "", "publisher's secp256k1 X-only public key (64 hex chars) for triangulation")
 	resourceAttestationURL := fs.String("resource-attestation-url", "", "URL pointing to the Resource Attestation (required)")
 	namespaceAttestationURL := fs.String("namespace-attestation-url", "", "URL pointing to the Namespace Attestation (required)")
@@ -344,7 +344,7 @@ func fragmentCreateCmd(args []string) {
 //   lapctl update-posts -base https://example.com -dir apps/server/static/publisherapi/people/alice
 func updatePostsCmd(args []string) {
     fs := flag.NewFlagSet("update-posts", flag.ExitOnError)
-    base := fs.String("base", "http://localhost:8081", "base URL (scheme://host[:port]) for LAP URLs")
+    base := fs.String("base", "http://localhost:8080", "base URL (scheme://host[:port]) for LAP URLs")
     root := fs.String("dir", "apps/server/static/publisherapi/people/alice", "root directory for Alice content")
     _ = fs.Parse(args)
 
@@ -698,7 +698,7 @@ func replaceArticleByDataLaFragmentURL(hostHTML string, targetURL string, replac
 // resetArtifactsCmd resets all LAP artifacts for alice by creating a new NA and updating all posts
 func resetArtifactsCmd(args []string) {
 	fs := flag.NewFlagSet("reset-artifacts", flag.ExitOnError)
-	base := fs.String("base", "http://localhost:8081", "base URL (scheme://host[:port]) for LAP URLs")
+	base := fs.String("base", "http://localhost:8080", "base URL (scheme://host[:port]) for LAP URLs")
 	root := fs.String("root", "apps/server/static/publisherapi/people/alice", "root directory for Alice content")
 	keysDir := fs.String("keys-dir", "keys", "directory containing publisher keys")
 	_ = fs.Parse(args)
