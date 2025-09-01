@@ -9,7 +9,7 @@
         <h2>Post 2</h2>
         <p>Yesterday • 5:02 PM</p>
     </header>
-    <p>Dark mode all the things. Readability first, fancy later.</p>
+    <p>Khinkali for lunch! Anyone else love Armenian dumplings?</p>
 </article>
 
   </section>
@@ -20,7 +20,7 @@
     data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
     data-la-resource-attestation-url="http://localhost:8080/people/alice/posts/2/_la_resource.json"
     data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
-    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDI8L2gyPgogICAgICAgIDxwPlllc3RlcmRheSDigKIgNTowMiBQTTwvcD4KICAgIDwvaGVhZGVyPgogICAgPHA+RGFyayBtb2RlIGFsbCB0aGUgdGhpbmdzLiBSZWFkYWJpbGl0eSBmaXJzdCwgZmFuY3kgbGF0ZXIuPC9wPgo8L2FydGljbGU+Cg=="
+    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDI8L2gyPgogICAgICAgIDxwPlllc3RlcmRheSDigKIgNTowMiBQTTwvcD4KICAgIDwvaGVhZGVyPgogICAgPHA+S2hpbmthbGkgZm9yIGx1bmNoISBBbnlvbmUgZWxzZSBsb3ZlIEFybWVuaWFuIGR1bXBsaW5ncz88L3A+CjwvYXJ0aWNsZT4K"
     hidden
   />
 </article>

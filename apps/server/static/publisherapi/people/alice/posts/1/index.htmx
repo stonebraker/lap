@@ -10,8 +10,7 @@
         <p>Today • 9:14 AM</p>
     </header>
     <p>
-        Kicking off a new project. Keeping things simple, minimal deps, and lots
-        of clarity.
+        Just made a big pot of Harissa for dinner! Armenian chicken and rice porridge is the best comfort food. 
     </p>
 </article>
 
@@ -23,7 +22,7 @@
     data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
     data-la-resource-attestation-url="http://localhost:8080/people/alice/posts/1/_la_resource.json"
     data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
-    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDE8L2gyPgogICAgICAgIDxwPlRvZGF5IOKAoiA5OjE0IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cD4KICAgICAgICBLaWNraW5nIG9mZiBhIG5ldyBwcm9qZWN0LiBLZWVwaW5nIHRoaW5ncyBzaW1wbGUsIG1pbmltYWwgZGVwcywgYW5kIGxvdHMKICAgICAgICBvZiBjbGFyaXR5LgogICAgPC9wPgo8L2FydGljbGU+Cg=="
+    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDE8L2gyPgogICAgICAgIDxwPlRvZGF5IOKAoiA5OjE0IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cD4KICAgICAgICBKdXN0IG1hZGUgYSBiaWcgcG90IG9mIEhhcmlzc2EgZm9yIGRpbm5lciEgQXJtZW5pYW4gY2hpY2tlbiBhbmQgcmljZSBwb3JyaWRnZSBpcyB0aGUgYmVzdCBjb21mb3J0IGZvb2QuIAogICAgPC9wPgo8L2FydGljbGU+Cg=="
     hidden
   />
 </article>
