@@ -15,11 +15,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -53,6 +56,8 @@ func main() {
 		naCreateCmd(os.Args[2:])
 	case "reset-artifacts":
 		resetArtifactsCmd(os.Args[2:])
+	case "verify-remote":
+		verifyRemoteCmd(os.Args[2:])
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -71,6 +76,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  update-posts      Generate v0.2 fragments for posts 1..3\n")
 	fmt.Fprintf(os.Stderr, "  na-create     Create a v0.2 namespace attestation for a namespace URL\n")
 	fmt.Fprintf(os.Stderr, "  reset-artifacts Reset all LAP artifacts for alice by creating a new NA and updating all posts\n")
+	fmt.Fprintf(os.Stderr, "  verify-remote Fetch a fragment from a URL and verify it using the verifier service\n")
 }
 
 func keygenCmd(args []string) {
@@ -886,4 +892,87 @@ func resetArtifactsCmd(args []string) {
 	}
 	
 	fmt.Fprintf(os.Stderr, "Successfully reset all LAP artifacts for alice\n")
+}
+
+// verifyRemoteCmd fetches a fragment from a URL and verifies it using the verifier service
+func verifyRemoteCmd(args []string) {
+	fs := flag.NewFlagSet("verify-remote", flag.ExitOnError)
+	fragmentURL := fs.String("url", "", "URL of the fragment to fetch and verify")
+	verifierURL := fs.String("verifier", "http://localhost:8082", "base URL of the verifier service")
+	timeout := fs.Duration("timeout", 30*time.Second, "HTTP timeout for requests")
+	_ = fs.Parse(args)
+
+	if *fragmentURL == "" {
+		fmt.Fprintf(os.Stderr, "verify-remote requires -url\n")
+		fs.Usage()
+		os.Exit(2)
+	}
+
+	// Create HTTP client
+	client := &http.Client{
+		Timeout: *timeout,
+	}
+
+	// Fetch the fragment from the specified URL
+	fmt.Fprintf(os.Stderr, "Fetching fragment from %s...\n", *fragmentURL)
+	resp, err := client.Get(*fragmentURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error fetching fragment: %v\n", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		fmt.Fprintf(os.Stderr, "error fetching fragment: HTTP %d %s\n", resp.StatusCode, resp.Status)
+		os.Exit(1)
+	}
+
+	// Read the fragment content
+	fragmentContent, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading fragment content: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Post the fragment to the verifier service
+	verifyEndpoint := strings.TrimSuffix(*verifierURL, "/") + "/verify"
+	fmt.Fprintf(os.Stderr, "Posting fragment to verifier service at %s...\n", verifyEndpoint)
+	
+	verifyResp, err := client.Post(verifyEndpoint, "text/html", bytes.NewReader(fragmentContent))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error posting to verifier service: %v\n", err)
+		os.Exit(1)
+	}
+	defer verifyResp.Body.Close()
+
+	// Read the verification result
+	resultContent, err := io.ReadAll(verifyResp.Body)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading verification result: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Pretty print the JSON result
+	var result map[string]interface{}
+	if err := json.Unmarshal(resultContent, &result); err != nil {
+		fmt.Fprintf(os.Stderr, "error parsing verification result: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Raw response: %s\n", string(resultContent))
+		os.Exit(1)
+	}
+
+	// Format and display the result
+	prettyResult, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error formatting result: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println(string(prettyResult))
+
+	// Exit with appropriate code based on verification result
+	if verified, ok := result["verified"].(bool); ok && verified {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
 }
