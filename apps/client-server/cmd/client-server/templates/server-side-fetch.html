@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Server-Side Fetch - LAP Demo</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .tab-content {
+                display: block;
+            }
+            .tab-content.hidden {
+                display: none;
+            }
+        </style>
+        <script>
+            function showTab(tabName) {
+                // Hide all tab contents
+                const tabContents = document.querySelectorAll(".tab-content");
+                tabContents.forEach((content) =>
+                    content.classList.add("hidden")
+                );
+
+                // Remove active styles from all tab buttons
+                const tabButtons = document.querySelectorAll(".tab-button");
+                tabButtons.forEach((button) => {
+                    button.classList.remove(
+                        "border-blue-500",
+                        "text-blue-400",
+                        "bg-gray-700/50"
+                    );
+                    button.classList.add("border-transparent", "text-gray-400");
+                });
+
+                // Show selected tab content
+                document
+                    .getElementById(tabName + "-tab")
+                    .classList.remove("hidden");
+
+                // Add active styles to clicked tab button
+                event.target.classList.remove(
+                    "border-transparent",
+                    "text-gray-400"
+                );
+                event.target.classList.add(
+                    "border-blue-500",
+                    "text-blue-400",
+                    "bg-gray-700/50"
+                );
+            }
+
+            function copyFragment() {
+                const fragmentHTML =
+                    document.getElementById("fragment-data").value;
+                const button = event.target.closest("button");
+                const originalHTML = button.innerHTML;
+
+                // Try modern clipboard API first
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard
+                        .writeText(fragmentHTML)
+                        .then(function () {
+                            showCopySuccess(button, originalHTML);
+                        })
+                        .catch(function (err) {
+                            console.error("Clipboard API failed: ", err);
+                            fallbackCopy(fragmentHTML, button, originalHTML);
+                        });
+                } else {
+                    // Fallback for non-secure contexts or older browsers
+                    fallbackCopy(fragmentHTML, button, originalHTML);
+                }
+            }
+
+            function fallbackCopy(text, button, originalHTML) {
+                // Create a temporary textarea element
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                try {
+                    const successful = document.execCommand("copy");
+                    if (successful) {
+                        showCopySuccess(button, originalHTML);
+                    } else {
+                        showCopyError();
+                    }
+                } catch (err) {
+                    console.error("Fallback copy failed: ", err);
+                    showCopyError();
+                } finally {
+                    document.body.removeChild(textarea);
+                }
+            }
+
+            function showCopySuccess(button, originalHTML) {
+                button.innerHTML =
+                    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                button.classList.add("bg-green-600", "text-white");
+                button.classList.remove(
+                    "bg-gray-800",
+                    "bg-gray-200",
+                    "text-gray-400",
+                    "text-gray-600"
+                );
+
+                setTimeout(function () {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove("bg-green-600", "text-white");
+                    // Restore original classes based on context
+                    if (button.closest(".border-green-500")) {
+                        button.classList.add("bg-gray-800", "text-gray-400");
+                    } else {
+                        button.classList.add("bg-gray-200", "text-gray-600");
+                    }
+                }, 2000);
+            }
+
+            function showCopyError() {
+                alert(
+                    "Failed to copy fragment to clipboard. Please try selecting and copying the text manually."
+                );
+            }
+        </script>
+    </head>
+    <body class="bg-gray-950 text-gray-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-6xl mx-auto">
+                {{template "navigation" .}} {{template "header" .}} {{template
+                "content-display" .}} {{template "raw-html" .}} {{template
+                "lap-roles" .}}
+            </div>
+        </div>
+
+        <!-- Hidden element to store fragment HTML for copying -->
+        <textarea id="fragment-data" style="display: none">
+{{.Fragment.RawHTML}}</textarea
+        >
+    </body>
+</html>

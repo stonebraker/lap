@@ -1,0 +1,35 @@
+{{define "header"}}
+<!-- Header -->
+<div class="text-center mb-12">
+    <h1 class="text-3xl font-bold mb-4">Server-Side Fetch Demo</h1>
+    <p class="text-gray-300 text-lg mb-6">
+        LAP fragment fetched from:
+        <code class="bg-gray-800 px-2 py-1 rounded">{{.FragmentURL}}</code>
+    </p>
+
+    <!-- Post Navigation -->
+    <div class="flex justify-center space-x-4 mb-8">
+        <span class="text-gray-400 text-sm">Try different posts:</span>
+        <a
+            href="/server-side-fetch/1"
+            class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors"
+            >Post 1</a
+        >
+        <a
+            href="/server-side-fetch/2"
+            class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors"
+            >Post 2</a
+        >
+        <a
+            href="/server-side-fetch/3"
+            class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors"
+            >Post 3</a
+        >
+        <a
+            href="/server-side-fetch/4"
+            class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-sm rounded transition-colors"
+            >Post 4 (404)</a
+        >
+    </div>
+</div>
+{{end}}

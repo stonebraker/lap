@@ -1,0 +1,243 @@
+{{define "verification-status"}}
+<!-- Verification Status -->
+<div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+    {{if .Verification.Error}}
+        <h2 class="text-xl font-semibold mb-4 text-red-400">Verification Error</h2>
+        <p class="text-gray-300">{{.Verification.Error}}</p>
+        <p class="text-gray-400 text-sm mt-2">Make sure the Verifier Service is running on port 8082</p>
+    {{else}}
+        <h2 class="text-xl font-semibold mb-4 {{if .Verification.Verified}}text-green-400{{else}}text-red-400{{end}}">
+            Verification Result: {{if .Verification.Verified}}✓ VERIFIED{{else}}✗ FAILED{{end}}
+        </h2>
+        
+        <!-- Verification Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-900 p-4 rounded">
+                <h3 class="font-medium mb-2">Resource Presence</h3>
+                <span class="{{if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}}">
+                    {{.Verification.ResourcePresence}}
+                </span>
+            </div>
+            <div class="bg-gray-900 p-4 rounded">
+                <h3 class="font-medium mb-2">Resource Integrity</h3>
+                <span class="{{if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}}">
+                    {{.Verification.ResourceIntegrity}}
+                </span>
+            </div>
+            <div class="bg-gray-900 p-4 rounded">
+                <h3 class="font-medium mb-2">Publisher Association</h3>
+                <span class="{{if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}}">
+                    {{.Verification.PublisherAssociation}}
+                </span>
+            </div>
+        </div>
+    {{end}}
+</div>
+{{end}}
+
+{{define "verification-status-compact"}}
+<!-- Compact Verification Status -->
+<div class="bg-gray-800 p-4 rounded-lg border border-gray-700 space-y-4">
+    {{if .Verification.Error}}
+        <h3 class="text-lg font-semibold mb-3 text-red-400">✗ Verification Error</h3>
+        <p class="text-gray-300 text-sm">{{.Verification.Error}}</p>
+        <p class="text-gray-400 text-xs mt-2">Verifier Service offline</p>
+    {{else}}
+        <h3 class="text-lg font-semibold {{if .Verification.Verified}}text-green-400{{else}}text-red-400{{end}}">
+            {{if .Verification.Verified}}✓{{else}}✗{{end}} Verification Results
+        </h3>
+        
+        <!-- Compact Verification Steps -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
+                <span class="text-gray-300">Resource</span>
+                <span class="{{if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
+                    {{.Verification.ResourcePresence}}
+                </span>
+            </div>
+            <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
+                <span class="text-gray-300">Integrity</span>
+                <span class="{{if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
+                    {{.Verification.ResourceIntegrity}}
+                </span>
+            </div>
+            <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
+                <span class="text-gray-300">Publisher</span>
+                <span class="{{if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
+                    {{.Verification.PublisherAssociation}}
+                </span>
+            </div>
+        </div>
+
+        <!-- Failure Details in same area -->
+        {{if .Verification.Failure}}
+        <div class="border-t border-gray-600 pt-4">
+            <h4 class="font-medium mb-3 text-red-400">Failure Details</h4>
+            <div class="bg-gray-900 p-3 rounded border border-gray-600 h-auto overflow-x-auto">
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <span class="text-gray-400 font-medium">Check:</span>
+                        <p class="text-gray-300 mt-1 break-words">{{.Verification.Failure.Check}}</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 font-medium">Reason:</span>
+                        <p class="text-gray-300 mt-1 break-words">{{.Verification.Failure.Reason}}</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 font-medium">Message:</span>
+                        <p class="text-gray-300 mt-1 break-words">{{.Verification.Failure.Message}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    {{end}}
+</div>
+{{end}}
+
+{{define "verification-failure-details"}}
+<!-- Failure Details with Scroll -->
+{{if .Verification.Failure}}
+<div class="bg-gray-800 p-4 rounded-lg border border-gray-700 h-fit">
+    <h4 class="font-medium mb-3 text-red-400">Failure Details</h4>
+    <div class="bg-gray-900 p-3 rounded border border-gray-600 max-h-48 overflow-y-auto">
+        <div class="space-y-3 text-sm">
+            <div>
+                <span class="text-gray-400 font-medium">Check:</span>
+                <p class="text-gray-300 mt-1">{{.Verification.Failure.Check}}</p>
+            </div>
+            <div>
+                <span class="text-gray-400 font-medium">Reason:</span>
+                <p class="text-gray-300 mt-1">{{.Verification.Failure.Reason}}</p>
+            </div>
+            <div>
+                <span class="text-gray-400 font-medium">Message:</span>
+                <p class="text-gray-300 mt-1">{{.Verification.Failure.Message}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+{{end}}
+
+{{define "verification-json-full"}}
+<!-- Full Width Verification Result JSON -->
+<div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+    <h3 class="text-xl font-semibold mb-4">Verification Result JSON</h3>
+    <p class="text-gray-400 text-sm mb-4">
+        Raw JSON response from the verifier service
+    </p>
+    <div class="bg-gray-900 p-4 rounded border border-gray-600 text-sm overflow-x-auto">
+        <pre class="text-gray-100"><code>{
+  "verified": {{if .Verification.Verified}}true{{else}}false{{end}},
+  "resource_presence": "{{.Verification.ResourcePresence}}",
+  "resource_integrity": "{{.Verification.ResourceIntegrity}}",
+  "publisher_association": "{{.Verification.PublisherAssociation}}"{{if .Verification.Failure}},
+  "failure": {
+    "check": "{{.Verification.Failure.Check}}",
+    "reason": "{{.Verification.Failure.Reason}}",
+    "message": "{{.Verification.Failure.Message}}"
+  }{{end}}{{if .Verification.Context}},
+  "context": {
+    "resource_attestation_url": "{{.Verification.Context.ResourceAttestationURL}}",
+    "namespace_attestation_url": "{{.Verification.Context.NamespaceAttestationURL}}",
+    "verified_at": {{.Verification.Context.VerifiedAt}}
+  }{{end}}{{if .Verification.Error}},
+  "error": "{{.Verification.Error}}"{{end}}
+}</code></pre>
+    </div>
+</div>
+{{end}}
+
+{{define "verification-details-compact"}}
+<!-- Compact Verification Details -->
+{{if .Verification.Failure}}
+<div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+    <h4 class="font-medium mb-3 text-red-400">Failure Details</h4>
+    <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+            <span class="text-gray-400">Check:</span>
+            <span class="text-gray-300">{{.Verification.Failure.Check}}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-400">Reason:</span>
+            <span class="text-gray-300">{{.Verification.Failure.Reason}}</span>
+        </div>
+        <div class="mt-2">
+            <span class="text-gray-400">Message:</span>
+            <p class="text-gray-300 mt-1">{{.Verification.Failure.Message}}</p>
+        </div>
+    </div>
+</div>
+{{end}}
+
+<!-- Verification Result JSON -->
+<div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+    <h4 class="font-medium mb-3">Verification JSON</h4>
+    <p class="text-gray-400 text-xs mb-3">
+        Raw response from verifier service
+    </p>
+    <div class="bg-gray-900 p-3 rounded text-xs overflow-x-auto max-h-64 overflow-y-auto">
+        <pre class="text-gray-100"><code>{
+  "verified": {{if .Verification.Verified}}true{{else}}false{{end}},
+  "resource_presence": "{{.Verification.ResourcePresence}}",
+  "resource_integrity": "{{.Verification.ResourceIntegrity}}",
+  "publisher_association": "{{.Verification.PublisherAssociation}}"{{if .Verification.Failure}},
+  "failure": {
+    "check": "{{.Verification.Failure.Check}}",
+    "reason": "{{.Verification.Failure.Reason}}",
+    "message": "{{.Verification.Failure.Message}}"
+  }{{end}}{{if .Verification.Context}},
+  "context": {
+    "resource_attestation_url": "{{.Verification.Context.ResourceAttestationURL}}",
+    "namespace_attestation_url": "{{.Verification.Context.NamespaceAttestationURL}}",
+    "verified_at": {{.Verification.Context.VerifiedAt}}
+  }{{end}}{{if .Verification.Error}},
+  "error": "{{.Verification.Error}}"{{end}}
+}</code></pre>
+    </div>
+</div>
+{{end}}
+
+{{define "verification-details"}}
+<!-- Verification Details and JSON -->
+{{if and (not .Verification.Error) (or .Verification.Failure (not .Verification.Verified))}}
+<div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+    {{if .Verification.Failure}}
+    <div class="bg-gray-900 p-4 rounded border border-gray-600 mb-4">
+        <h4 class="font-medium mb-2">Failure Details</h4>
+        <p class="text-sm text-gray-300 mb-1"><strong>Check:</strong> {{.Verification.Failure.Check}}</p>
+        <p class="text-sm text-gray-300 mb-1"><strong>Reason:</strong> {{.Verification.Failure.Reason}}</p>
+        <p class="text-sm text-gray-300"><strong>Message:</strong> {{.Verification.Failure.Message}}</p>
+    </div>
+    {{end}}
+    
+    <!-- Verification Result JSON -->
+    <div class="bg-gray-900 p-4 rounded border border-gray-600">
+        <h4 class="font-medium mb-2">Verification Result JSON</h4>
+        <p class="text-gray-400 text-xs mb-3">
+            Raw JSON response from the verifier service
+        </p>
+        <div class="bg-black p-3 rounded text-xs overflow-x-auto">
+            <pre class="text-gray-100"><code>{
+  "verified": {{if .Verification.Verified}}true{{else}}false{{end}},
+  "resource_presence": "{{.Verification.ResourcePresence}}",
+  "resource_integrity": "{{.Verification.ResourceIntegrity}}",
+  "publisher_association": "{{.Verification.PublisherAssociation}}"{{if .Verification.Failure}},
+  "failure": {
+    "check": "{{.Verification.Failure.Check}}",
+    "reason": "{{.Verification.Failure.Reason}}",
+    "message": "{{.Verification.Failure.Message}}"
+  }{{end}}{{if .Verification.Context}},
+  "context": {
+    "resource_attestation_url": "{{.Verification.Context.ResourceAttestationURL}}",
+    "namespace_attestation_url": "{{.Verification.Context.NamespaceAttestationURL}}",
+    "verified_at": {{.Verification.Context.VerifiedAt}}
+  }{{end}}{{if .Verification.Error}},
+  "error": "{{.Verification.Error}}"{{end}}
+}</code></pre>
+        </div>
+    </div>
+</div>
+{{end}}
+{{end}}

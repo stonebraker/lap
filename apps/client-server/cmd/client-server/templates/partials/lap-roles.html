@@ -1,0 +1,281 @@
+{{define "lap-roles"}}
+<!-- LAP Protocol Roles -->
+<div class="mt-12 bg-gray-800 rounded-lg border border-gray-700">
+    <h2 class="text-xl font-semibold mb-6 p-6 pb-0 text-gray-100">
+        LAP Protocol Role Responsibilities
+    </h2>
+
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-gray-600 px-6">
+        <button
+            class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-400 bg-gray-700/50"
+            onclick="showTab('server')"
+        >
+            Server
+        </button>
+        <button
+            class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300"
+            onclick="showTab('client')"
+        >
+            Client
+        </button>
+        <button
+            class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300"
+            onclick="showTab('verifier')"
+        >
+            Verifier
+        </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6">
+        {{template "server-tab" .}} {{template "client-tab" .}} {{template
+        "verifier-tab" .}}
+    </div>
+</div>
+{{end}} {{define "server-tab"}}
+<!-- Server Tab -->
+<div id="server-tab" class="tab-content">
+    <div class="text-sm text-gray-300 space-y-4">
+        <div>
+            <h3 class="font-medium mb-2 text-green-300">
+                Resource Management (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>Generate Resource Attestations for each fragment</li>
+                <li>
+                    Ensure Resource Attestations are served from the same origin
+                    as the resource
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-green-300">
+                Fragment Generation (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Embed canonical content bytes in fragment's &lt;link&gt;
+                    element using href="data:text/html;base64,..."
+                </li>
+                <li>
+                    Include SHA-256 hash of canonical content bytes in data-hash
+                    attribute
+                </li>
+                <li>
+                    Embed Resource Attestation data in &lt;link&gt; element's
+                    data attributes
+                </li>
+                <li>
+                    Include publisher's public key in data-la-publisher-claim
+                    attribute
+                </li>
+                <li>
+                    Specify Resource and Namespace Attestation URLs in
+                    respective data attributes
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-green-300">
+                Attestation Management (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Create and sign Resource Attestations using the resource's
+                    private key
+                </li>
+                <li>
+                    Create and sign Namespace Attestations using the publisher's
+                    private key
+                </li>
+                <li>
+                    Serve attestations at specified URLs with proper namespace
+                    coverage
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}} {{define "client-tab"}}
+<!-- Client Tab -->
+<div id="client-tab" class="tab-content hidden">
+    <div class="text-sm text-gray-300 space-y-4">
+        <div>
+            <h3 class="font-medium mb-2 text-purple-300">
+                Fragment Handling (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Preserve all LAP protocol attributes when embedding
+                    fragments
+                </li>
+                <li>
+                    NOT modify the canonical content bytes in the &lt;link&gt;
+                    element
+                </li>
+                <li>
+                    NOT alter attestation URLs in
+                    data-la-resource-attestation-url and
+                    data-la-namespace-attestation-url attributes
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-purple-300">
+                Verification State Handling (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Clearly indicate when a fragment has not been verified OR
+                    not render it
+                </li>
+                <li>
+                    Clearly indicate when a fragment has failed verification OR
+                    not render it
+                </li>
+                <li>Are NOT required to indicate successful verification</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-purple-300">
+                Preview Content Handling (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    NOT modify preview content in ways that misrepresent the
+                    canonical bytes
+                </li>
+                <li>
+                    Replace only the contents of the preview section, not the
+                    entire &lt;section&gt; element
+                </li>
+                <li>
+                    Handle canonical content decode/parse failures gracefully by
+                    falling back to preview content
+                </li>
+                <li>
+                    Sanitize canonical content before DOM injection to prevent
+                    XSS attacks
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-purple-300">
+                Recommended Practices (SHOULD)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>Verify fragments before rendering (using a Verifier)</li>
+                <li>Handle verification failures gracefully</li>
+                <li>Respect fragment expiration times</li>
+                <li>
+                    Provide means for users to manually verify at-rest fragments
+                </li>
+                <li>
+                    Replace preview section contents with decoded canonical
+                    bytes when rendering
+                </li>
+                <li>
+                    Validate that decoded canonical content is well-formed HTML
+                    before replacement
+                </li>
+            </ul>
+        </div>
+
+        <div class="mt-4 p-3 bg-purple-800/30 rounded text-xs">
+            <strong class="text-purple-300">Security Note:</strong> Preview
+            content can be modified by malicious clients while verification
+            continues to pass. Conforming clients should prioritize canonical
+            content bytes over preview content for security-critical
+            applications.
+        </div>
+    </div>
+</div>
+{{end}} {{define "verifier-tab"}}
+<!-- Verifier Tab -->
+<div id="verifier-tab" class="tab-content hidden">
+    <div class="text-sm text-gray-300 space-y-4">
+        <div>
+            <h3 class="font-medium mb-2 text-orange-300">
+                Verification Process (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Perform all three verification checks: Resource Presence,
+                    Resource Integrity, and Publisher Association
+                </li>
+                <li>
+                    Validate Resource Attestation signatures against the
+                    resource's public key
+                </li>
+                <li>
+                    Validate Namespace Attestation signatures against the
+                    publisher's public key
+                </li>
+                <li>
+                    Confirm fragment's data-la-publisher-claim matches Namespace
+                    Attestation's key
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-orange-300">
+                Network Operations (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Fetch Resource Attestations from URL specified in fragment's
+                    data-la-resource-attestation-url
+                </li>
+                <li>
+                    Fetch Namespace Attestations from URL specified in
+                    data-la-namespace-attestation-url
+                </li>
+                <li>Handle network failures gracefully</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-orange-300">
+                Result Reporting (MUST)
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Return verification results conforming to the normative
+                    result object specification
+                </li>
+                <li>Report specific failure reasons and error codes</li>
+                <li>
+                    Implement fail-fast behavior (stop at first failure, skip
+                    remaining checks)
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="font-medium mb-2 text-orange-300">
+                Implementation Options
+            </h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>
+                    Verification libraries (vendored or imported by clients)
+                </li>
+                <li>
+                    Verification web services (called by clients over HTTP/API)
+                </li>
+                <li>Browser plugins (installed by users)</li>
+                <li>
+                    Custom verification programs (not recommended for most use
+                    cases)
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}}
