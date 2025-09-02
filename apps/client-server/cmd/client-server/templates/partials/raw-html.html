@@ -2,8 +2,98 @@
 <!-- Raw HTML Display -->
 <div class="mt-12 bg-gray-800 p-8 rounded-lg border border-gray-700">
     <h2 class="text-xl font-semibold mb-4">Raw Fragment HTML</h2>
-    <pre
-        class="bg-gray-900 p-4 rounded border border-gray-600 text-sm overflow-x-auto"
-    ><code>{{.Fragment.RawHTML}}</code></pre>
+
+    <!-- Fragment URL with PUT button -->
+    <div class="mb-4 flex items-center justify-between">
+        <div
+            id="fragment-url"
+            class="text-sm text-gray-300 font-mono bg-gray-900 px-3 py-2 rounded border border-gray-600 flex-1 mr-4"
+        >
+            {{.FragmentURL}}
+        </div>
+        <button
+            id="put-button"
+            onclick="putFragment()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+        >
+            PUT
+        </button>
+    </div>
+
+    <!-- Editable fragment code -->
+    <textarea
+        id="fragment-editor"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y min-h-96"
+        placeholder="Fragment HTML content..."
+    >
+{{.Fragment.RawHTML}}</textarea
+    >
 </div>
+
+<script>
+    function putFragment() {
+        const button = document.getElementById("put-button");
+        const textarea = document.getElementById("fragment-editor");
+        const urlDiv = document.getElementById("fragment-url");
+
+        const fragmentContent = textarea.value;
+        const fragmentUrl = urlDiv.textContent.trim();
+
+        // Show loading state
+        const originalButtonText = button.innerHTML;
+        button.innerHTML = "Saving...";
+        button.disabled = true;
+        button.classList.add("opacity-50");
+
+        // Make PUT request
+        fetch(fragmentUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "text/html",
+            },
+            body: fragmentContent,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`
+                );
+            })
+            .then((data) => {
+                // Show success state
+                button.innerHTML = "✓ Saved";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-green-600");
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-green-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 2000);
+            })
+            .catch((error) => {
+                console.error("Error saving fragment:", error);
+
+                // Show error state
+                button.innerHTML = "✗ Error";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-red-600");
+
+                // Show error message
+                alert(`Failed to save fragment: ${error.message}`);
+
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-red-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 3000);
+            });
+    }
+</script>
 {{end}}
