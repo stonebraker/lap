@@ -30,6 +30,39 @@
     >
 </div>
 
+{{if .ResourceAttestationURL}}
+<!-- Resource Attestation Display -->
+<div class="mt-8 bg-gray-800 p-8 rounded-lg border border-gray-700">
+    <h2 class="text-xl font-semibold mb-4">Resource Attestation</h2>
+
+    <!-- Resource Attestation URL with PUT button -->
+    <div class="mb-4 flex items-center justify-between">
+        <div
+            id="attestation-url"
+            class="text-sm text-gray-300 font-mono bg-gray-900 px-3 py-2 rounded border border-gray-600 flex-1 mr-4"
+        >
+            {{.ResourceAttestationURL}}
+        </div>
+        <button
+            id="attestation-put-button"
+            onclick="putResourceAttestation()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+        >
+            PUT
+        </button>
+    </div>
+
+    <!-- Editable resource attestation JSON -->
+    <textarea
+        id="attestation-editor"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y min-h-48"
+        placeholder="Resource attestation JSON content..."
+    >
+{{.ResourceAttestation}}</textarea
+    >
+</div>
+{{end}}
+
 <script>
     function putFragment() {
         const button = document.getElementById("put-button");
@@ -85,6 +118,71 @@
 
                 // Show error message
                 alert(`Failed to save fragment: ${error.message}`);
+
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-red-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 3000);
+            });
+    }
+
+    function putResourceAttestation() {
+        const button = document.getElementById("attestation-put-button");
+        const textarea = document.getElementById("attestation-editor");
+        const urlDiv = document.getElementById("attestation-url");
+
+        const attestationContent = textarea.value;
+        const attestationUrl = urlDiv.textContent.trim();
+
+        // Show loading state
+        const originalButtonText = button.innerHTML;
+        button.innerHTML = "Saving...";
+        button.disabled = true;
+        button.classList.add("opacity-50");
+
+        // Make PUT request
+        fetch(attestationUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: attestationContent,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`
+                );
+            })
+            .then((data) => {
+                // Show success state
+                button.innerHTML = "✓ Saved";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-green-600");
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-green-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 2000);
+            })
+            .catch((error) => {
+                console.error("Error saving resource attestation:", error);
+
+                // Show error state
+                button.innerHTML = "✗ Error";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-red-600");
+
+                // Show error message
+                alert(`Failed to save resource attestation: ${error.message}`);
 
                 // Reset button after 3 seconds
                 setTimeout(() => {

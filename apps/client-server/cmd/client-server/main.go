@@ -120,8 +120,16 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 	// Process the fragment for safe rendering
 	processedFragment := processFragment(string(fragmentHTML), verificationResult)
 	
+	// Fetch resource attestation if available
+	var resourceAttestation string
+	var resourceAttestationURL string
+	if verificationResult.Context != nil && verificationResult.Context.ResourceAttestationURL != "" {
+		resourceAttestationURL = verificationResult.Context.ResourceAttestationURL
+		resourceAttestation = fetchResourceAttestation(resourceAttestationURL)
+	}
+	
 	// Render the page with the processed fragment and verification result
-	renderFragmentPageWithVerification(w, processedFragment, fragmentURL, verificationResult)
+	renderFragmentPageWithVerificationAndAttestation(w, processedFragment, fragmentURL, verificationResult, resourceAttestation, resourceAttestationURL)
 }
 
 // verifyFragment sends the fragment to the verifier service and returns the result
@@ -230,8 +238,32 @@ func sanitizeHTML(htmlContent string) string {
 	return htmlContent
 }
 
-// renderFragmentPageWithVerification renders the server-side fetch page with the fragment and verification
-func renderFragmentPageWithVerification(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, verification *VerificationResult) {
+// fetchResourceAttestation fetches the resource attestation JSON from the given URL
+func fetchResourceAttestation(attestationURL string) string {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	
+	resp, err := client.Get(attestationURL)
+	if err != nil {
+		return fmt.Sprintf(`{"error": "Failed to fetch resource attestation: %v"}`, err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 200 {
+		return fmt.Sprintf(`{"error": "Resource attestation fetch failed: HTTP %d"}`, resp.StatusCode)
+	}
+	
+	attestationJSON, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Sprintf(`{"error": "Failed to read resource attestation: %v"}`, err)
+	}
+	
+	return string(attestationJSON)
+}
+
+// renderFragmentPageWithVerificationAndAttestation renders the server-side fetch page with the fragment, verification, and resource attestation
+func renderFragmentPageWithVerificationAndAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string) {
 	tmpl, err := template.ParseFS(templateFS, 
 		"templates/server-side-fetch.html",
 		"templates/partials/*.html",
@@ -242,13 +274,17 @@ func renderFragmentPageWithVerification(w http.ResponseWriter, fragment *Process
 	}
 
 	data := struct {
-		Fragment     *ProcessedFragment
-		FragmentURL  string
-		Verification *VerificationResult
+		Fragment                *ProcessedFragment
+		FragmentURL             string
+		Verification            *VerificationResult
+		ResourceAttestation     string
+		ResourceAttestationURL  string
 	}{
-		Fragment:     fragment,
-		FragmentURL:  fragmentURL,
-		Verification: verification,
+		Fragment:                fragment,
+		FragmentURL:             fragmentURL,
+		Verification:            verification,
+		ResourceAttestation:     resourceAttestation,
+		ResourceAttestationURL:  resourceAttestationURL,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
