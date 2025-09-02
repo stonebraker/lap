@@ -23,8 +23,9 @@
     <!-- Editable fragment code -->
     <textarea
         id="fragment-editor"
-        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y min-h-96"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
         placeholder="Fragment HTML content..."
+        oninput="autoResize(this)"
     >
 {{.Fragment.RawHTML}}</textarea
     >
@@ -55,15 +56,64 @@
     <!-- Editable resource attestation JSON -->
     <textarea
         id="attestation-editor"
-        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y min-h-48"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
         placeholder="Resource attestation JSON content..."
+        oninput="autoResize(this)"
     >
 {{.ResourceAttestation}}</textarea
+    >
+</div>
+{{end}} {{if .NamespaceAttestationURL}}
+<!-- Namespace Attestation Display -->
+<div class="mt-8 bg-gray-800 p-8 rounded-lg border border-gray-700">
+    <h2 class="text-xl font-semibold mb-4">Namespace Attestation</h2>
+
+    <!-- Namespace Attestation URL with PUT button -->
+    <div class="mb-4 flex items-center justify-between">
+        <div
+            id="namespace-attestation-url"
+            class="text-sm text-gray-300 font-mono bg-gray-900 px-3 py-2 rounded border border-gray-600 flex-1 mr-4"
+        >
+            {{.NamespaceAttestationURL}}
+        </div>
+        <button
+            id="namespace-attestation-put-button"
+            onclick="putNamespaceAttestation()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+        >
+            PUT
+        </button>
+    </div>
+
+    <!-- Editable namespace attestation JSON -->
+    <textarea
+        id="namespace-attestation-editor"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
+        placeholder="Namespace attestation JSON content..."
+        oninput="autoResize(this)"
+    >
+{{.NamespaceAttestation}}</textarea
     >
 </div>
 {{end}}
 
 <script>
+    // Auto-resize textarea function
+    function autoResize(textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    // Initialize auto-resize for all textareas on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll(
+            'textarea[oninput="autoResize(this)"]'
+        );
+        textareas.forEach((textarea) => {
+            autoResize(textarea);
+        });
+    });
+
     function putFragment() {
         const button = document.getElementById("put-button");
         const textarea = document.getElementById("fragment-editor");
@@ -100,13 +150,10 @@
                 button.classList.remove("bg-blue-600", "hover:bg-blue-700");
                 button.classList.add("bg-green-600");
 
-                // Reset button after 2 seconds
+                // Reload page after 1.5 seconds to show updated verification status
                 setTimeout(() => {
-                    button.innerHTML = originalButtonText;
-                    button.disabled = false;
-                    button.classList.remove("opacity-50", "bg-green-600");
-                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
-                }, 2000);
+                    window.location.reload();
+                }, 1500);
             })
             .catch((error) => {
                 console.error("Error saving fragment:", error);
@@ -183,6 +230,75 @@
 
                 // Show error message
                 alert(`Failed to save resource attestation: ${error.message}`);
+
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-red-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 3000);
+            });
+    }
+
+    function putNamespaceAttestation() {
+        const button = document.getElementById(
+            "namespace-attestation-put-button"
+        );
+        const textarea = document.getElementById(
+            "namespace-attestation-editor"
+        );
+        const urlDiv = document.getElementById("namespace-attestation-url");
+
+        const attestationContent = textarea.value;
+        const attestationUrl = urlDiv.textContent.trim();
+
+        // Show loading state
+        const originalButtonText = button.innerHTML;
+        button.innerHTML = "Saving...";
+        button.disabled = true;
+        button.classList.add("opacity-50");
+
+        // Make PUT request
+        fetch(attestationUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: attestationContent,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`
+                );
+            })
+            .then((data) => {
+                // Show success state
+                button.innerHTML = "✓ Saved";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-green-600");
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove("opacity-50", "bg-green-600");
+                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                }, 2000);
+            })
+            .catch((error) => {
+                console.error("Error saving namespace attestation:", error);
+
+                // Show error state
+                button.innerHTML = "✗ Error";
+                button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                button.classList.add("bg-red-600");
+
+                // Show error message
+                alert(`Failed to save namespace attestation: ${error.message}`);
 
                 // Reset button after 3 seconds
                 setTimeout(() => {

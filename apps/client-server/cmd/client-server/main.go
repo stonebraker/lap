@@ -128,8 +128,16 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 		resourceAttestation = fetchResourceAttestation(resourceAttestationURL)
 	}
 	
+	// Fetch namespace attestation if available
+	var namespaceAttestation string
+	var namespaceAttestationURL string
+	if verificationResult.Context != nil && verificationResult.Context.NamespaceAttestationURL != "" {
+		namespaceAttestationURL = verificationResult.Context.NamespaceAttestationURL
+		namespaceAttestation = fetchNamespaceAttestation(namespaceAttestationURL)
+	}
+	
 	// Render the page with the processed fragment and verification result
-	renderFragmentPageWithVerificationAndAttestation(w, processedFragment, fragmentURL, verificationResult, resourceAttestation, resourceAttestationURL)
+	renderFragmentPageWithVerificationAndNamespaceAttestation(w, processedFragment, fragmentURL, verificationResult, resourceAttestation, resourceAttestationURL, namespaceAttestation, namespaceAttestationURL)
 }
 
 // verifyFragment sends the fragment to the verifier service and returns the result
@@ -262,8 +270,32 @@ func fetchResourceAttestation(attestationURL string) string {
 	return string(attestationJSON)
 }
 
-// renderFragmentPageWithVerificationAndAttestation renders the server-side fetch page with the fragment, verification, and resource attestation
-func renderFragmentPageWithVerificationAndAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string) {
+// fetchNamespaceAttestation fetches the namespace attestation JSON from the given URL
+func fetchNamespaceAttestation(attestationURL string) string {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	
+	resp, err := client.Get(attestationURL)
+	if err != nil {
+		return fmt.Sprintf(`{"error": "Failed to fetch namespace attestation: %v"}`, err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 200 {
+		return fmt.Sprintf(`{"error": "Namespace attestation fetch failed: HTTP %d"}`, resp.StatusCode)
+	}
+	
+	attestationJSON, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Sprintf(`{"error": "Failed to read namespace attestation: %v"}`, err)
+	}
+	
+	return string(attestationJSON)
+}
+
+// renderFragmentPageWithVerificationAndNamespaceAttestation renders the server-side fetch page with the fragment, verification, and attestations
+func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string, namespaceAttestation string, namespaceAttestationURL string) {
 	tmpl, err := template.ParseFS(templateFS, 
 		"templates/server-side-fetch.html",
 		"templates/partials/*.html",
@@ -274,17 +306,21 @@ func renderFragmentPageWithVerificationAndAttestation(w http.ResponseWriter, fra
 	}
 
 	data := struct {
-		Fragment                *ProcessedFragment
-		FragmentURL             string
-		Verification            *VerificationResult
-		ResourceAttestation     string
-		ResourceAttestationURL  string
+		Fragment                 *ProcessedFragment
+		FragmentURL              string
+		Verification             *VerificationResult
+		ResourceAttestation      string
+		ResourceAttestationURL   string
+		NamespaceAttestation     string
+		NamespaceAttestationURL  string
 	}{
-		Fragment:                fragment,
-		FragmentURL:             fragmentURL,
-		Verification:            verification,
-		ResourceAttestation:     resourceAttestation,
-		ResourceAttestationURL:  resourceAttestationURL,
+		Fragment:                 fragment,
+		FragmentURL:              fragmentURL,
+		Verification:             verification,
+		ResourceAttestation:      resourceAttestation,
+		ResourceAttestationURL:   resourceAttestationURL,
+		NamespaceAttestation:     namespaceAttestation,
+		NamespaceAttestationURL:  namespaceAttestationURL,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

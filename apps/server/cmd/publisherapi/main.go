@@ -35,6 +35,11 @@ func main() {
 		handleResourceAttestationUpdate(w, r, *dir)
 	})
 	
+	// Add PUT handler for namespace attestations
+	mux.Put("/people/alice/_la_namespace.json", func(w http.ResponseWriter, r *http.Request) {
+		handleNamespaceAttestationUpdate(w, r, *dir)
+	})
+	
 	mux.Mount("/", httpx.NewStaticRouter(*dir))
 
 	log.Printf("publisherapi serving %s on %s", *dir, *addr)
@@ -115,4 +120,35 @@ func handleResourceAttestationUpdate(w http.ResponseWriter, r *http.Request, bas
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, `{"success": true, "message": "Resource attestation updated successfully", "path": "/people/alice/posts/%s/_la_resource.json"}`, postID)
+}
+
+// handleNamespaceAttestationUpdate handles PUT requests to update namespace attestation files
+func handleNamespaceAttestationUpdate(w http.ResponseWriter, r *http.Request, baseDir string) {
+	// Read the attestation content from request body
+	attestationContent, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	
+	// Construct the file path
+	attestationPath := filepath.Join(baseDir, "people", "alice", "_la_namespace.json")
+	
+	// Ensure the directory exists
+	dir := filepath.Dir(attestationPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		http.Error(w, "Failed to create directory", http.StatusInternalServerError)
+		return
+	}
+	
+	// Write the attestation to the file
+	if err := os.WriteFile(attestationPath, attestationContent, 0644); err != nil {
+		http.Error(w, "Failed to write namespace attestation", http.StatusInternalServerError)
+		return
+	}
+	
+	// Return success response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, `{"success": true, "message": "Namespace attestation updated successfully", "path": "/people/alice/_la_namespace.json"}`)
 }
