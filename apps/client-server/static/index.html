@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Linked Attestations Protocol (LAP) Demo</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-950 text-gray-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold mb-4">
+                        Linked Attestations Protocol (LAP) Demo
+                    </h1>
+                    <p class="text-gray-300 text-lg">
+                        Explore how LAP enables cryptographically verifiable
+                        content fragments
+                    </p>
+                </div>
+
+                <!-- Demo Options -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <!-- Client-Side Fetch -->
+                    <div
+                        class="bg-gray-800 p-8 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                    >
+                        <div class="mb-6">
+                            <div
+                                class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4"
+                            >
+                                <svg
+                                    class="w-6 h-6 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-semibold mb-3">
+                                Client-Side Fetch
+                            </h2>
+                            <p class="text-gray-300 mb-6">
+                                Fetch and verify LAP fragments using JavaScript
+                                in the browser. This approach demonstrates how
+                                client applications can directly interact with
+                                LAP publishers and verifiers.
+                            </p>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Real-time fragment fetching
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Interactive verification
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Browser-based cryptography
+                            </div>
+                        </div>
+                        <a
+                            href="/client-side-fetch/"
+                            class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                        >
+                            Try Client-Side Demo
+                        </a>
+                    </div>
+
+                    <!-- Server-Side Fetch -->
+                    <div
+                        class="bg-gray-800 p-8 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                    >
+                        <div class="mb-6">
+                            <div
+                                class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4"
+                            >
+                                <svg
+                                    class="w-6 h-6 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-semibold mb-3">
+                                Server-Side Fetch
+                            </h2>
+                            <p class="text-gray-300 mb-6">
+                                Fetch and verify LAP fragments on the server
+                                before rendering. This approach shows how web
+                                applications can pre-verify content and provide
+                                enhanced security guarantees.
+                            </p>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Pre-verified content
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Server-side validation
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-green-500 rounded-full mr-2"
+                                ></span>
+                                Template integration
+                            </div>
+                        </div>
+                        <a
+                            href="/server-side-fetch/"
+                            class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                        >
+                            Try Server-Side Demo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- About LAP -->
+                <div
+                    class="bg-gray-800 p-8 rounded-lg border border-gray-700 mb-8"
+                >
+                    <h3 class="text-xl font-semibold mb-4">
+                        About the Linked Attestations Protocol
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                        <div>
+                            <h4 class="font-medium text-gray-200 mb-2">
+                                Cryptographic Verification
+                            </h4>
+                            <p class="text-gray-400">
+                                Every fragment is cryptographically signed,
+                                ensuring content authenticity and integrity.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-200 mb-2">
+                                Hypermedia Architecture
+                            </h4>
+                            <p class="text-gray-400">
+                                Built on hypermedia principles, LAP enables
+                                seamless content discovery and verification.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-200 mb-2">
+                                Decentralized Trust
+                            </h4>
+                            <p class="text-gray-400">
+                                No central authority required - trust is
+                                established through cryptographic proofs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center text-gray-400 text-sm">
+                    <p>
+                        This is a reference implementation for educational and
+                        demonstration purposes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

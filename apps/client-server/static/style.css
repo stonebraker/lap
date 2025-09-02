@@ -1,0 +1,30 @@
+/* LAP Client Server Custom Styles */
+
+.lap-fragment-verified {
+    @apply border-green-500 bg-green-900/20;
+}
+
+.lap-fragment-unverified {
+    @apply border-yellow-500 bg-yellow-900/20;
+}
+
+.lap-fragment-failed {
+    @apply border-red-500 bg-red-900/20;
+}
+
+.lap-preview {
+    @apply bg-gray-800 p-4 rounded border border-gray-600;
+}
+
+/* Custom component styles for future use */
+.lap-card {
+    @apply bg-gray-800 p-6 rounded-lg border border-gray-700;
+}
+
+.lap-button-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors;
+}
+
+.lap-button-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors;
+}

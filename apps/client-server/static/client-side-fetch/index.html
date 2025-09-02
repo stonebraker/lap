@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Client-Side Fetch - LAP Demo</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-950 text-gray-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Navigation -->
+                <div class="mb-8">
+                    <a
+                        href="/"
+                        class="text-blue-400 hover:text-blue-300 flex items-center"
+                    >
+                        <svg
+                            class="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 19l-7-7 7-7"
+                            ></path>
+                        </svg>
+                        Back to Home
+                    </a>
+                </div>
+
+                <!-- Header -->
+                <div class="text-center mb-12">
+                    <h1 class="text-3xl font-bold mb-4">
+                        Client-Side Fetch Demo
+                    </h1>
+                    <p class="text-gray-300 text-lg">
+                        LAP fragments fetched and verified in the browser
+                    </p>
+                </div>
+
+                <!-- Coming Soon -->
+                <div
+                    class="bg-gray-800 p-8 rounded-lg border border-gray-700 text-center"
+                >
+                    <div
+                        class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4"
+                    >
+                        <svg
+                            class="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            ></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold mb-4">
+                        Implementation Coming Soon
+                    </h2>
+                    <p class="text-gray-300 mb-6">
+                        This demo will show how to fetch LAP fragments using
+                        JavaScript, verify them with the Verifier Service, and
+                        display them dynamically.
+                    </p>
+                    <div
+                        class="bg-gray-900 p-4 rounded border border-gray-600 text-left"
+                    >
+                        <h3 class="font-medium mb-2">
+                            Features to be implemented:
+                        </h3>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• Fetch fragments via JavaScript</li>
+                            <li>• Call Verifier Service API</li>
+                            <li>• Display verification status</li>
+                            <li>• Interactive fragment exploration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
