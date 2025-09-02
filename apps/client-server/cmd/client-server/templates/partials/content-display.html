@@ -287,6 +287,153 @@
         </div>
     </div>
 
+    <!-- Detailed Verification Steps -->
+    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+        <h3 class="text-xl font-semibold mb-4">Verification Steps</h3>
+        <p class="text-gray-400 text-sm mb-6">
+            Detailed breakdown of each verification check performed by the verifier service
+        </p>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Resource Presence Column -->
+            <div class="bg-gray-900 p-4 rounded border border-gray-600">
+                <h4 class="font-semibold mb-4 flex items-center">
+                    <span class="{{if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} text-lg mr-2">
+                        {{if eq .Verification.ResourcePresence "pass"}}✓{{else if eq .Verification.ResourcePresence "fail"}}✗{{else}}○{{end}}
+                    </span>
+                    Resource Presence
+                </h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start space-x-3 {{if .Verification.Error}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if .Verification.Error}}text-gray-500{{else if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if .Verification.Error}}○{{else if eq .Verification.ResourcePresence "pass"}}✓{{else if eq .Verification.ResourcePresence "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Extract resource URL</div>
+                            <div class="text-xs text-gray-400 mt-1">Parse fragment for _la_resource.json link</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if .Verification.Error}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if .Verification.Error}}text-gray-500{{else if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if .Verification.Error}}○{{else if eq .Verification.ResourcePresence "pass"}}✓{{else if eq .Verification.ResourcePresence "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Fetch resource attestation</div>
+                            <div class="text-xs text-gray-400 mt-1">HTTP GET to resource URL</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if .Verification.Error}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if .Verification.Error}}text-gray-500{{else if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if .Verification.Error}}○{{else if eq .Verification.ResourcePresence "pass"}}✓{{else if eq .Verification.ResourcePresence "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Validate JSON structure</div>
+                            <div class="text-xs text-gray-400 mt-1">Check required fields and format</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource Integrity Column -->
+            <div class="bg-gray-900 p-4 rounded border border-gray-600">
+                <h4 class="font-semibold mb-4 flex items-center">
+                    <span class="{{if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} text-lg mr-2">
+                        {{if eq .Verification.ResourceIntegrity "pass"}}✓{{else if eq .Verification.ResourceIntegrity "fail"}}✗{{else}}○{{end}}
+                    </span>
+                    Resource Integrity
+                </h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.ResourceIntegrity "pass"}}✓{{else if eq .Verification.ResourceIntegrity "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Extract content hash</div>
+                            <div class="text-xs text-gray-400 mt-1">Get SHA-256 from resource attestation</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.ResourceIntegrity "pass"}}✓{{else if eq .Verification.ResourceIntegrity "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Decode canonical content</div>
+                            <div class="text-xs text-gray-400 mt-1">Base64 decode from fragment link</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.ResourceIntegrity "pass"}}✓{{else if eq .Verification.ResourceIntegrity "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Compare hashes</div>
+                            <div class="text-xs text-gray-400 mt-1">Verify content matches attestation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publisher Association Column -->
+            <div class="bg-gray-900 p-4 rounded border border-gray-600">
+                <h4 class="font-semibold mb-4 flex items-center">
+                    <span class="{{if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} text-lg mr-2">
+                        {{if eq .Verification.PublisherAssociation "pass"}}✓{{else if eq .Verification.PublisherAssociation "fail"}}✗{{else}}○{{end}}
+                    </span>
+                    Publisher Association
+                </h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.PublisherAssociation "pass"}}✓{{else if eq .Verification.PublisherAssociation "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Extract namespace URL</div>
+                            <div class="text-xs text-gray-400 mt-1">Get _la_namespace.json from resource</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.PublisherAssociation "pass"}}✓{{else if eq .Verification.PublisherAssociation "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Fetch namespace attestation</div>
+                            <div class="text-xs text-gray-400 mt-1">HTTP GET to namespace URL</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else}}text-gray-300{{end}}">
+                        <span class="{{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}text-gray-500{{else if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} text-base mt-0.5">
+                            {{if or .Verification.Error (eq .Verification.ResourcePresence "fail")}}○{{else if eq .Verification.PublisherAssociation "pass"}}✓{{else if eq .Verification.PublisherAssociation "fail"}}✗{{else}}○{{end}}
+                        </span>
+                        <div>
+                            <div class="font-medium">Verify publisher claim</div>
+                            <div class="text-xs text-gray-400 mt-1">Check resource is in namespace</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Status -->
+        <div class="mt-6 pt-4 border-t border-gray-600">
+            <div class="text-center">
+                <div class="text-lg font-semibold {{if .Verification.Verified}}text-green-400{{else}}text-red-400{{end}} mb-2">
+                    {{if .Verification.Error}}
+                        Verification Error
+                    {{else if .Verification.Verified}}
+                        All Checks Passed - Content Verified
+                    {{else}}
+                        Verification Failed
+                    {{end}}
+                </div>
+                {{if .Verification.Failure}}
+                <div class="text-sm text-gray-400">
+                    Failed at: {{.Verification.Failure.Check}} - {{.Verification.Failure.Reason}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
     <!-- Results JSON - Full Width -->
     <div>{{template "verification-json-full" .}}</div>
 </div>
