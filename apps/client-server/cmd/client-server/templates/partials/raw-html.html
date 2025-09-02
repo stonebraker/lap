@@ -152,7 +152,8 @@
 
                 // Reload page after 1.5 seconds to show updated verification status
                 setTimeout(() => {
-                    window.location.reload();
+                    window.location.href = window.location.href.split("#")[0];
+                    window.scrollTo(0, 0);
                 }, 1500);
             })
             .catch((error) => {
@@ -212,13 +213,11 @@
                 button.classList.remove("bg-blue-600", "hover:bg-blue-700");
                 button.classList.add("bg-green-600");
 
-                // Reset button after 2 seconds
+                // Reload page after 1.5 seconds to show updated verification status
                 setTimeout(() => {
-                    button.innerHTML = originalButtonText;
-                    button.disabled = false;
-                    button.classList.remove("opacity-50", "bg-green-600");
-                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
-                }, 2000);
+                    window.location.href = window.location.href.split("#")[0];
+                    window.scrollTo(0, 0);
+                }, 1500);
             })
             .catch((error) => {
                 console.error("Error saving resource attestation:", error);
@@ -281,13 +280,11 @@
                 button.classList.remove("bg-blue-600", "hover:bg-blue-700");
                 button.classList.add("bg-green-600");
 
-                // Reset button after 2 seconds
+                // Reload page after 1.5 seconds to show updated verification status
                 setTimeout(() => {
-                    button.innerHTML = originalButtonText;
-                    button.disabled = false;
-                    button.classList.remove("opacity-50", "bg-green-600");
-                    button.classList.add("bg-blue-600", "hover:bg-blue-700");
-                }, 2000);
+                    window.location.href = window.location.href.split("#")[0];
+                    window.scrollTo(0, 0);
+                }, 1500);
             })
             .catch((error) => {
                 console.error("Error saving namespace attestation:", error);

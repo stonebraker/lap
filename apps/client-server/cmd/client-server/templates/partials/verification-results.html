@@ -50,19 +50,19 @@
         <!-- Compact Verification Steps -->
         <div class="space-y-2">
             <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
-                <span class="text-gray-300">Resource</span>
+                <span class="text-gray-300">Resource Presence</span>
                 <span class="{{if eq .Verification.ResourcePresence "pass"}}text-green-400{{else if eq .Verification.ResourcePresence "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
                     {{.Verification.ResourcePresence}}
                 </span>
             </div>
             <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
-                <span class="text-gray-300">Integrity</span>
+                <span class="text-gray-300">Resource Integrity</span>
                 <span class="{{if eq .Verification.ResourceIntegrity "pass"}}text-green-400{{else if eq .Verification.ResourceIntegrity "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
                     {{.Verification.ResourceIntegrity}}
                 </span>
             </div>
             <div class="flex justify-between items-center p-2 bg-gray-900 rounded text-sm">
-                <span class="text-gray-300">Publisher</span>
+                <span class="text-gray-300">Publisher Association</span>
                 <span class="{{if eq .Verification.PublisherAssociation "pass"}}text-green-400{{else if eq .Verification.PublisherAssociation "fail"}}text-red-400{{else}}text-gray-400{{end}} font-medium">
                     {{.Verification.PublisherAssociation}}
                 </span>
