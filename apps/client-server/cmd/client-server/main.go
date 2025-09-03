@@ -59,6 +59,16 @@ type ProcessedFragment struct {
 	DecodeError      string
 }
 
+// ProfileData holds the profile information extracted from the profile fragment
+type ProfileData struct {
+	Name        string
+	DisplayName string
+	Picture     string
+	Website     string
+	PublicKey   string
+	Error       string
+}
+
 func main() {
 	addr := flag.String("addr", ":8081", "address to listen on")
 	dir := flag.String("dir", "apps/client-server/static", "directory to serve")
@@ -124,24 +134,44 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 	// Process the fragment for safe rendering
 	processedFragment := processFragment(string(fragmentHTML), verificationResult)
 	
-	// Fetch resource attestation if available
+	// Extract attestation URLs from the raw HTML fragment (always, regardless of verification status)
+	extractedResourceURL, extractedNamespaceURL := extractAttestationURLsFromHTML(string(fragmentHTML))
+	
+	// Fetch resource attestation - try verification context first, then extracted URL
 	var resourceAttestation string
 	var resourceAttestationURL string
 	if verificationResult.Context != nil && verificationResult.Context.ResourceAttestationURL != "" {
 		resourceAttestationURL = verificationResult.Context.ResourceAttestationURL
 		resourceAttestation = fetchResourceAttestation(resourceAttestationURL)
+	} else if extractedResourceURL != "" {
+		resourceAttestationURL = extractedResourceURL
+		resourceAttestation = fetchResourceAttestation(resourceAttestationURL)
 	}
 	
-	// Fetch namespace attestation if available
+	// Fetch namespace attestation - try verification context first, then extracted URL
 	var namespaceAttestation string
 	var namespaceAttestationURL string
+	var profileData *ProfileData
 	if verificationResult.Context != nil && verificationResult.Context.NamespaceAttestationURL != "" {
 		namespaceAttestationURL = verificationResult.Context.NamespaceAttestationURL
 		namespaceAttestation = fetchNamespaceAttestation(namespaceAttestationURL)
+	} else if extractedNamespaceURL != "" {
+		namespaceAttestationURL = extractedNamespaceURL
+		namespaceAttestation = fetchNamespaceAttestation(namespaceAttestationURL)
+	}
+	
+	// If verification passed and we have namespace attestation, try to fetch profile data
+	if verificationResult.Verified && namespaceAttestation != "" {
+		if namespaceURL, err := extractNamespaceURL(namespaceAttestation); err == nil {
+			profileData = fetchProfileFragment(namespaceURL)
+		}
+	} else {
+		// If verification failed, set profileData to nil to avoid template errors
+		profileData = nil
 	}
 	
 	// Render the page with the processed fragment and verification result
-	renderFragmentPageWithVerificationAndNamespaceAttestation(w, processedFragment, fragmentURL, postID, verificationResult, resourceAttestation, resourceAttestationURL, namespaceAttestation, namespaceAttestationURL)
+	renderFragmentPageWithVerificationAndNamespaceAttestation(w, processedFragment, fragmentURL, postID, verificationResult, resourceAttestation, resourceAttestationURL, namespaceAttestation, namespaceAttestationURL, profileData)
 }
 
 // verifyFragment sends the fragment to the verifier service and returns the result
@@ -309,8 +339,123 @@ func fetchNamespaceAttestation(attestationURL string) string {
 	return string(attestationJSON)
 }
 
+// extractNamespaceURL extracts the namespace URL from the namespace attestation JSON
+func extractNamespaceURL(namespaceAttestationJSON string) (string, error) {
+	var attestation struct {
+		Payload struct {
+			Namespace string `json:"namespace"`
+		} `json:"payload"`
+	}
+	
+	if err := json.Unmarshal([]byte(namespaceAttestationJSON), &attestation); err != nil {
+		return "", fmt.Errorf("failed to parse namespace attestation: %v", err)
+	}
+	
+	return attestation.Payload.Namespace, nil
+}
+
+// fetchProfileFragment fetches the profile fragment from the given namespace URL
+func fetchProfileFragment(namespaceURL string) *ProfileData {
+	profileURL := namespaceURL + "profile/index.htmx"
+	
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	
+	resp, err := client.Get(profileURL)
+	if err != nil {
+		return &ProfileData{
+			Error: fmt.Sprintf("Failed to fetch profile: %v", err),
+		}
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 200 {
+		return &ProfileData{
+			Error: fmt.Sprintf("Profile fetch failed: HTTP %d", resp.StatusCode),
+		}
+	}
+	
+	profileHTML, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return &ProfileData{
+			Error: fmt.Sprintf("Failed to read profile: %v", err),
+		}
+	}
+	
+	return parseProfileFromHTML(string(profileHTML))
+}
+
+// extractAttestationURLsFromHTML extracts resource and namespace attestation URLs from raw HTML fragment
+func extractAttestationURLsFromHTML(htmlContent string) (string, string) {
+	var resourceURL, namespaceURL string
+	
+	// Extract resource attestation URL
+	if idx := strings.Index(htmlContent, `data-la-resource-attestation-url="`); idx >= 0 {
+		start := idx + len(`data-la-resource-attestation-url="`)
+		end := strings.Index(htmlContent[start:], `"`)
+		if end >= 0 {
+			resourceURL = htmlContent[start : start+end]
+		}
+	}
+	
+	// Extract namespace attestation URL
+	if idx := strings.Index(htmlContent, `data-la-namespace-attestation-url="`); idx >= 0 {
+		start := idx + len(`data-la-namespace-attestation-url="`)
+		end := strings.Index(htmlContent[start:], `"`)
+		if end >= 0 {
+			namespaceURL = htmlContent[start : start+end]
+		}
+	}
+	
+	return resourceURL, namespaceURL
+}
+
+// parseProfileFromHTML extracts profile information from the profile fragment HTML
+func parseProfileFromHTML(profileHTML string) *ProfileData {
+	profile := &ProfileData{}
+	
+	// Extract name from h1 tag
+	nameRegex := regexp.MustCompile(`<h1[^>]*>([^<]+)</h1>`)
+	if matches := nameRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+		profile.DisplayName = strings.TrimSpace(matches[1])
+		profile.Name = profile.DisplayName // Use display name as name for now
+	}
+	
+	// Extract profile picture from img src
+	imgRegex := regexp.MustCompile(`<img[^>]*src="([^"]+)"[^>]*alt="[^"]*profile[^"]*"[^>]*>`)
+	if matches := imgRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+		profile.Picture = matches[1]
+	}
+	
+	// Extract website from href
+	websiteRegex := regexp.MustCompile(`<a[^>]*href="([^"]+)"[^>]*>([^<]+)</a>`)
+	if matches := websiteRegex.FindStringSubmatch(profileHTML); len(matches) > 2 {
+		profile.Website = matches[1]
+	}
+	
+	// Extract public key from data-public-key attribute or text content
+	keyRegex := regexp.MustCompile(`data-public-key="([^"]+)"`)
+	if matches := keyRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+		fullKey := matches[1]
+		if len(fullKey) > 8 {
+			profile.PublicKey = fullKey[:4] + "..." + fullKey[len(fullKey)-4:]
+		} else {
+			profile.PublicKey = fullKey
+		}
+	} else {
+		// Fallback: look for key text pattern
+		keyTextRegex := regexp.MustCompile(`Key:\s*([a-f0-9]{4}\.\.\.[a-f0-9]{4})`)
+		if matches := keyTextRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+			profile.PublicKey = matches[1]
+		}
+	}
+	
+	return profile
+}
+
 // renderFragmentPageWithVerificationAndNamespaceAttestation renders the server-side fetch page with the fragment, verification, and attestations
-func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, currentPostID string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string, namespaceAttestation string, namespaceAttestationURL string) {
+func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, currentPostID string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string, namespaceAttestation string, namespaceAttestationURL string, profileData *ProfileData) {
 	tmpl, err := template.ParseFS(templateFS, 
 		"templates/server-side-fetch.html",
 		"templates/partials/*.html",
@@ -329,6 +474,7 @@ func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWr
 		ResourceAttestationURL   string
 		NamespaceAttestation     string
 		NamespaceAttestationURL  string
+		ProfileData              *ProfileData
 	}{
 		Fragment:                 fragment,
 		FragmentURL:              fragmentURL,
@@ -338,6 +484,7 @@ func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWr
 		ResourceAttestationURL:   resourceAttestationURL,
 		NamespaceAttestation:     namespaceAttestation,
 		NamespaceAttestationURL:  namespaceAttestationURL,
+		ProfileData:              profileData,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

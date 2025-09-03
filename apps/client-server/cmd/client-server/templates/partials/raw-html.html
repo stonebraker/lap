@@ -31,7 +31,6 @@
     >
 </div>
 
-{{if .ResourceAttestationURL}}
 <!-- Resource Attestation Display -->
 <div class="mt-8 bg-gray-800 p-8 rounded-lg border border-gray-700">
     <h2 class="text-xl font-semibold mb-4">Resource Attestation</h2>
@@ -42,7 +41,8 @@
             id="attestation-url"
             class="text-sm text-gray-300 font-mono bg-gray-900 px-3 py-2 rounded border border-gray-600 flex-1 mr-4"
         >
-            {{.ResourceAttestationURL}}
+            {{if .ResourceAttestationURL}}{{.ResourceAttestationURL}}{{else}}No
+            resource attestation URL available{{end}}
         </div>
         <button
             id="attestation-put-button"
@@ -60,10 +60,10 @@
         placeholder="Resource attestation JSON content..."
         oninput="autoResize(this)"
     >
-{{.ResourceAttestation}}</textarea
+{{if .ResourceAttestation}}{{.ResourceAttestation}}{{else}}No resource attestation data available{{end}}</textarea
     >
 </div>
-{{end}} {{if .NamespaceAttestationURL}}
+
 <!-- Namespace Attestation Display -->
 <div class="mt-8 bg-gray-800 p-8 rounded-lg border border-gray-700">
     <h2 class="text-xl font-semibold mb-4">Namespace Attestation</h2>
@@ -74,7 +74,9 @@
             id="namespace-attestation-url"
             class="text-sm text-gray-300 font-mono bg-gray-900 px-3 py-2 rounded border border-gray-600 flex-1 mr-4"
         >
-            {{.NamespaceAttestationURL}}
+            {{if
+            .NamespaceAttestationURL}}{{.NamespaceAttestationURL}}{{else}}No
+            namespace attestation URL available{{end}}
         </div>
         <button
             id="namespace-attestation-put-button"
@@ -92,10 +94,9 @@
         placeholder="Namespace attestation JSON content..."
         oninput="autoResize(this)"
     >
-{{.NamespaceAttestation}}</textarea
+{{if .NamespaceAttestation}}{{.NamespaceAttestation}}{{else}}No namespace attestation data available{{end}}</textarea
     >
 </div>
-{{end}}
 
 <script>
     // Auto-resize textarea function
