@@ -94,10 +94,15 @@ func VerifyFragment(fragment wire.Fragment, resourceAttestation wire.ResourceAtt
 	return result
 }
 
+// normalizeURL removes trailing slash for consistent URL comparison
+func normalizeURL(url string) string {
+	return strings.TrimSuffix(url, "/")
+}
+
 // verifyResourcePresence checks that the Resource Attestation is accessible and matches the fragment
 func verifyResourcePresence(fragment wire.Fragment, ra wire.ResourceAttestation) error {
-	// Check URL matching
-	if ra.FragmentURL != fragment.FragmentURL {
+	// Check URL matching (normalize both URLs to handle trailing slashes)
+	if normalizeURL(ra.FragmentURL) != normalizeURL(fragment.FragmentURL) {
 		return fmt.Errorf("resource attestation fragment URL mismatch: got %s, want %s", ra.FragmentURL, fragment.FragmentURL)
 	}
 

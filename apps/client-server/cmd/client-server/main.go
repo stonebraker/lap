@@ -119,7 +119,7 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Send the fragment to the verifier service
-	verificationResult := verifyFragment(string(fragmentHTML))
+	verificationResult := verifyFragment(string(fragmentHTML), fragmentURL)
 	
 	// Process the fragment for safe rendering
 	processedFragment := processFragment(string(fragmentHTML), verificationResult)
@@ -145,15 +145,26 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // verifyFragment sends the fragment to the verifier service and returns the result
-func verifyFragment(fragmentHTML string) *VerificationResult {
+func verifyFragment(fragmentHTML string, fragmentURL string) *VerificationResult {
 	verifierURL := "http://localhost:8082/verify"
 	
 	client := &http.Client{
 		Timeout: 15 * time.Second,
 	}
 	
-	// Send the fragment HTML as the request body
-	resp, err := client.Post(verifierURL, "text/html", bytes.NewBufferString(fragmentHTML))
+	// Create request with the actual fetch URL in header
+	req, err := http.NewRequest("POST", verifierURL, bytes.NewBufferString(fragmentHTML))
+	if err != nil {
+		return &VerificationResult{
+			Verified: false,
+			Error:    fmt.Sprintf("Failed to create request: %v", err),
+		}
+	}
+	req.Header.Set("Content-Type", "text/html")
+	req.Header.Set("X-Fetch-URL", fragmentURL)
+	
+	// Send the request
+	resp, err := client.Do(req)
 	if err != nil {
 		return &VerificationResult{
 			Verified: false,

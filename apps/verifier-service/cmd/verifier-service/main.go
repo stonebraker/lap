@@ -91,8 +91,14 @@ func verifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the actual fetch URL from query parameter or header
+	actualFetchURL := r.URL.Query().Get("fetch_url")
+	if actualFetchURL == "" {
+		actualFetchURL = r.Header.Get("X-Fetch-URL")
+	}
+
 	// Process the fragment and perform verification
-	result, err := processFragmentVerification(string(body))
+	result, err := processFragmentVerification(string(body), actualFetchURL)
 	if err != nil {
 		// Return error as JSON response instead of plain text HTTP error
 		errorResponse := map[string]interface{}{

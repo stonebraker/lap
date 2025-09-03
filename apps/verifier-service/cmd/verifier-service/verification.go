@@ -28,9 +28,9 @@ import (
 )
 
 // processFragmentVerification processes a complete HTML fragment and performs LAP v0.2 verification
-func processFragmentVerification(htmlContent string) (*verify.VerificationResult, error) {
+func processFragmentVerification(htmlContent string, actualFetchURL string) (*verify.VerificationResult, error) {
 	// Parse the fragment from the HTML content
-	fragment, err := parseFragmentFromHTML(htmlContent)
+	fragment, err := parseFragmentFromHTML(htmlContent, actualFetchURL)
 	if err != nil {
 		return &verify.VerificationResult{
 			Verified:         false,
@@ -144,21 +144,33 @@ func processFragmentVerification(htmlContent string) (*verify.VerificationResult
 
 // parseFragmentFromHTML extracts a LAP fragment from HTML content
 // This is adapted from the verifier CLI implementation
-func parseFragmentFromHTML(htmlContent string) (*wire.Fragment, error) {
+func parseFragmentFromHTML(htmlContent string, actualFetchURL string) (*wire.Fragment, error) {
+	// Use the actual fetch URL as the fragment URL, not the one claimed in the HTML
+	fragmentURL := actualFetchURL
+	if fragmentURL == "" {
+		// Fallback to extracting from HTML if no actual fetch URL provided
+		needle := `data-la-fragment-url="`
+		idx := strings.Index(htmlContent, needle)
+		if idx < 0 {
+			return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
+		}
+
+		// Extract the actual fragment URL from the HTML
+		fragmentURLStart := idx + len(needle)
+		fragmentURLEnd := strings.Index(htmlContent[fragmentURLStart:], `"`)
+		if fragmentURLEnd < 0 {
+			return nil, fmt.Errorf("fragment structure malformed: incomplete data-la-fragment-url attribute")
+		}
+		fragmentURL = htmlContent[fragmentURLStart : fragmentURLStart+fragmentURLEnd]
+	}
+
+	// Find the start of the article element
 	// Look for any fragment in the HTML (we'll use the first one found)
 	needle := `data-la-fragment-url="`
 	idx := strings.Index(htmlContent, needle)
 	if idx < 0 {
 		return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
 	}
-
-	// Extract the actual fragment URL from the HTML
-	fragmentURLStart := idx + len(needle)
-	fragmentURLEnd := strings.Index(htmlContent[fragmentURLStart:], `"`)
-	if fragmentURLEnd < 0 {
-		return nil, fmt.Errorf("fragment structure malformed: incomplete data-la-fragment-url attribute")
-	}
-	fragmentURL := htmlContent[fragmentURLStart : fragmentURLStart+fragmentURLEnd]
 
 	// Find the start of the article element
 	start := strings.LastIndex(htmlContent[:idx], "<article")
