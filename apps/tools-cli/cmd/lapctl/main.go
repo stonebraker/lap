@@ -63,7 +63,7 @@ func usage() {
 	exe := filepath.Base(os.Args[0])
 	fmt.Fprintf(os.Stderr, "Usage: %s <command> [options]\n", exe)
 	fmt.Fprintf(os.Stderr, "\nCommands:\n")
-	fmt.Fprintf(os.Stderr, "  keygen      Generate a secp256k1 keypair and print or append to .env\n")
+	fmt.Fprintf(os.Stderr, "  keygen      Generate a secp256k1 keypair and print or write to file (.env or .json)\n")
 	fmt.Fprintf(os.Stderr, "  ra-create   Create a v0.2 resource attestation for an HTML file\n")
 	fmt.Fprintf(os.Stderr, "  fragment-create   Create a v0.2 HTML fragment (index.htmx) from an content.htmx\n")
 
@@ -75,7 +75,8 @@ func usage() {
 func keygenCmd(args []string) {
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	name := fs.String("name", "alice", "label for the keypair (e.g. alice)")
-	out := fs.String("out", "", "optional path to write env lines (e.g. .env)")
+	out := fs.String("out", "", "optional path to write output (e.g. .env or .json)")
+	format := fs.String("format", "env", "output format: env or json")
 	_ = fs.Parse(args)
 
 	priv, pubHex, err := crypto.GenerateKeyPair()
@@ -83,28 +84,62 @@ func keygenCmd(args []string) {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
-	_ = priv // not used other than to demonstrate generation
 	privHex := hex.EncodeToString(priv.Serialize())
 
-	prefix := *name
-	if prefix == "" {
-		prefix = "publisher"
-	}
-	lines := fmt.Sprintf("%s=%s\n%s=%s\n", envKey(prefix, "PRIVKEY"), privHex, envKey(prefix, "PUBKEY_XONLY"), pubHex)
-
 	if *out == "" {
-		fmt.Print(lines)
+		// Print to stdout based on format
+		if *format == "json" {
+			storedKey := artifacts.StoredKey{
+				PrivKeyHex:    privHex,
+				PubKeyXOnly:   pubHex,
+				CreatedAtUnix: time.Now().Unix(),
+			}
+			jsonData, err := json.MarshalIndent(storedKey, "", "  ")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error marshaling JSON: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Print(string(jsonData))
+		} else {
+			// Default env format
+			prefix := *name
+			if prefix == "" {
+				prefix = "publisher"
+			}
+			lines := fmt.Sprintf("%s=%s\n%s=%s\n", envKey(prefix, "PRIVKEY"), privHex, envKey(prefix, "PUBKEY_XONLY"), pubHex)
+			fmt.Print(lines)
+		}
 		return
 	}
-	f, err := os.OpenFile(*out, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "open %s: %v\n", *out, err)
-		os.Exit(1)
-	}
-	defer f.Close()
-	if _, err := f.WriteString(lines); err != nil {
-		fmt.Fprintf(os.Stderr, "write %s: %v\n", *out, err)
-		os.Exit(1)
+
+	// Write to file
+	if *format == "json" {
+		storedKey := artifacts.StoredKey{
+			PrivKeyHex:    privHex,
+			PubKeyXOnly:   pubHex,
+			CreatedAtUnix: time.Now().Unix(),
+		}
+		if err := artifacts.WriteJSON0600(*out, storedKey); err != nil {
+			fmt.Fprintf(os.Stderr, "write %s: %v\n", *out, err)
+			os.Exit(1)
+		}
+	} else {
+		// Default env format
+		prefix := *name
+		if prefix == "" {
+			prefix = "publisher"
+		}
+		lines := fmt.Sprintf("%s=%s\n%s=%s\n", envKey(prefix, "PRIVKEY"), privHex, envKey(prefix, "PUBKEY_XONLY"), pubHex)
+		f, err := os.OpenFile(*out, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "open %s: %v\n", *out, err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		if _, err := f.WriteString(lines); err != nil {
+			fmt.Fprintf(os.Stderr, "write %s: %v\n", *out, err)
+			os.Exit(1)
+		}
 	}
 }
 

@@ -1,0 +1,8 @@
+{
+  "payload": {
+    "namespace": "http://localhost:8080/people/beth/",
+    "exp": 1788408229
+  },
+  "key": "9c7fd1c3128d4ad22db0fa71d34adccc617b76b9c9f6943dff766b35b7210953",
+  "sig": "e47d1df1fdb37f8a419ff5baf931da94276ca66338e613db7a84c706c11edb02c5f787a8e2dcf5e69e2c6faa90edcaa89d5f093cffee38269bf4b814a7946434"
+}
