@@ -1,8 +1,8 @@
 {
   "payload": {
     "namespace": "http://localhost:8080/people/alice/",
-    "exp": 1788190871
+    "exp": 1788403314
   },
   "key": "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
-  "sig": "e51afb0dab4f6ff5351dc7fc5bf6d8cfc2ef2ead679c82c540ea1c98787143405ec652b73537ec83e19f0cfe906ecc8193354c8a073d2601c483b4734b6f6154"
+  "sig": "5e4908eae2b58e3a66a595bb3026ac657d12d7c75dd8d82367c1a16095d2dfe63d825e9e14859ab14edc200c28ee6cabeaa5639dc2afe3acbf9407dfde106986"
 }

@@ -12,12 +12,12 @@ import (
 	"log"
 	"mime"
 	"net/http"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/stonebraker/lap/apps/client-server/internal/httpx"
+	"github.com/stonebraker/lap/apps/demo-utils/artifacts"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -358,28 +358,28 @@ func renderError(w http.ResponseWriter, message string, err error) {
 
 // resetArtifactsHandler calls the lapctl reset-artifacts command
 func resetArtifactsHandler(w http.ResponseWriter, r *http.Request) {
-	// Execute the lapctl reset-artifacts command using the full path to the binary
-	cmd := exec.Command("./bin/lapctl", "reset-artifacts")
+	// Call the extracted ResetArtifacts function directly
+	base := "http://localhost:8080"
+	root := "apps/server/static/publisherapi/people/alice"
+	keysDir := "keys"
 	
-	// Capture both stdout and stderr
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	// Capture stderr output by redirecting it to a buffer
+	var stderr bytes.Buffer
+	// Note: The artifacts.ResetArtifacts function writes to os.Stderr
+	// We'll capture the error and include it in the response
 	
-	// Run the command
-	err := cmd.Run()
+	err := artifacts.ResetArtifacts(base, root, keysDir)
 	
 	// Prepare response
 	response := map[string]interface{}{
 		"success": err == nil,
-		"stdout":  stdout.String(),
+		"stdout":  "", // No stdout from the function
 		"stderr":  stderr.String(),
 	}
 	
 	if err != nil {
 		response["error"] = err.Error()
-		log.Printf("reset-artifacts command failed: %v", err)
-		log.Printf("stderr: %s", stderr.String())
+		log.Printf("reset-artifacts failed: %v", err)
 	}
 	
 	// Set response headers
