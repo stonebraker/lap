@@ -141,7 +141,7 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Render the page with the processed fragment and verification result
-	renderFragmentPageWithVerificationAndNamespaceAttestation(w, processedFragment, fragmentURL, verificationResult, resourceAttestation, resourceAttestationURL, namespaceAttestation, namespaceAttestationURL)
+	renderFragmentPageWithVerificationAndNamespaceAttestation(w, processedFragment, fragmentURL, postID, verificationResult, resourceAttestation, resourceAttestationURL, namespaceAttestation, namespaceAttestationURL)
 }
 
 // verifyFragment sends the fragment to the verifier service and returns the result
@@ -299,7 +299,7 @@ func fetchNamespaceAttestation(attestationURL string) string {
 }
 
 // renderFragmentPageWithVerificationAndNamespaceAttestation renders the server-side fetch page with the fragment, verification, and attestations
-func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string, namespaceAttestation string, namespaceAttestationURL string) {
+func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWriter, fragment *ProcessedFragment, fragmentURL string, currentPostID string, verification *VerificationResult, resourceAttestation string, resourceAttestationURL string, namespaceAttestation string, namespaceAttestationURL string) {
 	tmpl, err := template.ParseFS(templateFS, 
 		"templates/server-side-fetch.html",
 		"templates/partials/*.html",
@@ -312,6 +312,7 @@ func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWr
 	data := struct {
 		Fragment                 *ProcessedFragment
 		FragmentURL              string
+		CurrentPostID            string
 		Verification             *VerificationResult
 		ResourceAttestation      string
 		ResourceAttestationURL   string
@@ -320,6 +321,7 @@ func renderFragmentPageWithVerificationAndNamespaceAttestation(w http.ResponseWr
 	}{
 		Fragment:                 fragment,
 		FragmentURL:              fragmentURL,
+		CurrentPostID:            currentPostID,
 		Verification:             verification,
 		ResourceAttestation:      resourceAttestation,
 		ResourceAttestationURL:   resourceAttestationURL,
