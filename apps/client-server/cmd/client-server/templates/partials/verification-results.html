@@ -98,7 +98,7 @@
             <p class="text-gray-400 text-xs mb-3">
                 Raw response from verifier service
             </p>
-            <div class="bg-gray-900 p-3 rounded border border-gray-600 text-xs overflow-x-auto max-h-64 overflow-y-auto">
+            <div class="bg-gray-900 p-3 rounded border border-gray-600 text-xs overflow-x-auto">
                 <pre class="text-gray-100"><code>{
   "verified": {{if .Verification.Verified}}true{{else}}false{{end}},
   "resource_presence": "{{.Verification.ResourcePresence}}",
@@ -127,7 +127,7 @@
 {{if .Verification.Failure}}
 <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 h-fit">
     <h4 class="font-medium mb-3 text-red-400">Failure Details</h4>
-    <div class="bg-gray-900 p-3 rounded border border-gray-600 max-h-48 overflow-y-auto">
+    <div class="bg-gray-900 p-3 rounded border border-gray-600">
         <div class="space-y-3 text-sm">
             <div>
                 <span class="text-gray-400 font-medium">Check:</span>
@@ -204,7 +204,7 @@
     <p class="text-gray-400 text-xs mb-3">
         Raw response from verifier service
     </p>
-    <div class="bg-gray-900 p-3 rounded text-xs overflow-x-auto max-h-64 overflow-y-auto">
+    <div class="bg-gray-900 p-3 rounded text-xs overflow-x-auto">
         <pre class="text-gray-100"><code>{
   "verified": {{if .Verification.Verified}}true{{else}}false{{end}},
   "resource_presence": "{{.Verification.ResourcePresence}}",

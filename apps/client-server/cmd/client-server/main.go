@@ -12,6 +12,7 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -71,6 +72,9 @@ func main() {
 	// Add server-side fetch route
 	mux.Get("/server-side-fetch/", serverSideFetchHandler)
 	mux.Get("/server-side-fetch/{postID}", serverSideFetchHandler)
+	
+	// Add reset artifacts route
+	mux.Post("/people/alice/reset-artifacts", resetArtifactsHandler)
 	
 	// Mount static file server for everything else
 	mux.Mount("/", httpx.NewStaticRouter(*dir))
@@ -349,5 +353,41 @@ func renderError(w http.ResponseWriter, message string, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	if execErr := tmpl.Execute(w, data); execErr != nil {
 		log.Printf("Error executing error template: %v", execErr)
+	}
+}
+
+// resetArtifactsHandler calls the lapctl reset-artifacts command
+func resetArtifactsHandler(w http.ResponseWriter, r *http.Request) {
+	// Execute the lapctl reset-artifacts command using the full path to the binary
+	cmd := exec.Command("./bin/lapctl", "reset-artifacts")
+	
+	// Capture both stdout and stderr
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	
+	// Run the command
+	err := cmd.Run()
+	
+	// Prepare response
+	response := map[string]interface{}{
+		"success": err == nil,
+		"stdout":  stdout.String(),
+		"stderr":  stderr.String(),
+	}
+	
+	if err != nil {
+		response["error"] = err.Error()
+		log.Printf("reset-artifacts command failed: %v", err)
+		log.Printf("stderr: %s", stderr.String())
+	}
+	
+	// Set response headers
+	w.Header().Set("Content-Type", "application/json")
+	
+	// Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding JSON response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }

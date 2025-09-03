@@ -23,7 +23,7 @@
     <!-- Editable fragment code -->
     <textarea
         id="fragment-editor"
-        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono"
         placeholder="Fragment HTML content..."
         oninput="autoResize(this)"
     >
@@ -56,7 +56,7 @@
     <!-- Editable resource attestation JSON -->
     <textarea
         id="attestation-editor"
-        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono"
         placeholder="Resource attestation JSON content..."
         oninput="autoResize(this)"
     >
@@ -88,7 +88,7 @@
     <!-- Editable namespace attestation JSON -->
     <textarea
         id="namespace-attestation-editor"
-        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono resize-y"
+        class="w-full bg-gray-900 p-4 rounded border border-gray-600 text-sm font-mono"
         placeholder="Namespace attestation JSON content..."
         oninput="autoResize(this)"
     >
@@ -101,7 +101,7 @@
     // Auto-resize textarea function
     function autoResize(textarea) {
         textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
+        textarea.style.height = Math.max(textarea.scrollHeight, 200) + "px";
     }
 
     // Initialize auto-resize for all textareas on page load
