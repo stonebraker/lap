@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Style Options - Profile Card Large</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style type="text/tailwindcss">
+            @layer components {
+                .profile-card-large {
+                    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 max-w-md mx-auto;
+                }
+                .profile-card-large header {
+                    @apply flex items-center gap-4 mb-4;
+                }
+                .profile-card-large img {
+                    @apply w-16 h-16 rounded-full object-cover border-2 border-gray-200;
+                }
+                .profile-card-large h1 {
+                    @apply text-xl font-bold text-gray-900 mb-1;
+                }
+                .profile-card-large header p {
+                    @apply text-sm text-gray-600;
+                }
+                .profile-card-large > p {
+                    @apply text-gray-700 leading-relaxed mb-4;
+                }
+                .profile-card-large div {
+                    @apply mb-3;
+                }
+                .profile-card-large h2 {
+                    @apply text-sm font-semibold text-gray-800 mb-2;
+                }
+                .profile-card-large a {
+                    @apply text-blue-600 hover:text-blue-800 underline;
+                }
+                .profile-card-large .stats p {
+                    @apply text-sm text-gray-600 mb-1;
+                }
+                .profile-card-large .key {
+                    @apply text-xs text-gray-500;
+                }
+            }
+        </style>
+        <script>
+            function copyPublicKey(button) {
+                const publicKey = button.getAttribute("data-public-key");
+                const originalText = button.textContent;
+
+                // Try modern clipboard API first
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard
+                        .writeText(publicKey)
+                        .then(function () {
+                            button.textContent = "copied!";
+                            button.classList.add("text-green-600");
+                            setTimeout(function () {
+                                button.textContent = originalText;
+                                button.classList.remove("text-green-600");
+                            }, 2000);
+                        })
+                        .catch(function (err) {
+                            console.error("Clipboard API failed: ", err);
+                            fallbackCopy(publicKey, button, originalText);
+                        });
+                } else {
+                    fallbackCopy(publicKey, button, originalText);
+                }
+            }
+
+            function fallbackCopy(text, button, originalText) {
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                try {
+                    const successful = document.execCommand("copy");
+                    if (successful) {
+                        button.textContent = "copied!";
+                        button.classList.add("text-green-600");
+                        setTimeout(function () {
+                            button.textContent = originalText;
+                            button.classList.remove("text-green-600");
+                        }, 2000);
+                    }
+                } catch (err) {
+                    console.error("Fallback copy failed: ", err);
+                } finally {
+                    document.body.removeChild(textarea);
+                }
+            }
+        </script>
+    </head>
+    <body class="bg-gray-100 min-h-screen py-8">
+        <div class="max-w-4xl mx-auto px-4">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    Style Options
+                </h1>
+                <p class="text-gray-600">Profile Card Large</p>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="mb-12">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    Preview
+                </h2>
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <!-- Styled Profile Card -->
+                    <article class="profile-card-large">
+                        <header>
+                            <img
+                                src="/people/alice/images/alice_profile_pic.jpg"
+                                alt="Alice's profile picture"
+                            />
+                            <div>
+                                <h1>Alice Cooks</h1>
+                                <p>@alice</p>
+                            </div>
+                        </header>
+                        <p>
+                            Hi, I'm Alice! I'm a curious and adventurous person
+                            who loves exploring new lands and cooking.
+                        </p>
+                        <div>
+                            <h2>About</h2>
+                            <p>Birthday: December 25, 1990</p>
+                            <p>Interests: Cooking, Travel, Adventure</p>
+                            <p>
+                                Website:
+                                <a href="http://localhost:8080/people/alice"
+                                    >alice.cooks</a
+                                >
+                            </p>
+                        </div>
+                        <div class="stats">
+                            <h2>Stats</h2>
+                            <p>Posts: 3</p>
+                            <p>Following: 127</p>
+                            <p>Followers: 2.4K</p>
+                        </div>
+                        <div class="key">
+                            <div class="flex items-center gap-2">
+                                <svg
+                                    class="w-3 h-3 text-gray-500"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                                    ></path>
+                                </svg>
+                                <span class="text-xs text-gray-500 font-mono"
+                                    >ac20...9677</span
+                                >
+                                <button
+                                    onclick="copyPublicKey(this)"
+                                    class="text-xs text-blue-600 hover:text-blue-800 cursor-pointer"
+                                    data-public-key="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+                                >
+                                    copy
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Styles Section -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    Tailwind Styles Used
+                </h2>
+                <div
+                    class="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto"
+                >
+                    <pre class="text-sm"><code>@layer components {
+  .profile-card-large {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 max-w-md mx-auto;
+  }
+  .profile-card-large header {
+    @apply flex items-center gap-4 mb-4;
+  }
+  .profile-card-large img {
+    @apply w-16 h-16 rounded-full object-cover border-2 border-gray-200;
+  }
+  .profile-card-large h1 {
+    @apply text-xl font-bold text-gray-900 mb-1;
+  }
+  .profile-card-large header p {
+    @apply text-sm text-gray-600;
+  }
+  .profile-card-large > p {
+    @apply text-gray-700 leading-relaxed mb-4;
+  }
+  .profile-card-large div {
+    @apply mb-3;
+  }
+  .profile-card-large h2 {
+    @apply text-sm font-semibold text-gray-800 mb-2;
+  }
+  .profile-card-large a {
+    @apply text-blue-600 hover:text-blue-800 underline;
+  }
+  .profile-card-large .stats p {
+    @apply text-sm text-gray-600 mb-1;
+  }
+  .profile-card-large .key p {
+    @apply text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded;
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Usage Instructions -->
+            <div class="mt-8 p-6 bg-blue-50 rounded-lg">
+                <h3 class="text-lg font-semibold text-blue-900 mb-2">Usage</h3>
+                <p class="text-blue-800">
+                    To apply this styling to your LAP fragment, add the CSS
+                    classes to your stylesheet and ensure your HTML structure
+                    matches the preview above. The fragment content will be
+                    automatically styled when rendered with these classes.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

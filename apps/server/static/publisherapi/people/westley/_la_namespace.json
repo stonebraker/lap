@@ -1,0 +1,8 @@
+{
+  "payload": {
+    "namespace": "http://localhost:8080/people/westley/",
+    "exp": 1788439355
+  },
+  "key": "6b9f28d049f89883ca53d460821a2259d0ad9922fd6d5e0b334d397d3c68ff87",
+  "sig": "238780b7a81be6174788d20c975ad95f7f2e81315863514a7021baff086c4d21d3a85ed41b33ac7a402f062e263c8f87bec9690ea02fe2698b1cd0b2f156be3b"
+}

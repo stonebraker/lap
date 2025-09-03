@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Alice Cooks — Profile</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style type="text/tailwindcss">
+            @layer components {
+                .profile-card {
+                    @apply rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm;
+                }
+                .post-preview {
+                    @apply rounded-lg border border-gray-800 bg-gray-900 p-4 hover:border-gray-700 transition-colors;
+                }
+                .post-preview header {
+                    @apply mb-2;
+                }
+                .post-preview header h2 {
+                    @apply text-lg font-semibold text-gray-100;
+                }
+                .post-preview header p {
+                    @apply text-sm text-gray-400;
+                }
+                .post-preview p {
+                    @apply leading-relaxed text-gray-300;
+                }
+            }
+        </style>
+    </head>
+    <body class="min-h-screen bg-gray-950 text-gray-100 antialiased">
+        <!-- Background Pattern -->
+        <div
+            class="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 opacity-50"
+        ></div>
+        <div
+            class="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"
+        ></div>
+
+        <main class="relative max-w-4xl mx-auto px-4 py-8">
+            <!-- Banner with Overlay Profile -->
+            <div class="relative mb-8 rounded-xl overflow-hidden">
+                <!-- Banner Image -->
+                <img
+                    src="/people/alice/images/alice_banner.jpg"
+                    alt="Alice's banner"
+                    class="w-full h-64 md:h-80 object-cover object-bottom"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                />
+                <!-- Fallback Banner -->
+                <div
+                    class="w-full h-64 md:h-80 bg-gradient-to-r from-indigo-600 to-purple-600 hidden flex items-center justify-center"
+                >
+                    <div class="text-center text-white">
+                        <div class="text-4xl font-bold mb-2">Alice Cooks</div>
+                        <div class="text-lg opacity-90">
+                            Adventurous Cook & Explorer
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dark Overlay for Readability -->
+                <div class="absolute inset-0 bg-black/40"></div>
+
+                <!-- Profile Content Overlay -->
+                <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                    <div
+                        class="flex flex-col md:flex-row items-start md:items-end gap-6"
+                    >
+                        <!-- Profile Picture -->
+                        <div class="relative">
+                            <img
+                                src="/people/alice/images/alice_profile_pic.jpg"
+                                alt="Alice's profile picture"
+                                class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/20 backdrop-blur-sm object-cover shadow-2xl"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            />
+                            <div
+                                class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/20 bg-indigo-600 flex items-center justify-center font-bold text-2xl md:text-3xl hidden shadow-2xl"
+                            >
+                                A
+                            </div>
+                        </div>
+
+                        <!-- Profile Info -->
+                        <div class="flex-1 text-white">
+                            <div
+                                class="flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+                            >
+                                <div>
+                                    <h1
+                                        class="text-3xl md:text-4xl font-bold mb-2 drop-shadow-lg"
+                                    >
+                                        Alice Cooks
+                                    </h1>
+                                    <p
+                                        class="text-lg md:text-xl text-white/90 mb-3 drop-shadow-md"
+                                    >
+                                        @alice
+                                    </p>
+                                    <p
+                                        class="text-white/90 leading-relaxed max-w-2xl drop-shadow-md"
+                                    >
+                                        Hi, I'm Alice! I'm a curious and
+                                        adventurous person who loves exploring
+                                        new lands and cooking.
+                                    </p>
+                                </div>
+
+                                <!-- Profile Stats -->
+                                <div class="flex gap-6 text-center">
+                                    <div
+                                        class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3"
+                                    >
+                                        <div
+                                            class="text-2xl font-bold text-white"
+                                        >
+                                            3
+                                        </div>
+                                        <div class="text-sm text-white/80">
+                                            Posts
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3"
+                                    >
+                                        <div
+                                            class="text-2xl font-bold text-white"
+                                        >
+                                            Dec 25
+                                        </div>
+                                        <div class="text-sm text-white/80">
+                                            Birthday
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profile Bar -->
+                            <div class="flex flex-wrap items-center gap-6 mt-6">
+                                <!-- Website Link -->
+                                <a
+                                    href="http://localhost:8080/people/alice"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg transition-colors text-sm text-white border border-white/20"
+                                >
+                                    <svg
+                                        class="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                        ></path>
+                                    </svg>
+                                    alice.cooks
+                                </a>
+
+                                <!-- Following Count -->
+                                <div
+                                    class="flex items-center gap-2 text-white/90"
+                                >
+                                    <span class="font-semibold">127</span>
+                                    <span class="text-sm">following</span>
+                                </div>
+
+                                <!-- Followers Count -->
+                                <div
+                                    class="flex items-center gap-2 text-white/90"
+                                >
+                                    <span class="font-semibold">2.4K</span>
+                                    <span class="text-sm">followers</span>
+                                </div>
+
+                                <!-- Public Key (Subtle) -->
+                                <div
+                                    class="flex items-center gap-2 text-white/60 text-xs"
+                                >
+                                    <svg
+                                        class="w-3 h-3"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                                        ></path>
+                                    </svg>
+                                    <span class="font-mono">ac20...9677</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Posts Section -->
+            <section class="mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-white">Recent Posts</h2>
+                    <a
+                        href="/people/alice/posts/"
+                        class="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                    >
+                        View all →
+                    </a>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- Post 1 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 1</h2>
+                            <p>Today • 9:14 AM</p>
+                        </header>
+                        <p>
+                            Just made a big pot of Harissa for dinner! Armenian
+                            chicken and rice porridge is the best comfort food.
+                        </p>
+                        <div class="mt-4">
+                            <a
+                                href="/people/alice/posts/1/"
+                                class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                                Read more
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 5l7 7-7 7"
+                                    ></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Post 2 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 2</h2>
+                            <p>Yesterday • 5:02 PM</p>
+                        </header>
+                        <p>
+                            Dark mode all the things. Readability first, fancy
+                            later.
+                        </p>
+                        <div class="mt-4">
+                            <a
+                                href="/people/alice/posts/2/"
+                                class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                                Read more
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 5l7 7-7 7"
+                                    ></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Post 3 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 3</h2>
+                            <p>2 days ago • 11:37 AM</p>
+                        </header>
+                        <p>
+                            Loving plain HTML + Tailwind from a CDN for quick
+                            scaffolds. Fast to read, fast to ship.
+                        </p>
+                        <div class="mt-4">
+                            <a
+                                href="/people/alice/posts/3/"
+                                class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                                Read more
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 5l7 7-7 7"
+                                    ></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="profile-card p-6 mb-8">
+                <h3 class="text-xl font-semibold text-white mb-4">About</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div>
+                        <h4 class="font-medium text-gray-200 mb-2">Birthday</h4>
+                        <p class="text-gray-400">December 25, 1990</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-200 mb-2">
+                            Interests
+                        </h4>
+                        <p class="text-gray-400">Cooking, Travel, Adventure</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center text-gray-500 text-sm">
+                <p>
+                    Profile powered by LAP v0.2 • Cryptographically verified
+                    content
+                </p>
+            </footer>
+        </main>
+    </body>
+</html>

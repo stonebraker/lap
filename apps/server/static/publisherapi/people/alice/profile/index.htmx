@@ -1,0 +1,51 @@
+<article
+    data-la-spec="v0.2"
+    data-la-fragment-url="http://localhost:8080/people/alice/profile"
+>
+    <section class="la-preview">
+        <article>
+            <header>
+                <img
+                    src="/people/alice/images/alice_profile_pic.jpg"
+                    alt="Alice's profile picture"
+                />
+                <h1>Alice Cooks</h1>
+                <p>@alice</p>
+            </header>
+            <p>
+                Hi, I'm Alice! I'm a curious and adventurous person who loves
+                exploring new lands and cooking.
+            </p>
+            <div>
+                <h2>About</h2>
+                <p>Birthday: December 25, 1990</p>
+                <p>Interests: Cooking, Travel, Adventure</p>
+                <p>
+                    Website:
+                    <a href="http://localhost:8080/people/alice">alice.cooks</a>
+                </p>
+            </div>
+            <div>
+                <h2>Stats</h2>
+                <p>Posts: 3</p>
+                <p>Following: 127</p>
+                <p>Followers: 2.4K</p>
+            </div>
+            <div>
+                <h2>Public Key</h2>
+                <p>
+                    ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677
+                </p>
+            </div>
+        </article>
+    </section>
+    <link
+        rel="canonical"
+        type="text/html"
+        data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+        data-la-resource-attestation-url="http://localhost:8080/people/alice/profile/_la_resource.json"
+        data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
+        href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxpbWcKICAgICAgICAgICAgc3JjPSIvcGVvcGxlL2FsaWNlL2ltYWdlcy9hbGljZV9wcm9maWxlX3BpYy5qcGciCiAgICAgICAgICAgIGFsdD0iQWxpY2UncyBwcm9maWxlIHBpY3R1cmUiCiAgICAgICAgLz4KICAgICAgICA8aDE+QWxpY2UgQ29va3M8L2gxPgogICAgICAgIDxwPkBhbGljZTwvcD4KICAgIDwvaGVhZGVyPgogICAgPHA+CiAgICAgICAgSGksIEknbSBBbGljZSEgSSdtIGEgY3VyaW91cyBhbmQgYWR2ZW50dXJvdXMgcGVyc29uIHdobyBsb3ZlcyBleHBsb3JpbmcKICAgICAgICBuZXcgbGFuZHMgYW5kIGNvb2tpbmcuCiAgICA8L3A+CiAgICA8ZGl2PgogICAgICAgIDxoMj5BYm91dDwvaDI+CiAgICAgICAgPHA+QmlydGhkYXk6IERlY2VtYmVyIDI1LCAxOTkwPC9wPgogICAgICAgIDxwPkludGVyZXN0czogQ29va2luZywgVHJhdmVsLCBBZHZlbnR1cmU8L3A+CiAgICAgICAgPHA+CiAgICAgICAgICAgIFdlYnNpdGU6CiAgICAgICAgICAgIDxhIGhyZWY9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UiPmFsaWNlLmNvb2tzPC9hPgogICAgICAgIDwvcD4KICAgIDwvZGl2PgogICAgPGRpdj4KICAgICAgICA8aDI+U3RhdHM8L2gyPgogICAgICAgIDxwPlBvc3RzOiAzPC9wPgogICAgICAgIDxwPkZvbGxvd2luZzogMTI3PC9wPgogICAgICAgIDxwPkZvbGxvd2VyczogMi40SzwvcD4KICAgIDwvZGl2PgogICAgPGRpdj4KICAgICAgICA8aDI+UHVibGljIEtleTwvaDI+CiAgICAgICAgPHA+YWMyMDg5OGVkZjk3YjVhMjRjNTk3NDllYzI2ZWE3YmM5NWNjMWQyODU5ZWY2YTE5NGNlYjdlZWIyYzcwOTY3NzwvcD4KICAgIDwvZGl2Pgo8L2FydGljbGU+Cg=="
+        hidden
+    />
+</article>

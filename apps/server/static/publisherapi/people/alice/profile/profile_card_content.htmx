@@ -1,0 +1,33 @@
+<article>
+    <header>
+        <img
+            src="/people/alice/images/alice_profile_pic.jpg"
+            alt="Alice's profile picture"
+        />
+        <h1>Alice Cooks</h1>
+        <p>@alice</p>
+    </header>
+    <p>
+        Hi, I'm Alice! I'm a curious and adventurous person who loves exploring
+        new lands and cooking.
+    </p>
+    <div>
+        <h2>About</h2>
+        <p>Birthday: December 25, 1990</p>
+        <p>Interests: Cooking, Travel, Adventure</p>
+        <p>
+            Website:
+            <a href="http://localhost:8080/people/alice">alice.cooks</a>
+        </p>
+    </div>
+    <div>
+        <h2>Stats</h2>
+        <p>Posts: 3</p>
+        <p>Following: 127</p>
+        <p>Followers: 2.4K</p>
+    </div>
+    <div>
+        <h2>Public Key</h2>
+        <p>ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677</p>
+    </div>
+</article>
