@@ -1,7 +1,7 @@
 <article>
     <header>
         <img
-            src="/people/alice/images/alice_profile_pic.jpg"
+            src="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
             alt="Alice's profile picture"
         />
         <h1>Alice Cooks</h1>

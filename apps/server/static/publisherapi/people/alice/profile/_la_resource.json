@@ -1,6 +1,6 @@
 {
-  "fragment_url": "http://localhost:8080/people/alice/profile",
-  "hash": "sha256:9dfa4a0b7c64b1da2d2e2e2ab40ab43118e546d5d3617428d4c199807340cc7f",
+  "fragment_url": "http://localhost:8080/people/alice/profile/index.htmx",
+  "hash": "sha256:585d9a78787167d4266404cb77b0832645c0823aca61f7d6604d7221ef87c440",
   "publisher_claim": "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
   "namespace_attestation_url": "http://localhost:8080/people/alice/_la_namespace.json"
 }
