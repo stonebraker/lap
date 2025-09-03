@@ -15,14 +15,16 @@
                         Linked Attestations Protocol (LAP) Demo
                     </h1>
                     <p class="text-gray-300 text-lg">
-                        Explore how LAP enables cryptographically verifiable
-                        content fragments
+                        Explore how LAP enables broad distribution of content
+                        that can always<br />
+                        be resolved back to its original publisher.
                     </p>
                 </div>
 
                 <!-- Demo Options -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                    <!-- Client-Side Fetch -->
+                    <!-- Client-Side Fetch (Commented Out) -->
+                    <!--
                     <div
                         class="bg-gray-800 p-8 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
                     >
@@ -87,6 +89,89 @@
                             Try Client-Side Demo
                         </a>
                     </div>
+                    -->
+
+                    <!-- About the Linked Attestations Protocol -->
+                    <div
+                        class="bg-gray-800 p-8 rounded-lg border border-gray-700"
+                    >
+                        <div class="mb-6">
+                            <div
+                                class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4"
+                            >
+                                <svg
+                                    class="w-6 h-6 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-semibold mb-3">
+                                About the Linked Attestations Protocol
+                            </h2>
+                            <p class="text-gray-300 mb-6">
+                                LAP provides proof of publisher authenticity and
+                                content integrity for peer-to-peer, distributed
+                                micro-content.
+                            </p>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-purple-500 rounded-full mr-2"
+                                ></span>
+                                Cryptographic verification
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-purple-500 rounded-full mr-2"
+                                ></span>
+                                Hypermedia architecture
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-purple-500 rounded-full mr-2"
+                                ></span>
+                                Web-native decentralization
+                            </div>
+                            <div
+                                class="flex items-center text-sm text-gray-400"
+                            >
+                                <span
+                                    class="w-2 h-2 bg-purple-500 rounded-full mr-2"
+                                ></span>
+                                No intermediaries, blockchains, or tokens
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <p class="mb-2">
+                                Micro-content can be embedded anywhere on the
+                                web while maintaining a cryptographic link to
+                                its creator/publisher.
+                            </p>
+                            <p class="mb-2">
+                                Built on hypermedia principles, LAP enables
+                                seamless content discovery and verification.
+                            </p>
+                            <p>
+                                No central authority required - trust is
+                                established through cryptographic proofs.
+                            </p>
+                        </div>
+                    </div>
 
                     <!-- Server-Side Fetch -->
                     <div
@@ -117,7 +202,7 @@
                                 Fetch and verify LAP fragments on the server
                                 before rendering. This approach shows how web
                                 applications can pre-verify content and provide
-                                enhanced security guarantees.
+                                enhanced publisher resolution.
                             </p>
                         </div>
                         <div class="space-y-3 mb-6">
@@ -152,44 +237,6 @@
                         >
                             Try Server-Side Demo
                         </a>
-                    </div>
-                </div>
-
-                <!-- About LAP -->
-                <div
-                    class="bg-gray-800 p-8 rounded-lg border border-gray-700 mb-8"
-                >
-                    <h3 class="text-xl font-semibold mb-4">
-                        About the Linked Attestations Protocol
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                        <div>
-                            <h4 class="font-medium text-gray-200 mb-2">
-                                Cryptographic Verification
-                            </h4>
-                            <p class="text-gray-400">
-                                Every fragment is cryptographically signed,
-                                ensuring content authenticity and integrity.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-200 mb-2">
-                                Hypermedia Architecture
-                            </h4>
-                            <p class="text-gray-400">
-                                Built on hypermedia principles, LAP enables
-                                seamless content discovery and verification.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-200 mb-2">
-                                Decentralized Trust
-                            </h4>
-                            <p class="text-gray-400">
-                                No central authority required - trust is
-                                established through cryptographic proofs.
-                            </p>
-                        </div>
                     </div>
                 </div>
 
