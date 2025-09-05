@@ -145,29 +145,37 @@ func processFragmentVerification(htmlContent string, actualFetchURL string) (*ve
 // parseFragmentFromHTML extracts a LAP fragment from HTML content
 // This is adapted from the verifier CLI implementation
 func parseFragmentFromHTML(htmlContent string, actualFetchURL string) (*wire.Fragment, error) {
-	// Use the actual fetch URL as the fragment URL, not the one claimed in the HTML
-	fragmentURL := actualFetchURL
-	if fragmentURL == "" {
-		// Fallback to extracting from HTML if no actual fetch URL provided
-		needle := `data-la-fragment-url="`
-		idx := strings.Index(htmlContent, needle)
-		if idx < 0 {
-			return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
-		}
-
-		// Extract the actual fragment URL from the HTML
-		fragmentURLStart := idx + len(needle)
-		fragmentURLEnd := strings.Index(htmlContent[fragmentURLStart:], `"`)
-		if fragmentURLEnd < 0 {
-			return nil, fmt.Errorf("fragment structure malformed: incomplete data-la-fragment-url attribute")
-		}
-		fragmentURL = htmlContent[fragmentURLStart : fragmentURLStart+fragmentURLEnd]
+	// Extract the claimed fragment URL from the HTML
+	needle := `data-la-fragment-url="`
+	idx := strings.Index(htmlContent, needle)
+	if idx < 0 {
+		return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
 	}
+
+	// Extract the claimed fragment URL from the HTML
+	fragmentURLStart := idx + len(needle)
+	fragmentURLEnd := strings.Index(htmlContent[fragmentURLStart:], `"`)
+	if fragmentURLEnd < 0 {
+		return nil, fmt.Errorf("fragment structure malformed: incomplete data-la-fragment-url attribute")
+	}
+	claimedFragmentURL := htmlContent[fragmentURLStart : fragmentURLStart+fragmentURLEnd]
+
+	// Validate that the claimed URL matches the actual fetch URL
+	if actualFetchURL != "" {
+		// Normalize URLs by removing trailing slashes for comparison
+		normalizedClaimed := strings.TrimSuffix(claimedFragmentURL, "/")
+		normalizedActual := strings.TrimSuffix(actualFetchURL, "/")
+		if normalizedClaimed != normalizedActual {
+			return nil, fmt.Errorf("URL mismatch: fragment claims URL %s but was fetched from %s", claimedFragmentURL, actualFetchURL)
+		}
+	}
+
+	// Use the claimed URL (which should match actualFetchURL if provided)
+	fragmentURL := claimedFragmentURL
 
 	// Find the start of the article element
 	// Look for any fragment in the HTML (we'll use the first one found)
-	needle := `data-la-fragment-url="`
-	idx := strings.Index(htmlContent, needle)
+	idx = strings.Index(htmlContent, needle)
 	if idx < 0 {
 		return nil, fmt.Errorf("no fragment found with data-la-fragment-url attribute")
 	}

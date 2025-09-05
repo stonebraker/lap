@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>The Fireswamp Inn - Adventure Experiences</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap");
+
+            .hero-bg {
+                background: linear-gradient(
+                        rgba(0, 0, 0, 0.5),
+                        rgba(0, 0, 0, 0.7)
+                    ),
+                    url("/people/westley/images/profile_banner.jpg");
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }
+
+            .experience-card {
+                background: linear-gradient(
+                    135deg,
+                    rgba(139, 69, 19, 0.1) 0%,
+                    rgba(160, 82, 45, 0.1) 100%
+                );
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(139, 69, 19, 0.3);
+            }
+
+            .fire-glow {
+                box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+            }
+
+            .swamp-texture {
+                background-image: radial-gradient(
+                        circle at 20% 50%,
+                        rgba(34, 139, 34, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 80% 20%,
+                        rgba(139, 69, 19, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 40% 80%,
+                        rgba(0, 100, 0, 0.1) 0%,
+                        transparent 50%
+                    );
+            }
+        </style>
+        <script src="/people/westley/components/la-profile.js"></script>
+        <script>
+            function copyFragment(button) {
+                // Get the raw fragment HTML from the data attribute
+                const fragmentData = button.getAttribute("data-fragment");
+                if (!fragmentData) {
+                    return;
+                }
+
+                // Copy to clipboard
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard
+                        .writeText(fragmentData)
+                        .then(() => {
+                            showCopied(button);
+                        })
+                        .catch((err) => {
+                            console.error("Failed to copy: ", err);
+                            fallbackCopy(fragmentData, button);
+                        });
+                } else {
+                    fallbackCopy(fragmentData, button);
+                }
+            }
+
+            function fallbackCopy(text, button) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand("copy");
+                    if (successful) {
+                        showCopied(button);
+                    }
+                } catch (err) {
+                    console.error("Fallback copy failed: ", err);
+                }
+
+                document.body.removeChild(textArea);
+            }
+
+            function showCopied(button) {
+                const span = button.querySelector("span");
+                const originalText = span.textContent;
+                span.textContent = "Copied";
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    span.textContent = originalText;
+                }, 2000);
+            }
+
+            async function verifyFragment(button) {
+                const span = button.querySelector("span");
+                const originalText = span.textContent;
+                const originalIcon = button.querySelector("svg");
+
+                // Disable button during verification
+                button.disabled = true;
+                button.classList.add("opacity-50");
+
+                try {
+                    // Get the complete fragment element from the DOM
+                    const fragmentElement = button
+                        .closest(".bg-gray-800")
+                        .querySelector("article[data-la-spec]");
+
+                    if (!fragmentElement) {
+                        throw new Error("No fragment element found");
+                    }
+
+                    // Get the complete fragment HTML with all LAP metadata
+                    const fragmentHTML = fragmentElement.outerHTML;
+
+                    // Send to verification service
+                    const response = await fetch(
+                        "http://localhost:8082/verify",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "text/html",
+                                "X-Fetch-URL":
+                                    "http://localhost:8080/people/alice/posts/1",
+                            },
+                            body: fragmentHTML,
+                        }
+                    );
+
+                    const result = await response.json();
+
+                    if (result.verified) {
+                        // Success - show checkmark
+                        span.textContent = "Verified";
+                        button.classList.remove(
+                            "text-gray-400",
+                            "hover:text-gray-300"
+                        );
+                        button.classList.add("text-green-400");
+
+                        // Change icon to checkmark
+                        originalIcon.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        `;
+
+                        // Reset after 3 seconds
+                        setTimeout(() => {
+                            span.textContent = originalText;
+                            button.classList.remove("text-green-400");
+                            button.classList.add(
+                                "text-gray-400",
+                                "hover:text-gray-300"
+                            );
+                            originalIcon.innerHTML = `
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            `;
+                        }, 3000);
+                    } else {
+                        // Verification failed
+                        span.textContent = "Failed";
+                        button.classList.remove(
+                            "text-gray-400",
+                            "hover:text-gray-300"
+                        );
+                        button.classList.add("text-red-400");
+
+                        // Change icon to X
+                        originalIcon.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        `;
+
+                        // Reset after 3 seconds
+                        setTimeout(() => {
+                            span.textContent = "Verify";
+                            button.classList.remove("text-red-400");
+                            button.classList.add(
+                                "text-gray-400",
+                                "hover:text-gray-300"
+                            );
+                            originalIcon.innerHTML = `
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            `;
+                        }, 3000);
+                    }
+                } catch (error) {
+                    console.error("Verification error:", error);
+
+                    // Show error state
+                    span.textContent = "Error";
+                    button.classList.remove(
+                        "text-gray-400",
+                        "hover:text-gray-300"
+                    );
+                    button.classList.add("text-red-400");
+
+                    // Change icon to X
+                    originalIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    `;
+
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        span.textContent = "Verify";
+                        button.classList.remove("text-red-400");
+                        button.classList.add(
+                            "text-gray-400",
+                            "hover:text-gray-300"
+                        );
+                        originalIcon.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        `;
+                    }, 3000);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    button.classList.remove("opacity-50");
+                }
+            }
+        </script>
+    </head>
+    <body class="bg-gray-900 text-gray-100 min-h-screen swamp-texture">
+        <!-- Hero Section -->
+        <div
+            class="hero-bg min-h-screen flex items-center justify-center relative"
+        >
+            <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+                <div class="mb-8">
+                    <img
+                        src="/people/westley/images/profile_pic.jpg"
+                        alt="Westley - Fireswamp Inn Proprietor"
+                        class="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-amber-600 fire-glow object-cover"
+                    />
+                    <h1
+                        class="text-6xl font-bold mb-4 font-cinzel text-amber-400"
+                    >
+                        The Fire Swamp Inn
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8 font-crimson">
+                        Feel free to visit anytime you feel like dying.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                    <div
+                        class="bg-black bg-opacity-50 p-6 rounded-lg border border-amber-600"
+                    >
+                        <h2
+                            class="text-2xl font-bold mb-4 text-amber-400 font-cinzel"
+                        >
+                            Proprietor
+                        </h2>
+                        <p class="text-lg font-semibold text-white">Westley</p>
+                        <p class="text-gray-300">
+                            Not The Real Dread Pirate Roberts/Farmboy
+                        </p>
+                    </div>
+
+                    <div
+                        class="bg-black bg-opacity-50 p-6 rounded-lg border border-amber-600"
+                    >
+                        <h2
+                            class="text-2xl font-bold mb-4 text-amber-400 font-cinzel"
+                        >
+                            Location
+                        </h2>
+                        <p class="text-lg font-semibold text-white">
+                            The Fire Swamp
+                        </p>
+                        <p class="text-gray-300">
+                            From the Cliffs of Insanity, just take a quick
+                            tumble down a steep ravine, then listen for popping
+                            sounds.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="py-16 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Left Column: Adventure Activities -->
+                    <div class="lg:col-span-1">
+                        <h2
+                            class="text-4xl font-bold mb-12 text-amber-400 font-cinzel"
+                        >
+                            Adventure Experiences
+                        </h2>
+
+                        <div class="space-y-12">
+                            <!-- ROUS Observation -->
+                            <div class="pb-8">
+                                <h3
+                                    class="text-2xl font-bold text-amber-400 font-cinzel mb-4"
+                                >
+                                    ROUS Observation
+                                </h3>
+                                <h4
+                                    class="text-xl font-semibold text-white font-crimson mb-4"
+                                >
+                                    Twilight Tunnel Tracking
+                                </h4>
+                                <p
+                                    class="text-gray-300 leading-relaxed font-crimson"
+                                >
+                                    Guests can participate in a guided twilight
+                                    expedition to observe Rodents of Unusual
+                                    Size in their native fire swamp environment,
+                                    using silent observation techniques to
+                                    witness these massive, aggressive rodents
+                                    hunting, foraging, and interacting in their
+                                    complex underground tunnel systems.
+                                </p>
+                            </div>
+
+                            <hr class="border-gray-700 border-opacity-50" />
+
+                            <!-- Fire Evasion -->
+                            <div class="py-8">
+                                <h3
+                                    class="text-2xl font-bold text-amber-400 font-cinzel mb-4"
+                                >
+                                    Fire Evasion
+                                </h3>
+                                <h4
+                                    class="text-xl font-semibold text-white font-crimson mb-4"
+                                >
+                                    Flame Footwork Mastery
+                                </h4>
+                                <p
+                                    class="text-gray-300 leading-relaxed font-crimson"
+                                >
+                                    Experienced fire swamp survival instructors
+                                    teach guests the intricate art of detecting
+                                    and avoiding spontaneous ground fire
+                                    eruptions through a combination of precise
+                                    footwork, terrain reading techniques, and
+                                    split-second reactive movements that can
+                                    mean the difference between life and death
+                                    in this treacherous landscape.
+                                </p>
+                            </div>
+
+                            <hr class="border-gray-700 border-opacity-50" />
+
+                            <!-- Lightning Sand Expedition -->
+                            <div class="pt-8">
+                                <h3
+                                    class="text-2xl font-bold text-amber-400 font-cinzel mb-4"
+                                >
+                                    Lightning Sand Expedition
+                                </h3>
+                                <h4
+                                    class="text-xl font-semibold text-white font-crimson mb-4"
+                                >
+                                    Moonlit Quicksand Challenge
+                                </h4>
+                                <p
+                                    class="text-gray-300 leading-relaxed font-crimson"
+                                >
+                                    Daring guests can join a moonlit, guided
+                                    swimming expedition through the fire swamp's
+                                    notorious lightning sand pools, learning
+                                    critical survival techniques for detecting
+                                    unstable ground, using conveniently placed
+                                    rope-like vines, and executing rapid
+                                    extraction methods should someone begin to
+                                    sink into the quicksand-like terrain.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Culinary & Future Content -->
+                    <div class="lg:col-span-1">
+                        <h2
+                            class="text-4xl font-bold mb-12 text-amber-400 font-cinzel"
+                        >
+                            Culinary Experiences
+                        </h2>
+
+                        <!-- 1. Guest Chef: Alice Cooks -->
+                        <div class="pb-8">
+                            <h3
+                                class="text-2xl font-bold text-amber-400 font-cinzel mb-0"
+                            >
+                                Guest Chef: Alice Cooks
+                            </h3>
+                        </div>
+
+                        <!-- {{if and .AlicePost .AlicePost.Verified}}
+                        <div class="py-0">
+                            <div
+                                class="relative mb-6 rounded-lg overflow-hidden"
+                            >
+                                {{if .ProfileData.Banner}}
+                                <div
+                                    class="relative h-32 bg-gradient-to-r from-amber-900 to-orange-800"
+                                >
+                                    <img
+                                        src="{{.ProfileData.Banner}}"
+                                        alt="{{.ProfileData.DisplayName}}'s banner"
+                                        class="w-full h-full object-cover object-bottom opacity-80"
+                                    />
+                                    <div
+                                        class="absolute inset-0 bg-black bg-opacity-40"
+                                    ></div>
+                                </div>
+                                {{else}}
+                                <div
+                                    class="h-32 bg-gradient-to-r from-amber-900 to-orange-800 flex items-center justify-center"
+                                >
+                                    <div class="text-center">
+                                        <h3
+                                            class="text-2xl font-bold text-amber-200 font-cinzel"
+                                        >
+                                            {{.ProfileData.DisplayName}}
+                                        </h3>
+                                        <p class="text-amber-300 text-sm">
+                                            Guest Chef
+                                        </p>
+                                    </div>
+                                </div>
+                                {{end}}
+
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 p-4"
+                                >
+                                    <div class="flex items-end space-x-4">
+                                        {{if .ProfileData.Picture}}
+                                        <img
+                                            src="{{.ProfileData.Picture}}"
+                                            alt="{{.ProfileData.DisplayName}}'s profile picture"
+                                            class="w-16 h-16 rounded-full border-4 border-amber-400 object-cover"
+                                        />
+                                        {{end}}
+                                        <div class="flex-1">
+                                            <h3
+                                                class="text-xl font-bold text-white font-cinzel mb-1"
+                                            >
+                                                {{.ProfileData.DisplayName}}
+                                            </h3>
+                                            <p
+                                                class="text-amber-200 text-sm mb-2"
+                                            >
+                                                Guest Chef at The Fireswamp Inn
+                                            </p>
+                                            {{if .ProfileData.Website}}
+                                            <a
+                                                href="{{.ProfileData.Website}}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="text-amber-300 hover:text-amber-200 text-sm"
+                                            >
+                                                {{.ProfileData.Website}}
+                                            </a>
+                                            {{end}}
+                                        </div>
+                                        <div
+                                            class="flex items-center bg-green-900 bg-opacity-80 px-3 py-1 rounded-full"
+                                        >
+                                            <svg
+                                                class="w-4 h-4 text-green-400 mr-1"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M5 13l4 4L19 7"
+                                                ></path>
+                                            </svg>
+                                            <span
+                                                class="text-xs text-green-400 font-semibold"
+                                                >Verified</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{end}} -->
+
+                        <!-- Web Component Profile Card -->
+                        <div class="py-4">
+                            <la-profile
+                                src="http://localhost:8080/people/alice/profile/index.htmx"
+                            ></la-profile>
+
+                            <!-- Profile Loading Indicator -->
+                            <div
+                                class="-mt-4 text-xs text-gray-500 text-center"
+                            >
+                                <span class="inline-flex items-center">
+                                    <svg
+                                        class="w-3 h-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                        ></path>
+                                    </svg>
+                                    Profile hypermedia fragment fetched and
+                                    embedded client-side
+                                </span>
+                            </div>
+
+                            <noscript>
+                                <div
+                                    class="bg-gray-800 bg-opacity-30 p-6 rounded-lg border border-gray-700"
+                                >
+                                    <p class="text-gray-300">
+                                        Web component requires JavaScript to
+                                        load.
+                                    </p>
+                                </div>
+                            </noscript>
+                        </div>
+
+                        <!-- 3. Swamp Feast Extraordinaire -->
+                        <div class="py-2">
+                            <h3
+                                class="text-2xl font-bold text-amber-400 font-cinzel mb-4"
+                            >
+                                Swamp Feast Extraordinaire
+                            </h3>
+                            <p
+                                class="text-gray-300 leading-relaxed font-crimson mb-4"
+                            >
+                                Alice Cooks prepares a special fire
+                                swamp-inspired feast, crafting dishes that
+                                incorporate local ingredients like smoked marsh
+                                herbs, rare root vegetables, and proteins
+                                sourced from the treacherous surrounding
+                                ecosystem. You'll finally get an answer to the
+                                question, does ROUS taste just like chicken?
+                            </p>
+                        </div>
+
+                        <!-- 4. Recent posts... -->
+                        <div class="py-2">
+                            <h3
+                                class="text-2xl font-bold text-amber-400 font-cinzel mb-4"
+                            >
+                                Alice's Recent posts...
+                            </h3>
+                        </div>
+
+                        <!-- 5. Post 1 -->
+                        <div class="pt-0">
+                            <!-- Post Content -->
+                            <div
+                                class="bg-gray-800 bg-opacity-30 p-6 rounded-lg border border-gray-700"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-4"
+                                >
+                                    <h4
+                                        class="text-lg font-bold text-amber-400 font-cinzel"
+                                    >
+                                        Post 1
+                                    </h4>
+                                    <div class="flex items-center space-x-3">
+                                        <button
+                                            onclick="copyFragment(this)"
+                                            class="flex items-center space-x-2 text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                                            title="Copy fragment"
+                                            data-fragment="PGFydGljbGUgZGF0YS10eXBlPSJwb3N0Ij4KICAgIDxoZWFkZXI+CiAgICAgICAgPGgyIGRhdGEtcHJvcD0idGl0bGUiPlBvc3QgMTwvaDI+CiAgICAgICAgPHAgZGF0YS1wcm9wPSJwdWJsaXNoZWRfZGF0ZSI+VG9kYXkg4oCiIDk6MTQgQU08L3A+CiAgICAgICAgPG1ldGEgcHJvcGVydHk9ImNyZWF0ZWRfYXQiIGNvbnRlbnQ9IjE3NTU4Njg0NDAiIC8+CiAgICA8L2hlYWRlcj4KICAgIDxtYWluIGRhdGEtcHJvcD0iYm9keSI+CiAgICAgICAgPHA+CiAgICAgICAgICAgIEp1c3QgbWFkZSBhIGJpZyBwb3Qgb2YgSGFyaXNzYSBmb3IgZGlubmVyISBBcm1lbmlhbiBjaGlja2VuIGFuZCByaWNlCiAgICAgICAgICAgIHBvcnJpZGdlIGlzIHRoZSBiZXN0IGNvbWZvcnQgZm9vZC4KICAgICAgICA8L3A+CiAgICA8L21haW4+CjwvYXJ0aWNsZT4K"
+                                        >
+                                            <span class="text-sm">Copy</span>
+                                            <svg
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                                ></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onclick="verifyFragment(this)"
+                                            class="flex items-center space-x-2 text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                                            title="Verify fragment"
+                                        >
+                                            <span class="text-sm">Verify</span>
+                                            <svg
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                ></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="prose prose-invert max-w-none text-gray-300"
+                                >
+                                    <article
+                                        data-la-spec="v0.2"
+                                        data-la-fragment-url="http://localhost:8080/people/alice/posts/1"
+                                    >
+                                        <section class="la-preview">
+                                            <article data-type="post">
+                                                <header>
+                                                    <h2 data-prop="title">
+                                                        Post 1
+                                                    </h2>
+                                                    <p
+                                                        data-prop="published_date"
+                                                    >
+                                                        Today • 9:14 AM
+                                                    </p>
+                                                    <meta
+                                                        property="created_at"
+                                                        content="1755868440"
+                                                    />
+                                                </header>
+                                                <main data-prop="body">
+                                                    <p>
+                                                        Just made a big pot of
+                                                        Harissa for dinner!
+                                                        Armenian chicken and
+                                                        rice porridge is the
+                                                        best comfort food.
+                                                    </p>
+                                                </main>
+                                            </article>
+                                        </section>
+                                        <link
+                                            rel="canonical"
+                                            type="text/html"
+                                            data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+                                            data-la-resource-attestation-url="http://localhost:8080/people/alice/posts/1/_la_resource.json"
+                                            data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
+                                            href="data:text/html;base64,PGFydGljbGUgZGF0YS10eXBlPSJwb3N0Ij4KICAgIDxoZWFkZXI+CiAgICAgICAgPGgyIGRhdGEtcHJvcD0idGl0bGUiPlBvc3QgMTwvaDI+CiAgICAgICAgPHAgZGF0YS1wcm9wPSJwdWJsaXNoZWRfZGF0ZSI+VG9kYXkg4oCiIDk6MTQgQU08L3A+CiAgICAgICAgPG1ldGEgcHJvcGVydHk9ImNyZWF0ZWRfYXQiIGNvbnRlbnQ9IjE3NTU4Njg0NDAiIC8+CiAgICA8L2hlYWRlcj4KICAgIDxtYWluIGRhdGEtcHJvcD0iYm9keSI+CiAgICAgICAgPHA+CiAgICAgICAgICAgIEp1c3QgbWFkZSBhIGJpZyBwb3Qgb2YgSGFyaXNzYSBmb3IgZGlubmVyISBBcm1lbmlhbiBjaGlja2VuIGFuZCByaWNlCiAgICAgICAgICAgIHBvcnJpZGdlIGlzIHRoZSBiZXN0IGNvbWZvcnQgZm9vZC4KICAgICAgICA8L3A+CiAgICA8L21haW4+CjwvYXJ0aWNsZT4K"
+                                            hidden
+                                        />
+                                    </article>
+                                </div>
+                            </div>
+
+                            <!-- Post Loading Indicator -->
+                            <div class="mt-2 text-xs text-gray-500 text-center">
+                                <span class="inline-flex items-center">
+                                    <svg
+                                        class="w-3 h-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        ></path>
+                                    </svg>
+                                    Post hypermedia fragment hardcoded in page
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-black bg-opacity-50 py-8 border-t border-amber-600">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                <p class="text-gray-400 font-crimson">
+                    The Fireswamp Inn - Sleep well, we'll most likely kill you
+                    in the morning.
+                </p>
+                <p class="text-sm text-gray-500 mt-2">
+                    © 2025 Westley's Fire Swamp Adventures
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

@@ -66,6 +66,7 @@ type ProfileData struct {
 	Picture     string
 	Website     string
 	PublicKey   string
+	Banner      string
 	Error       string
 }
 
@@ -82,6 +83,10 @@ func main() {
 	// Add server-side fetch route
 	mux.Get("/server-side-fetch/", serverSideFetchHandler)
 	mux.Get("/server-side-fetch/{postID}", serverSideFetchHandler)
+	
+	// Add Westley's page route with Alice's post integration
+	mux.Get("/people/westley/", westleyPageHandler)
+	mux.Get("/people/westley", westleyPageHandler)
 	
 	// Add reset artifacts route
 	mux.Post("/people/alice/reset-artifacts", resetArtifactsHandler)
@@ -428,6 +433,12 @@ func parseProfileFromHTML(profileHTML string) *ProfileData {
 		profile.Picture = matches[1]
 	}
 	
+	// Extract banner image from img src with banner in alt text
+	bannerRegex := regexp.MustCompile(`<img[^>]*src="([^"]+)"[^>]*alt="[^"]*banner[^"]*"[^>]*>`)
+	if matches := bannerRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+		profile.Banner = matches[1]
+	}
+	
 	// Extract website from href
 	websiteRegex := regexp.MustCompile(`<a[^>]*href="([^"]+)"[^>]*>([^<]+)</a>`)
 	if matches := websiteRegex.FindStringSubmatch(profileHTML); len(matches) > 2 {
@@ -514,6 +525,142 @@ func renderError(w http.ResponseWriter, message string, err error) {
 	if execErr := tmpl.Execute(w, data); execErr != nil {
 		log.Printf("Error executing error template: %v", execErr)
 	}
+}
+
+// westleyPageHandler serves Westley's page with Alice's verified post integrated
+func westleyPageHandler(w http.ResponseWriter, r *http.Request) {
+	// Fetch Alice's post 1 from the publisher server
+	fragmentURL := "http://localhost:8080/people/alice/posts/1/"
+	
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	
+	resp, err := client.Get(fragmentURL)
+	if err != nil {
+		renderError(w, "Failed to fetch Alice's post", err)
+		return
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 200 {
+		renderError(w, "Alice's post fetch failed", fmt.Errorf("HTTP %d", resp.StatusCode))
+		return
+	}
+	
+	fragmentHTML, err := io.ReadAll(resp.Body)
+	if err != nil {
+		renderError(w, "Failed to read Alice's post", err)
+		return
+	}
+	
+	// Verify the fragment
+	verificationResult := verifyFragment(string(fragmentHTML), fragmentURL)
+	
+	// Process the fragment for safe rendering
+	processedFragment := processFragment(string(fragmentHTML), verificationResult)
+	
+	// Extract attestation URLs from the raw HTML fragment
+	extractedResourceURL, extractedNamespaceURL := extractAttestationURLsFromHTML(string(fragmentHTML))
+	
+	// Fetch resource attestation (not used in Westley's page but kept for consistency)
+	var resourceAttestationURL string
+	if verificationResult.Context != nil && verificationResult.Context.ResourceAttestationURL != "" {
+		resourceAttestationURL = verificationResult.Context.ResourceAttestationURL
+		_ = fetchResourceAttestation(resourceAttestationURL)
+	} else if extractedResourceURL != "" {
+		resourceAttestationURL = extractedResourceURL
+		_ = fetchResourceAttestation(resourceAttestationURL)
+	}
+	
+	// Fetch namespace attestation
+	var namespaceAttestation string
+	var namespaceAttestationURL string
+	var profileData *ProfileData
+	if verificationResult.Context != nil && verificationResult.Context.NamespaceAttestationURL != "" {
+		namespaceAttestationURL = verificationResult.Context.NamespaceAttestationURL
+		namespaceAttestation = fetchNamespaceAttestation(namespaceAttestationURL)
+	} else if extractedNamespaceURL != "" {
+		namespaceAttestationURL = extractedNamespaceURL
+		namespaceAttestation = fetchNamespaceAttestation(namespaceAttestationURL)
+	}
+	
+	// If verification passed and we have namespace attestation, try to fetch profile data
+	if verificationResult.Verified && namespaceAttestation != "" {
+		if namespaceURL, err := extractNamespaceURL(namespaceAttestation); err == nil {
+			profileData = fetchProfileFragment(namespaceURL)
+		}
+	} else {
+		profileData = nil
+	}
+	
+	// Render Westley's page with Alice's post integrated
+	renderWestleyPageWithAlicePost(w, processedFragment, verificationResult, profileData)
+}
+
+// renderWestleyPageWithAlicePost renders Westley's page with Alice's verified post integrated
+func renderWestleyPageWithAlicePost(w http.ResponseWriter, fragment *ProcessedFragment, verification *VerificationResult, profileData *ProfileData) {
+	tmpl, err := template.ParseFiles("apps/client-server/static/people/westley/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Fragment     *ProcessedFragment
+		Verification *VerificationResult
+		ProfileData  *ProfileData
+		AlicePost    *AlicePostData
+	}{
+		Fragment:     fragment,
+		Verification: verification,
+		ProfileData:  profileData,
+		AlicePost:    extractAlicePostData(fragment, verification, profileData),
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// AlicePostData holds the processed Alice post data for display
+type AlicePostData struct {
+	Title       string
+	Content     template.HTML
+	Verified    bool
+	ProfileName string
+	ProfilePic  string
+	Error       string
+}
+
+// extractAlicePostData extracts and processes Alice's post data for display
+func extractAlicePostData(fragment *ProcessedFragment, verification *VerificationResult, profileData *ProfileData) *AlicePostData {
+	post := &AlicePostData{
+		Verified: verification.Verified,
+	}
+	
+	if profileData != nil {
+		post.ProfileName = profileData.DisplayName
+		post.ProfilePic = profileData.Picture
+	}
+	
+	if verification.Verified && fragment.CanonicalContent != "" {
+		// Extract title from the canonical content
+		titleRegex := regexp.MustCompile(`<h[1-6][^>]*>([^<]+)</h[1-6]>`)
+		if matches := titleRegex.FindStringSubmatch(string(fragment.CanonicalContent)); len(matches) > 1 {
+			post.Title = strings.TrimSpace(matches[1])
+		} else {
+			post.Title = "Alice's Latest Post"
+		}
+		post.Content = fragment.CanonicalContent
+	} else {
+		post.Title = "Alice's Post (Verification Failed)"
+		post.Content = fragment.PreviewContent
+		post.Error = "Post verification failed"
+	}
+	
+	return post
 }
 
 // resetArtifactsHandler calls the lapctl reset-artifacts command

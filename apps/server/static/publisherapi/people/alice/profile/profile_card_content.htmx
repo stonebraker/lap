@@ -1,23 +1,45 @@
 <article>
+    <div
+        class="banner"
+        data-profile-banner="http://localhost:8080/people/alice/images/alice_banner.jpg"
+    >
+        <img
+            src="http://localhost:8080/people/alice/images/alice_banner.jpg"
+            alt="Alice's banner image"
+        />
+    </div>
     <header>
         <img
             src="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
             alt="Alice's profile picture"
+            data-profile-picture="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
         />
-        <h1>Alice Cooks</h1>
-        <p>@alice</p>
+        <h1 data-profile-display-name="Alice Cooks">Alice Cooks</h1>
+        <p data-profile-name="Alice">@alice</p>
     </header>
-    <p>
+    <p
+        data-profile-about="Hi, I'm Alice! I'm a curious and adventurous person who loves exploring new lands and cooking rabbit stew."
+    >
         Hi, I'm Alice! I'm a curious and adventurous person who loves exploring
         new lands and cooking.
     </p>
     <div>
         <h2>About</h2>
-        <p>Birthday: December 25, 1990</p>
+        <p
+            data-profile-birthday-year="1990"
+            data-profile-birthday-month="12"
+            data-profile-birthday-day="25"
+        >
+            Birthday: December 25, 1990
+        </p>
         <p>Interests: Cooking, Travel, Adventure</p>
         <p>
             Website:
-            <a href="http://localhost:8080/people/alice">alice.cooks</a>
+            <a
+                href="http://localhost:8080/people/alice"
+                data-profile-website="http://localhost:8080/peope/alice"
+                >http://localhost:8080/people/alice</a
+            >
         </p>
     </div>
     <div>
@@ -28,6 +50,10 @@
     </div>
     <div>
         <h2>Public Key</h2>
-        <p>ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677</p>
+        <p
+            data-profile-pubkey="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+        >
+            ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677
+        </p>
     </div>
 </article>
