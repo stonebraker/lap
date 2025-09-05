@@ -37,7 +37,7 @@
             Website:
             <a
                 href="http://localhost:8080/people/alice"
-                data-profile-website="http://localhost:8080/peope/alice"
+                data-profile-website="http://localhost:8080/people/alice"
                 >http://localhost:8080/people/alice</a
             >
         </p>

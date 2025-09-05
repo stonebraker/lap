@@ -1,75 +1,76 @@
 <article
-    data-la-spec="v0.2"
-    data-la-fragment-url="http://localhost:8080/people/alice/profile/index.htmx"
+  data-la-spec="v0.2"
+  data-la-fragment-url="http://localhost:8080/people/alice/profile/index.htmx"
 >
-    <section class="la-preview">
-        <article>
-            <div
-                class="banner"
-                data-profile-banner="http://localhost:8080/people/alice/images/alice_banner.jpg"
-            >
-                <img
-                    src="http://localhost:8080/people/alice/images/alice_banner.jpg"
-                    alt="Alice's banner image"
-                />
-            </div>
-            <header>
-                <img
-                    src="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
-                    alt="Alice's profile picture"
-                    data-profile-picture="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
-                />
-                <h1 data-profile-display-name="Alice Cooks">Alice Cooks</h1>
-                <p data-profile-name="Alice">@alice</p>
-            </header>
+  <section class="la-preview">
+    <article>
+        <div
+            class="banner"
+            data-profile-banner="http://localhost:8080/people/alice/images/alice_banner.jpg"
+        >
+            <img
+                src="http://localhost:8080/people/alice/images/alice_banner.jpg"
+                alt="Alice's banner image"
+            />
+        </div>
+        <header>
+            <img
+                src="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
+                alt="Alice's profile picture"
+                data-profile-picture="http://localhost:8080/people/alice/images/alice_profile_pic.jpg"
+            />
+            <h1 data-profile-display-name="Alice Cooks">Alice Cooks</h1>
+            <p data-profile-name="Alice">@alice</p>
+        </header>
+        <p
+            data-profile-about="Hi, I'm Alice! I'm a curious and adventurous person who loves exploring new lands and cooking rabbit stew."
+        >
+            Hi, I'm Alice! I'm a curious and adventurous person who loves exploring
+            new lands and cooking.
+        </p>
+        <div>
+            <h2>About</h2>
             <p
-                data-profile-about="Hi, I'm Alice! I'm a curious and adventurous person who loves exploring new lands and cooking rabbit stew."
+                data-profile-birthday-year="1990"
+                data-profile-birthday-month="12"
+                data-profile-birthday-day="25"
             >
-                Hi, I'm Alice! I'm a curious and adventurous person who loves
-                exploring new lands and cooking.
+                Birthday: December 25, 1990
             </p>
-            <div>
-                <h2>About</h2>
-                <p
-                    data-profile-birthday-year="1990"
-                    data-profile-birthday-month="12"
-                    data-profile-birthday-day="25"
+            <p>Interests: Cooking, Travel, Adventure</p>
+            <p>
+                Website:
+                <a
+                    href="http://localhost:8080/people/alice"
+                    data-profile-website="http://localhost:8080/people/alice"
+                    >http://localhost:8080/people/alice</a
                 >
-                    Birthday: December 25, 1990
-                </p>
-                <p>Interests: Cooking, Travel, Adventure</p>
-                <p>
-                    Website:
-                    <a
-                        href="http://localhost:8080/people/alice"
-                        data-profile-website="http://localhost:8080/peope/alice"
-                        >http://localhost:8080/people/alice</a
-                    >
-                </p>
-            </div>
-            <div>
-                <h2>Stats</h2>
-                <p>Posts: 3</p>
-                <p>Following: 127</p>
-                <p>Followers: 2.4K</p>
-            </div>
-            <div>
-                <h2>Public Key</h2>
-                <p
-                    data-profile-pubkey="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
-                >
-                    ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677
-                </p>
-            </div>
-        </article>
-    </section>
-    <link
-        rel="canonical"
-        type="text/html"
-        data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
-        data-la-resource-attestation-url="http://localhost:8080/people/alice/profile/_la_resource.json"
-        data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
-        href="data:text/html;base64,PGFydGljbGU+CiAgICA8ZGl2CiAgICAgICAgY2xhc3M9ImJhbm5lciIKICAgICAgICBkYXRhLXByb2ZpbGUtYmFubmVyPSJodHRwOi8vbG9jYWxob3N0OjgwODAvcGVvcGxlL2FsaWNlL2ltYWdlcy9hbGljZV9iYW5uZXIuanBnIgogICAgPgogICAgICAgIDxpbWcKICAgICAgICAgICAgc3JjPSJodHRwOi8vbG9jYWxob3N0OjgwODAvcGVvcGxlL2FsaWNlL2ltYWdlcy9hbGljZV9iYW5uZXIuanBnIgogICAgICAgICAgICBhbHQ9IkFsaWNlJ3MgYmFubmVyIGltYWdlIgogICAgICAgIC8+CiAgICA8L2Rpdj4KICAgIDxoZWFkZXI+CiAgICAgICAgPGltZwogICAgICAgICAgICBzcmM9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UvaW1hZ2VzL2FsaWNlX3Byb2ZpbGVfcGljLmpwZyIKICAgICAgICAgICAgYWx0PSJBbGljZSdzIHByb2ZpbGUgcGljdHVyZSIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLXBpY3R1cmU9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UvaW1hZ2VzL2FsaWNlX3Byb2ZpbGVfcGljLmpwZyIKICAgICAgICAvPgogICAgICAgIDxoMSBkYXRhLXByb2ZpbGUtZGlzcGxheS1uYW1lPSJBbGljZSBDb29rcyI+QWxpY2UgQ29va3M8L2gxPgogICAgICAgIDxwIGRhdGEtcHJvZmlsZS1uYW1lPSJBbGljZSI+QGFsaWNlPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cAogICAgICAgIGRhdGEtcHJvZmlsZS1hYm91dD0iSGksIEknbSBBbGljZSEgSSdtIGEgY3VyaW91cyBhbmQgYWR2ZW50dXJvdXMgcGVyc29uIHdobyBsb3ZlcyBleHBsb3JpbmcgbmV3IGxhbmRzIGFuZCBjb29raW5nIHJhYmJpdCBzdGV3LiIKICAgID4KICAgICAgICBIaSwgSSdtIEFsaWNlISBJJ20gYSBjdXJpb3VzIGFuZCBhZHZlbnR1cm91cyBwZXJzb24gd2hvIGxvdmVzIGV4cGxvcmluZwogICAgICAgIG5ldyBsYW5kcyBhbmQgY29va2luZy4KICAgIDwvcD4KICAgIDxkaXY+CiAgICAgICAgPGgyPkFib3V0PC9oMj4KICAgICAgICA8cAogICAgICAgICAgICBkYXRhLXByb2ZpbGUtYmlydGhkYXkteWVhcj0iMTk5MCIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLWJpcnRoZGF5LW1vbnRoPSIxMiIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLWJpcnRoZGF5LWRheT0iMjUiCiAgICAgICAgPgogICAgICAgICAgICBCaXJ0aGRheTogRGVjZW1iZXIgMjUsIDE5OTAKICAgICAgICA8L3A+CiAgICAgICAgPHA+SW50ZXJlc3RzOiBDb29raW5nLCBUcmF2ZWwsIEFkdmVudHVyZTwvcD4KICAgICAgICA8cD4KICAgICAgICAgICAgV2Vic2l0ZToKICAgICAgICAgICAgPGEKICAgICAgICAgICAgICAgIGhyZWY9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UiCiAgICAgICAgICAgICAgICBkYXRhLXByb2ZpbGUtd2Vic2l0ZT0iaHR0cDovL2xvY2FsaG9zdDo4MDgwL3Blb3BlL2FsaWNlIgogICAgICAgICAgICAgICAgPmh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2U8L2EKICAgICAgICAgICAgPgogICAgICAgIDwvcD4KICAgIDwvZGl2PgogICAgPGRpdj4KICAgICAgICA8aDI+U3RhdHM8L2gyPgogICAgICAgIDxwPlBvc3RzOiAzPC9wPgogICAgICAgIDxwPkZvbGxvd2luZzogMTI3PC9wPgogICAgICAgIDxwPkZvbGxvd2VyczogMi40SzwvcD4KICAgIDwvZGl2PgogICAgPGRpdj4KICAgICAgICA8aDI+UHVibGljIEtleTwvaDI+CiAgICAgICAgPHAKICAgICAgICAgICAgZGF0YS1wcm9maWxlLXB1YmtleT0iYWMyMDg5OGVkZjk3YjVhMjRjNTk3NDllYzI2ZWE3YmM5NWNjMWQyODU5ZWY2YTE5NGNlYjdlZWIyYzcwOTY3NyIKICAgICAgICA+CiAgICAgICAgICAgIGFjMjA4OThlZGY5N2I1YTI0YzU5NzQ5ZWMyNmVhN2JjOTVjYzFkMjg1OWVmNmExOTRjZWI3ZWViMmM3MDk2NzcKICAgICAgICA8L3A+CiAgICA8L2Rpdj4KPC9hcnRpY2xlPgo="
-        hidden
-    />
+            </p>
+        </div>
+        <div>
+            <h2>Stats</h2>
+            <p>Posts: 3</p>
+            <p>Following: 127</p>
+            <p>Followers: 2.4K</p>
+        </div>
+        <div>
+            <h2>Public Key</h2>
+            <p
+                data-profile-pubkey="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+            >
+                ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677
+            </p>
+        </div>
+    </article>
+
+  </section>
+  <link
+    rel="canonical"
+    type="text/html"
+    data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
+    data-la-resource-attestation-url="http://localhost:8080/people/alice/profile/_la_resource.json"
+    data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
+    href="data:text/html;base64,PGFydGljbGU+CiAgICA8ZGl2CiAgICAgICAgY2xhc3M9ImJhbm5lciIKICAgICAgICBkYXRhLXByb2ZpbGUtYmFubmVyPSJodHRwOi8vbG9jYWxob3N0OjgwODAvcGVvcGxlL2FsaWNlL2ltYWdlcy9hbGljZV9iYW5uZXIuanBnIgogICAgPgogICAgICAgIDxpbWcKICAgICAgICAgICAgc3JjPSJodHRwOi8vbG9jYWxob3N0OjgwODAvcGVvcGxlL2FsaWNlL2ltYWdlcy9hbGljZV9iYW5uZXIuanBnIgogICAgICAgICAgICBhbHQ9IkFsaWNlJ3MgYmFubmVyIGltYWdlIgogICAgICAgIC8+CiAgICA8L2Rpdj4KICAgIDxoZWFkZXI+CiAgICAgICAgPGltZwogICAgICAgICAgICBzcmM9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UvaW1hZ2VzL2FsaWNlX3Byb2ZpbGVfcGljLmpwZyIKICAgICAgICAgICAgYWx0PSJBbGljZSdzIHByb2ZpbGUgcGljdHVyZSIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLXBpY3R1cmU9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UvaW1hZ2VzL2FsaWNlX3Byb2ZpbGVfcGljLmpwZyIKICAgICAgICAvPgogICAgICAgIDxoMSBkYXRhLXByb2ZpbGUtZGlzcGxheS1uYW1lPSJBbGljZSBDb29rcyI+QWxpY2UgQ29va3M8L2gxPgogICAgICAgIDxwIGRhdGEtcHJvZmlsZS1uYW1lPSJBbGljZSI+QGFsaWNlPC9wPgogICAgPC9oZWFkZXI+CiAgICA8cAogICAgICAgIGRhdGEtcHJvZmlsZS1hYm91dD0iSGksIEknbSBBbGljZSEgSSdtIGEgY3VyaW91cyBhbmQgYWR2ZW50dXJvdXMgcGVyc29uIHdobyBsb3ZlcyBleHBsb3JpbmcgbmV3IGxhbmRzIGFuZCBjb29raW5nIHJhYmJpdCBzdGV3LiIKICAgID4KICAgICAgICBIaSwgSSdtIEFsaWNlISBJJ20gYSBjdXJpb3VzIGFuZCBhZHZlbnR1cm91cyBwZXJzb24gd2hvIGxvdmVzIGV4cGxvcmluZwogICAgICAgIG5ldyBsYW5kcyBhbmQgY29va2luZy4KICAgIDwvcD4KICAgIDxkaXY+CiAgICAgICAgPGgyPkFib3V0PC9oMj4KICAgICAgICA8cAogICAgICAgICAgICBkYXRhLXByb2ZpbGUtYmlydGhkYXkteWVhcj0iMTk5MCIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLWJpcnRoZGF5LW1vbnRoPSIxMiIKICAgICAgICAgICAgZGF0YS1wcm9maWxlLWJpcnRoZGF5LWRheT0iMjUiCiAgICAgICAgPgogICAgICAgICAgICBCaXJ0aGRheTogRGVjZW1iZXIgMjUsIDE5OTAKICAgICAgICA8L3A+CiAgICAgICAgPHA+SW50ZXJlc3RzOiBDb29raW5nLCBUcmF2ZWwsIEFkdmVudHVyZTwvcD4KICAgICAgICA8cD4KICAgICAgICAgICAgV2Vic2l0ZToKICAgICAgICAgICAgPGEKICAgICAgICAgICAgICAgIGhyZWY9Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9wZW9wbGUvYWxpY2UiCiAgICAgICAgICAgICAgICBkYXRhLXByb2ZpbGUtd2Vic2l0ZT0iaHR0cDovL2xvY2FsaG9zdDo4MDgwL3Blb3BsZS9hbGljZSIKICAgICAgICAgICAgICAgID5odHRwOi8vbG9jYWxob3N0OjgwODAvcGVvcGxlL2FsaWNlPC9hCiAgICAgICAgICAgID4KICAgICAgICA8L3A+CiAgICA8L2Rpdj4KICAgIDxkaXY+CiAgICAgICAgPGgyPlN0YXRzPC9oMj4KICAgICAgICA8cD5Qb3N0czogMzwvcD4KICAgICAgICA8cD5Gb2xsb3dpbmc6IDEyNzwvcD4KICAgICAgICA8cD5Gb2xsb3dlcnM6IDIuNEs8L3A+CiAgICA8L2Rpdj4KICAgIDxkaXY+CiAgICAgICAgPGgyPlB1YmxpYyBLZXk8L2gyPgogICAgICAgIDxwCiAgICAgICAgICAgIGRhdGEtcHJvZmlsZS1wdWJrZXk9ImFjMjA4OThlZGY5N2I1YTI0YzU5NzQ5ZWMyNmVhN2JjOTVjYzFkMjg1OWVmNmExOTRjZWI3ZWViMmM3MDk2NzciCiAgICAgICAgPgogICAgICAgICAgICBhYzIwODk4ZWRmOTdiNWEyNGM1OTc0OWVjMjZlYTdiYzk1Y2MxZDI4NTllZjZhMTk0Y2ViN2VlYjJjNzA5Njc3CiAgICAgICAgPC9wPgogICAgPC9kaXY+CjwvYXJ0aWNsZT4K"
+    hidden
+  />
 </article>
