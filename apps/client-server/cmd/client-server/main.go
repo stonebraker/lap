@@ -416,49 +416,53 @@ func extractAttestationURLsFromHTML(htmlContent string) (string, string) {
 	return resourceURL, namespaceURL
 }
 
-// parseProfileFromHTML extracts profile information from the profile fragment HTML
+// parseProfileFromHTML extracts profile information from the LAP fragment HTML
 func parseProfileFromHTML(profileHTML string) *ProfileData {
 	profile := &ProfileData{}
 	
-	// Extract name from h1 tag
-	nameRegex := regexp.MustCompile(`<h1[^>]*>([^<]+)</h1>`)
-	if matches := nameRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+	// Extract display name from data-profile-display-name attribute
+	displayNameRegex := regexp.MustCompile(`data-profile-display-name="([^"]+)"`)
+	if matches := displayNameRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
 		profile.DisplayName = strings.TrimSpace(matches[1])
-		profile.Name = profile.DisplayName // Use display name as name for now
 	}
 	
-	// Extract profile picture from img src
-	imgRegex := regexp.MustCompile(`<img[^>]*src="([^"]+)"[^>]*alt="[^"]*profile[^"]*"[^>]*>`)
-	if matches := imgRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+	// Extract name from data-profile-name attribute
+	nameRegex := regexp.MustCompile(`data-profile-name="([^"]+)"`)
+	if matches := nameRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
+		profile.Name = strings.TrimSpace(matches[1])
+	}
+	
+	// If no name found, use display name as fallback
+	if profile.Name == "" && profile.DisplayName != "" {
+		profile.Name = profile.DisplayName
+	}
+	
+	// Extract profile picture from data-profile-picture attribute
+	pictureRegex := regexp.MustCompile(`data-profile-picture="([^"]+)"`)
+	if matches := pictureRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
 		profile.Picture = matches[1]
 	}
 	
-	// Extract banner image from img src with banner in alt text
-	bannerRegex := regexp.MustCompile(`<img[^>]*src="([^"]+)"[^>]*alt="[^"]*banner[^"]*"[^>]*>`)
+	// Extract banner image from data-profile-banner attribute
+	bannerRegex := regexp.MustCompile(`data-profile-banner="([^"]+)"`)
 	if matches := bannerRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
 		profile.Banner = matches[1]
 	}
 	
-	// Extract website from href
-	websiteRegex := regexp.MustCompile(`<a[^>]*href="([^"]+)"[^>]*>([^<]+)</a>`)
-	if matches := websiteRegex.FindStringSubmatch(profileHTML); len(matches) > 2 {
+	// Extract website from data-profile-website attribute
+	websiteRegex := regexp.MustCompile(`data-profile-website="([^"]+)"`)
+	if matches := websiteRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
 		profile.Website = matches[1]
 	}
 	
-	// Extract public key from data-public-key attribute or text content
-	keyRegex := regexp.MustCompile(`data-public-key="([^"]+)"`)
+	// Extract public key from data-profile-pubkey attribute
+	keyRegex := regexp.MustCompile(`data-profile-pubkey="([^"]+)"`)
 	if matches := keyRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
 		fullKey := matches[1]
 		if len(fullKey) > 8 {
 			profile.PublicKey = fullKey[:4] + "..." + fullKey[len(fullKey)-4:]
 		} else {
 			profile.PublicKey = fullKey
-		}
-	} else {
-		// Fallback: look for key text pattern
-		keyTextRegex := regexp.MustCompile(`Key:\s*([a-f0-9]{4}\.\.\.[a-f0-9]{4})`)
-		if matches := keyTextRegex.FindStringSubmatch(profileHTML); len(matches) > 1 {
-			profile.PublicKey = matches[1]
 		}
 	}
 	
