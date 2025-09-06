@@ -190,7 +190,7 @@ func isURLUnderNamespace(url, namespace string) bool {
 	
 	// If namespace doesn't end with /, check if URL starts with namespace + "/"
 	// This handles cases like namespace="https://example.com/people/alice" 
-	// and URL="https://example.com/people/alice/posts/123"
+	// and URL="https://example.com/people/alice/frc/posts/123"
 	if strings.HasPrefix(url, namespace+"/") {
 		return true
 	}
