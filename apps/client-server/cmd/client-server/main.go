@@ -109,7 +109,7 @@ func serverSideFetchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Fetch the fragment from the publisher server
-	fragmentURL := fmt.Sprintf("http://localhost:8080/people/alice/posts/%s/", postID)
+	fragmentURL := fmt.Sprintf("http://localhost:8080/people/alice/frc/posts/%s/", postID)
 	
 	client := &http.Client{
 		Timeout: 10 * time.Second,
@@ -534,7 +534,7 @@ func renderError(w http.ResponseWriter, message string, err error) {
 // westleyPageHandler serves Westley's page with Alice's verified post integrated
 func westleyPageHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch Alice's post 1 from the publisher server
-	fragmentURL := "http://localhost:8080/people/alice/posts/1/"
+	fragmentURL := "http://localhost:8080/people/alice/frc/posts/1/"
 	
 	client := &http.Client{
 		Timeout: 10 * time.Second,
