@@ -94,8 +94,8 @@ func ResetArtifacts(base, root, keysDir string) error {
 		outPath := filepath.Join(postDir, "index.htmx")
 		
 		// Construct URLs for this post
-		fragmentURL := fmt.Sprintf("%s/people/alice/posts/%d", base, postNum)
-		resourceAttestationURL := fmt.Sprintf("%s/people/alice/posts/%d/_la_resource.json", base, postNum)
+		fragmentURL := fmt.Sprintf("%s/people/alice/frc/posts/%d", base, postNum)
+		resourceAttestationURL := fmt.Sprintf("%s/people/alice/frc/posts/%d/_la_resource.json", base, postNum)
 		
 		// Generate resource attestation first
 		fmt.Fprintf(os.Stderr, "generating resource attestation for post %d...\n", postNum)
@@ -135,7 +135,7 @@ func ResetArtifacts(base, root, keysDir string) error {
 			replacementHTML := string(fragmentData)
 			
 			// Update host file
-			fragmentURL := fmt.Sprintf("%s/people/alice/posts/%d", base, postNum)
+			fragmentURL := fmt.Sprintf("%s/people/alice/frc/posts/%d", base, postNum)
 			updatedHTML, updated := ReplaceArticleByDataLaFragmentURL(string(hostHTML), fragmentURL, replacementHTML)
 			if updated {
 				hostHTML = []byte(updatedHTML)
