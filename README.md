@@ -27,7 +27,7 @@ go run ./apps/client-server/cmd/client-server
 
 ### 2. Visit the demo
 
--   **Alice's posts**: http://localhost:8080/people/alice/posts/
+-   **Alice's posts**: http://localhost:8080/people/alice/frc/posts/
 -   **LAP Play page**: http://localhost:8081
 
 ### 3. What you'll see
@@ -113,8 +113,8 @@ Create a Resource Attestation (RA) for an HTML file:
 
 ```bash
 bin/lapctl ra-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
-  -url http://localhost:8080/people/alice/posts/1 \
+  -in apps/server/static/publisherapi/people/alice/frc/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/frc/posts/1 \
   -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
   -namespace-attestation-url http://localhost:8080/people/alice/_la_namespace.json
 ```
@@ -143,10 +143,10 @@ Create a fragment (index.htmx) from `index.html`:
 
 ```bash
 bin/lapctl fragment-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
-  -url http://localhost:8080/people/alice/posts/1 \
+  -in apps/server/static/publisherapi/people/alice/frc/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/frc/posts/1 \
   -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
-  -resource-attestation-url http://localhost:8080/people/alice/posts/1/_la_resource.json \
+  -resource-attestation-url http://localhost:8080/people/alice/frc/posts/1/_la_resource.json \
   -namespace-attestation-url http://localhost:8080/people/alice/_la_namespace.json
 ```
 
