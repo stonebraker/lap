@@ -22,16 +22,16 @@ func TestVerifyFragment_Success(t *testing.T) {
 	
 	fragment := wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/123",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/123",
 		PreviewContent:              string(content),
 		CanonicalContent:            content,
 		PublisherClaim:              pubKey, // Use the generated key
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/123/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/123/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 
 	resourceAttestation := wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/123",
+		FragmentURL:             "https://example.com/people/alice/frc/posts/123",
 		Hash:                    contentHash,
 		PublisherClaim:          pubKey, // Use the generated key
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -106,17 +106,17 @@ func TestVerifyFragment_ResourcePresenceFailure(t *testing.T) {
 	
 	fragment := wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/123",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/123",
 		PreviewContent:              string(content),
 		CanonicalContent:            content,
 		PublisherClaim:              "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/123/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/123/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 
 	// Resource attestation with mismatched URL
 	resourceAttestation := wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/456", // Different URL
+		FragmentURL:             "https://example.com/people/alice/frc/posts/456", // Different URL
 		Hash:                    "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
 		PublisherClaim:          "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -168,17 +168,17 @@ func TestVerifyFragment_ResourceIntegrityFailure(t *testing.T) {
 	
 	fragment := wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/123",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/123",
 		PreviewContent:              string(content),
 		CanonicalContent:            content,
 		PublisherClaim:              "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/123/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/123/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 
 	// Resource attestation with correct URL but wrong hash
 	resourceAttestation := wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/123",
+		FragmentURL:             "https://example.com/people/alice/frc/posts/123",
 		Hash:                    "sha256:wronghash", // Wrong hash
 		PublisherClaim:          "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -231,16 +231,16 @@ func TestVerifyFragment_PublisherAssociationFailure(t *testing.T) {
 	
 	fragment := wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/123",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/123",
 		PreviewContent:              string(content),
 		CanonicalContent:            content,
 		PublisherClaim:              "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/123/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/123/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 
 	resourceAttestation := wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/123",
+		FragmentURL:             "https://example.com/people/alice/frc/posts/123",
 		Hash:                    contentHash,
 		PublisherClaim:          "f1a2d3c4e5f6078901234567890abcdef1234567890abcdef1234567890abcdef",
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -297,16 +297,16 @@ func TestVerifyFragment_ExpiredNamespaceAttestation(t *testing.T) {
 	
 	fragment := wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/123",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/123",
 		PreviewContent:              string(content),
 		CanonicalContent:            content,
 		PublisherClaim:              testKey,
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/123/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/123/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 
 	resourceAttestation := wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/123",
+		FragmentURL:             "https://example.com/people/alice/frc/posts/123",
 		Hash:                    contentHash,
 		PublisherClaim:          testKey,
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -361,22 +361,22 @@ func TestIsURLUnderNamespace(t *testing.T) {
 		expected  bool
 	}{
 		{
-			url:       "https://example.com/people/alice/posts/123",
+			url:       "https://example.com/people/alice/frc/posts/123",
 			namespace: "https://example.com/people/alice/",
 			expected:  true,
 		},
 		{
-			url:       "https://example.com/people/alice/posts/123",
+			url:       "https://example.com/people/alice/frc/posts/123",
 			namespace: "https://example.com/people/alice",
 			expected:  true,
 		},
 		{
-			url:       "https://example.com/people/alice/posts/123",
+			url:       "https://example.com/people/alice/frc/posts/123",
 			namespace: "https://example.com/people/bob/",
 			expected:  false,
 		},
 		{
-			url:       "https://example.com/people/alice/posts/123",
+			url:       "https://example.com/people/alice/frc/posts/123",
 			namespace: "https://other.com/people/alice/",
 			expected:  false,
 		},
