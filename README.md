@@ -45,13 +45,48 @@ It does not concern itself with the fetching and embedding of content which can 
 
 📖 **[Read the Complete Protocol Specification →](docs/v0.2/overview.md)**
 
-## Quick Start
+## Try the Demo! 🚀
+
+The easiest way to see LAP in action is to run our interactive demo. You'll see how content can be verified across different websites using cryptographic attestations.
+
+### Quick Demo Setup
+
+1. **Start the three servers** (run each in a separate terminal):
+
+    ```bash
+    # Terminal 1: Publisher server (Alice's content)
+    go run ./apps/server/cmd/publisherapi
+
+    # Terminal 2: Verifier service
+    go run ./apps/verifier-service/cmd/verifier-service
+
+    # Terminal 3: Client server (LAP Play page)
+    go run ./apps/client-server/cmd/client-server
+    ```
+
+2. **Visit the demo pages**:
+    - **Alice's posts**: http://localhost:8080/people/alice/posts/index.html
+    - **LAP Play page**: http://localhost:8081
+
+### What You'll See
+
+-   **Alice's posts** show content with cryptographic attestations that prove authenticity
+-   **LAP Play page** demonstrates how other sites can fetch and verify Alice's content
+-   **Real-time verification** shows whether content is authentic and unmodified
+-   **Profile integration** displays publisher information when verification succeeds
+
+The demo shows the core LAP concept: content that can be verified as authentic regardless of where it appears on the web.
+
+## Technical Details
 
 This repository contains:
 
 -   **publisherapi**: static file server for demonstrating LAP protocol with live examples
+-   **client-server**: interactive demo server showing LAP content verification and integration
 -   **verifier-cli**: CLI tool for LAP resource attestation verification with full cryptographic validation
+-   **verifier-service**: HTTP service for real-time LAP fragment verification
 -   **tools-cli (lapctl)**: primary CLI for LAP operations including key generation and attestation creation
+-   **Go SDK**: comprehensive Go library for LAP operations (canonicalization, crypto, verification, wire format)
 
 There are two Go modules tied together by `go.work` at the repo root:
 
@@ -112,12 +147,17 @@ go run ./apps/verifier-cli/cmd/verifier -h
 
 ```
 apps/
-  keygen-cli/               # key generation CLI tool
+  client-server/            # interactive demo server
     cmd/
-      keygen/
+      client-server/        # LAP Play page and verification demo
+    internal/
+      httpx/                # HTTP utilities
+    static/                 # demo content and templates
+  demo-utils/               # shared utilities for demos
+    artifacts/              # LAP artifact management
   server/
     cmd/
-      publisherapi/         # demo server
+      publisherapi/         # publisher API server
     internal/
       httpx/                # HTTP utilities
     static/
@@ -126,29 +166,36 @@ apps/
           alice/            # demo publisher
             posts/          # example LAP content
               1/, 2/, 3/    # posts with attestations
+            profile/        # publisher profile
   tools-cli/
     cmd/
       lapctl/               # primary LAP CLI tool
   verifier-cli/
     cmd/
       verifier/             # verification CLI
+  verifier-service/
+    cmd/
+      verifier-service/     # HTTP verification service
 docs/
   v0.1/                     # legacy documentation
   v0.2/                     # current specification
 sdks/
   go/                       # Go SDK (separate module)
     pkg/lap/
-      canonical/
-      crypto/
-      testutil/
-      verify/
-      wire/
+      canonical/            # content canonicalization
+      crypto/               # cryptographic operations
+      verify/               # verification logic
+      wire/                 # wire format handling
 keys/                       # key storage
 ```
 
 ### Cryptography
 
 The implementation uses SHA-256 hashing for Resource Attestation content integrity and secp256k1 + Schnorr signatures for Namespace Attestation publisher verification, with comprehensive validation including hash validation, signature verification, and drift detection.
+
+## Advanced Usage: lapctl CLI
+
+> **Note**: The following commands are for advanced users who want to create and manage LAP attestations manually. For most users, the demo above is sufficient to understand how LAP works.
 
 ### Tools CLI: lapctl
 
@@ -168,26 +215,12 @@ Create a fragment (index.htmx) from `index.html`:
 
 ```bash
 bin/lapctl fragment-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/index.html \
-  -url /people/alice/posts/1 \
-  -base http://localhost:8081 \
-  -publisher-claim f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00 \
-  -resource-attestation-url https://localhost:8081/people/alice/posts/1/_la_resource.json \
-  -namespace-attestation-url https://localhost:8081/people/alice/_la_namespace.json
+  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/posts/1 \
+  -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
+  -resource-attestation-url https://localhost:8080/people/alice/posts/1/_la_resource.json \
+  -namespace-attestation-url https://localhost:8080/people/alice/_la_namespace.json
 ```
-
-Update multiple posts (1-3) with fragments and attestations:
-
-```bash
-bin/lapctl update-posts \
-  -base http://localhost:8081 \
-  -dir apps/server/static/publisherapi/people/alice
-```
-
--   **Purpose**: Batch process posts 1-3 to generate Resource Attestations, fragments, and update host file
--   **Output**: Creates `_la_resource.json` and `index.htmx` for each post, updates `posts/index.html` host file
--   **Required**: `-base` URL and `-dir` root directory path
--   **Prerequisites**: Must have `keys/alice_publisher_key.json` (create with `bin/lapctl keygen -name alice`)
 
 Reset all LAP artifacts for Alice (complete refresh):
 
@@ -205,17 +238,10 @@ Create a Resource Attestation (RA) for an HTML file:
 ```bash
 # absolute URL
 bin/lapctl ra-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/index.html \
-  -url http://localhost:8081/people/alice/posts/1 \
-  -publisher-claim f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00 \
-  -namespace-attestation-url https://localhost:8081/people/alice/_la_namespace.json
-
-# or relative URL with -base
-bin/lapctl ra-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/index.html \
-  -url /people/alice/posts/1 -base http://localhost:8081 \
-  -publisher-claim f1a2d3c4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00 \
-  -namespace-attestation-url https://localhost:8081/people/alice/_la_namespace.json
+  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/posts/1 \
+  -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
+  -namespace-attestation-url http://localhost:8080/people/alice/_la_namespace.json
 ```
 
 -   **Purpose**: Creates an unsigned Resource Attestation JSON that links content to its publisher
@@ -230,7 +256,8 @@ Create a Namespace Attestation (NA) for a namespace:
 bin/lapctl na-create \
   -namespace https://localhost:8081/people/alice/ \
   -exp 1754909400 \
-  -privkey a1b2c3d4e5f6071829384756647382910abcdef1234567890fedcba0987654321
+  -privkey <generated private key> \
+  -out apps/server/static/publisherapi/people/alice
 ```
 
 -   Writes NA JSON to `<dir>/_la_namespace.json` by default (override with `-out`)
