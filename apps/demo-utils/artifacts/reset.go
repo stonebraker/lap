@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/stonebraker/lap/sdks/go/pkg/lap/canonical"
@@ -72,7 +73,13 @@ func ResetArtifacts(base, root, keysDir string) error {
 	}
 
 	// Write the namespace attestation
-	naOutputPath := filepath.Join(root, "_la_namespace.json")
+	// If root ends with "frc", go up one level to place NA at alice level
+	var naOutputPath string
+	if strings.HasSuffix(root, "frc") {
+		naOutputPath = filepath.Join(filepath.Dir(root), "_la_namespace.json")
+	} else {
+		naOutputPath = filepath.Join(root, "_la_namespace.json")
+	}
 	if err := os.MkdirAll(filepath.Dir(naOutputPath), 0755); err != nil {
 		return fmt.Errorf("mkdir %s: %w", filepath.Dir(naOutputPath), err)
 	}
