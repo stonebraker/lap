@@ -247,7 +247,7 @@ func naCreateCmd(args []string) {
 	privHexFlag := fs.String("privkey", "", "(optional) hex-encoded publisher private key; if provided, will be used and stored")
 	out := fs.String("out", "", "output directory path (default: current directory)")
 
-	keysDir := fs.String("keys-dir", "keys", "directory to store per-namespace keys (outside static)")
+	keysDir := fs.String("keys-dir", "demo-keys", "directory to store per-namespace keys (outside static)")
 	rotate := fs.Bool("rotate", false, "force generating a new keypair even if one exists for this namespace")
 	_ = fs.Parse(args)
 
@@ -290,7 +290,7 @@ func resetArtifactsCmd(args []string) {
 	fs := flag.NewFlagSet("reset-artifacts", flag.ExitOnError)
 	base := fs.String("base", "http://localhost:8080", "base URL (scheme://host[:port]) for LAP URLs")
 	root := fs.String("root", "apps/server/static/publisherapi/people/alice", "root directory for Alice content")
-	keysDir := fs.String("keys-dir", "keys", "directory containing publisher keys")
+	keysDir := fs.String("keys-dir", "demo-keys", "directory containing publisher keys")
 	_ = fs.Parse(args)
 
 	err := artifacts.ResetArtifacts(*base, *root, *keysDir)

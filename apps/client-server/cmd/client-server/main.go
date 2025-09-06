@@ -672,7 +672,7 @@ func resetArtifactsHandler(w http.ResponseWriter, r *http.Request) {
 	// Call the extracted ResetArtifacts function directly
 	base := "http://localhost:8080"
 	root := "apps/server/static/publisherapi/people/alice"
-	keysDir := "keys"
+	keysDir := "demo-keys"
 	
 	// Capture stderr output by redirecting it to a buffer
 	var stderr bytes.Buffer
