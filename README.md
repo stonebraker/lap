@@ -4,7 +4,7 @@
 
 ## What is LAP?
 
-LAP lets you verify that content actually came from its claimed publisher, even when it's shared across different websites. Think of it as a live, cryptographic link between content and creator that travels with the content.
+LAP lets you verify that content actually came from its claimed publisher, even when it's shared across different websites. Think of it as a live, cryptographic link between content and creator that travels with the content wherever it appears on the web.
 
 **Example:** Alice posts something on her site → Westley embeds it on his site → You can verify it really came from Alice.
 
