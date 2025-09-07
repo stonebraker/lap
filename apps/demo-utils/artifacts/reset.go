@@ -121,7 +121,7 @@ func ResetArtifacts(base, root, keysDir string) error {
 	}
 	
 	// Step 3: Update the host file with all three fragments
-	hostPath := filepath.Join(root, "posts", "index.html")
+	hostPath := filepath.Join(root, "posts", "index.htmx")
 	if _, err := os.Stat(hostPath); err == nil {
 		fmt.Fprintf(os.Stderr, "updating host file %s...\n", hostPath)
 		
