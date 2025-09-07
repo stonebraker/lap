@@ -13,7 +13,7 @@ class LAPFragmentVerifier {
             verifiedText: "Verified",
             failedText: "Failed",
             errorText: "Error",
-            hoverDelay: 200,
+            hoverDelay: 0,
             ...options,
         };
 
@@ -31,23 +31,59 @@ class LAPFragmentVerifier {
             this.scanForFragments();
         }
 
-        // Listen for htmx events to rescan when content is loaded
-        this.setupHtmxListeners();
+        // Set up generic content change detection
+        this.setupContentChangeDetection();
     }
 
-    setupHtmxListeners() {
-        // Listen for htmx content loaded events
-        document.addEventListener("htmx:afterRequest", (event) => {
-            // Small delay to ensure DOM is updated
-            setTimeout(() => {
-                this.scanForFragments();
-            }, 100);
+    setupContentChangeDetection() {
+        // Use MutationObserver to detect when new content is added to the DOM
+        const observer = new MutationObserver((mutations) => {
+            let shouldRescan = false;
+
+            mutations.forEach((mutation) => {
+                // Check if new nodes were added
+                if (
+                    mutation.type === "childList" &&
+                    mutation.addedNodes.length > 0
+                ) {
+                    // Check if any added nodes contain LAP fragments
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            // Check if the node itself is a LAP fragment
+                            if (
+                                node.matches &&
+                                node.matches("article[data-la-spec]")
+                            ) {
+                                shouldRescan = true;
+                            }
+                            // Check if the node contains LAP fragments
+                            if (
+                                node.querySelector &&
+                                node.querySelector("article[data-la-spec]")
+                            ) {
+                                shouldRescan = true;
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (shouldRescan) {
+                // Small delay to ensure DOM is fully updated
+                setTimeout(() => {
+                    this.scanForFragments();
+                }, 100);
+            }
         });
 
-        // Also listen for htmx:afterSettle for more reliable timing
-        document.addEventListener("htmx:afterSettle", (event) => {
-            this.scanForFragments();
+        // Start observing the entire document for changes
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
         });
+
+        // Store observer reference for cleanup
+        this.mutationObserver = observer;
     }
 
     scanForFragments() {
@@ -184,7 +220,7 @@ class LAPFragmentVerifier {
                 gap: 0.5rem;
                 z-index: 10;
                 opacity: 0;
-                transition: opacity 0.2s ease-in-out;
+                transition: opacity 0.3s ease-in-out;
                 pointer-events: none;
             }
 
@@ -446,6 +482,12 @@ class LAPFragmentVerifier {
             wrapper.classList.remove("lap-hover");
         });
         this.fragments.clear();
+
+        // Disconnect the mutation observer
+        if (this.mutationObserver) {
+            this.mutationObserver.disconnect();
+            this.mutationObserver = null;
+        }
     }
 }
 
