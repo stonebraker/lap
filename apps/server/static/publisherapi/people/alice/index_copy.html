@@ -5,8 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Alice Cooks — Profile</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-        <script src="/people/alice/scripts/lap-fragment-verifier.js"></script>
         <style type="text/tailwindcss">
             @layer components {
                 .profile-card {
@@ -25,29 +23,6 @@
                     @apply text-sm text-gray-400;
                 }
                 .post-preview p {
-                    @apply leading-relaxed text-gray-300;
-                }
-
-                /* Style the imported fragment content using Tailwind */
-                .grid.gap-6 article {
-                    @apply mb-4;
-                }
-                .grid.gap-6 article section article {
-                    @apply rounded-lg border border-gray-800 bg-gray-900 p-4 hover:border-gray-700 transition-colors;
-                }
-                .grid.gap-6 article section article header {
-                    @apply mb-2;
-                }
-                .grid.gap-6 article section article header h2 {
-                    @apply text-lg font-semibold text-gray-100;
-                }
-                .grid.gap-6 article section article header p {
-                    @apply text-sm text-gray-400;
-                }
-                .grid.gap-6 article section article p {
-                    @apply leading-relaxed text-gray-300;
-                }
-                .grid.gap-6 article section article main p {
                     @apply leading-relaxed text-gray-300;
                 }
             }
@@ -219,12 +194,42 @@
                     <h2 class="text-2xl font-bold text-white">Recent Posts</h2>
                 </div>
 
-                <div
-                    class="grid gap-6"
-                    hx-get="/people/alice/frc/posts/index.htmx"
-                    hx-trigger="load"
-                >
-                    <!-- Posts will be loaded here via htmx -->
+                <div class="grid gap-6">
+                    <!-- Post 1 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 1</h2>
+                            <p>Today • 9:14 AM</p>
+                        </header>
+                        <p>
+                            Just made a big pot of Harissa for dinner! Armenian
+                            chicken and rice porridge is the best comfort food.
+                        </p>
+                    </article>
+
+                    <!-- Post 2 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 2</h2>
+                            <p>Yesterday • 5:02 PM</p>
+                        </header>
+                        <p>
+                            Khinkali for lunch! Anyone else love Armenian
+                            dumplings?
+                        </p>
+                    </article>
+
+                    <!-- Post 3 -->
+                    <article class="post-preview">
+                        <header>
+                            <h2>Post 3</h2>
+                            <p>2 days ago • 11:37 AM</p>
+                        </header>
+                        <p>
+                            Made some Pakhlava for dessert tonight Layers of
+                            flaky pastry, nuts, and honey... yum!
+                        </p>
+                    </article>
                 </div>
             </section>
 

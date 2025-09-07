@@ -27,18 +27,18 @@ import (
 func createTestFragment() *wire.Fragment {
 	return &wire.Fragment{
 		Spec:                        "v0.2",
-		FragmentURL:                 "https://example.com/people/alice/posts/1",
+		FragmentURL:                 "https://example.com/people/alice/frc/posts/1",
 		PreviewContent:              "<h2>Test Post</h2><p>This is a test post content.</p>",
 		CanonicalContent:            []byte("<h2>Test Post</h2><p>This is a test post content.</p>"),
 		PublisherClaim:              "d2c2d625b0ccaba90d1c80bed1dde31321695929b1472b9b8e21f5705c1d1410",
-		ResourceAttestationURL:      "https://example.com/people/alice/posts/1/_la_resource.json",
+		ResourceAttestationURL:      "https://example.com/people/alice/frc/posts/1/_la_resource.json",
 		NamespaceAttestationURL:     "https://example.com/people/alice/_la_namespace.json",
 	}
 }
 
 func createTestResourceAttestation() *wire.ResourceAttestation {
 	return &wire.ResourceAttestation{
-		FragmentURL:             "https://example.com/people/alice/posts/1",
+		FragmentURL:             "https://example.com/people/alice/frc/posts/1",
 		Hash:                    "sha256:b7c58676c2c8dbe5e611f780f79f7a37e20c0af84309106778212f0ee95f6eb9",
 		PublisherClaim:          "d2c2d625b0ccaba90d1c80bed1dde31321695929b1472b9b8e21f5705c1d1410",
 		NamespaceAttestationURL: "https://example.com/people/alice/_la_namespace.json",
@@ -96,14 +96,14 @@ func TestParseFragmentFromHTML(t *testing.T) {
 <html>
 <head><title>Test</title></head>
 <body>
-<article data-la-spec="v0.2" data-la-fragment-url="https://example.com/people/alice/posts/1">
+<article data-la-spec="v0.2" data-la-fragment-url="https://example.com/people/alice/frc/posts/1">
 <section class="la-preview">
 <h2>Test Post</h2>
 <p>This is a test post content.</p>
 </section>
 <link rel="canonical" type="text/html" 
 data-la-publisher-claim="d2c2d625b0ccaba90d1c80bed1dde31321695929b1472b9b8e21f5705c1d1410"
-data-la-resource-attestation-url="https://example.com/people/alice/posts/1/_la_resource.json"
+data-la-resource-attestation-url="https://example.com/people/alice/frc/posts/1/_la_resource.json"
 data-la-namespace-attestation-url="https://example.com/people/alice/_la_namespace.json"
 href="data:text/html;base64,PGgyPlRlc3QgUG9zdDwvaDI+PHA+VGhpcyBpcyBhIHRlc3QgcG9zdCBjb250ZW50LjwvcD4="
 hidden />
@@ -111,7 +111,7 @@ hidden />
 </body>
 </html>`
 
-	fragment, err := parseFragmentFromHTML(html, "https://example.com/people/alice/posts/1")
+	fragment, err := parseFragmentFromHTML(html, "https://example.com/people/alice/frc/posts/1")
 	if err != nil {
 		t.Fatalf("parseFragmentFromHTML failed: %v", err)
 	}
@@ -121,15 +121,15 @@ hidden />
 		t.Errorf("Expected spec to be 'v0.2', got: %s", fragment.Spec)
 	}
 
-	if fragment.FragmentURL != "https://example.com/people/alice/posts/1" {
-		t.Errorf("Expected fragment URL to be 'https://example.com/people/alice/posts/1', got: %s", fragment.FragmentURL)
+	if fragment.FragmentURL != "https://example.com/people/alice/frc/posts/1" {
+		t.Errorf("Expected fragment URL to be 'https://example.com/people/alice/frc/posts/1', got: %s", fragment.FragmentURL)
 	}
 
 	if fragment.PublisherClaim != "d2c2d625b0ccaba90d1c80bed1dde31321695929b1472b9b8e21f5705c1d1410" {
 		t.Errorf("Expected publisher claim to match, got: %s", fragment.PublisherClaim)
 	}
 
-	if fragment.ResourceAttestationURL != "https://example.com/people/alice/posts/1/_la_resource.json" {
+	if fragment.ResourceAttestationURL != "https://example.com/people/alice/frc/posts/1/_la_resource.json" {
 		t.Errorf("Expected resource attestation URL to match, got: %s", fragment.ResourceAttestationURL)
 	}
 
@@ -158,7 +158,7 @@ func TestParseFragmentFromHTML_NoFragment(t *testing.T) {
 </body>
 </html>`
 
-	_, err := parseFragmentFromHTML(html, "https://example.com/people/alice/posts/1")
+	_, err := parseFragmentFromHTML(html, "https://example.com/people/alice/frc/posts/1")
 	if err == nil {
 		t.Error("Expected error when no fragment found")
 	}
@@ -174,7 +174,7 @@ func TestParseFragmentFromHTML_MalformedFragment(t *testing.T) {
 <html>
 <head><title>Test</title></head>
 <body>
-<article data-la-spec="v0.2" data-la-fragment-url="https://example.com/people/alice/posts/1">
+<article data-la-spec="v0.2" data-la-fragment-url="https://example.com/people/alice/frc/posts/1">
 <section class="la-preview">
 <h2>Test Post</h2>
 </section>
@@ -182,7 +182,7 @@ func TestParseFragmentFromHTML_MalformedFragment(t *testing.T) {
 </body>
 </html>`
 
-	_, err := parseFragmentFromHTML(html, "https://example.com/people/alice/posts/1")
+	_, err := parseFragmentFromHTML(html, "https://example.com/people/alice/frc/posts/1")
 	if err == nil {
 		t.Error("Expected error when fragment is malformed")
 	}

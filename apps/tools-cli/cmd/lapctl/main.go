@@ -150,7 +150,7 @@ func keygenCmd(args []string) {
 func raCreateCmd(args []string) {
 	fs := flag.NewFlagSet("ra-create", flag.ExitOnError)
 	inPath := fs.String("in", "", "path to input HTML file")
-	resURL := fs.String("url", "", "absolute resource URL or path (e.g. https://example.com/path or /people/alice/posts/1)")
+	resURL := fs.String("url", "", "absolute resource URL or path (e.g. https://example.com/path or /people/alice/frc/posts/1)")
 	base := fs.String("base", "", "optional base (scheme://host[:port]) to resolve -url against, e.g. http://localhost:8080")
 	publisherClaim := fs.String("publisher-claim", "", "publisher's secp256k1 X-only public key (64 hex chars) for triangulation")
 	namespaceAttestationURL := fs.String("namespace-attestation-url", "", "URL pointing to the Namespace Attestation (required)")
@@ -289,7 +289,7 @@ func toUpper(s string) string {
 func resetArtifactsCmd(args []string) {
 	fs := flag.NewFlagSet("reset-artifacts", flag.ExitOnError)
 	base := fs.String("base", "http://localhost:8080", "base URL (scheme://host[:port]) for LAP URLs")
-	root := fs.String("root", "apps/server/static/publisherapi/people/alice", "root directory for Alice content")
+	root := fs.String("root", "apps/server/static/publisherapi/people/alice/frc", "root directory for Alice content")
 	keysDir := fs.String("keys-dir", "demo-keys", "directory containing publisher keys")
 	_ = fs.Parse(args)
 

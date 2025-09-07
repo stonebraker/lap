@@ -364,7 +364,7 @@ func TestRaCreate_DefaultBehavior(t *testing.T) {
 	// Run ra-create with minimal arguments
 	output, stderr, err := runLapctl(t, "ra-create",
 		"-in", "test.html",
-		"-url", "https://example.com/people/alice/posts/1",
+		"-url", "https://example.com/people/alice/frc/posts/1",
 		"-publisher-claim", "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
 		"-namespace-attestation-url", "https://example.com/people/alice/_la_namespace.json")
 	
@@ -387,9 +387,9 @@ func TestRaCreate_DefaultBehavior(t *testing.T) {
 	attestation := readResourceAttestation(t, expectedPath)
 	
 	// Check required fields
-	if attestation.FragmentURL != "https://example.com/people/alice/posts/1" {
+	if attestation.FragmentURL != "https://example.com/people/alice/frc/posts/1" {
 		t.Errorf("Expected FragmentURL %s, got %s",
-			"https://example.com/people/alice/posts/1",
+			"https://example.com/people/alice/frc/posts/1",
 			attestation.FragmentURL)
 	}
 	
@@ -434,9 +434,9 @@ func TestFragmentCreate_DefaultBehavior(t *testing.T) {
 	// Run fragment-create with minimal arguments
 	output, stderr, err := runLapctl(t, "fragment-create",
 		"-in", "test.html",
-		"-url", "https://example.com/people/alice/posts/1",
+		"-url", "https://example.com/people/alice/frc/posts/1",
 		"-publisher-claim", "ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677",
-		"-resource-attestation-url", "https://example.com/people/alice/posts/1/_la_resource.json",
+		"-resource-attestation-url", "https://example.com/people/alice/frc/posts/1/_la_resource.json",
 		"-namespace-attestation-url", "https://example.com/people/alice/_la_namespace.json")
 	
 	if err != nil {
@@ -467,7 +467,7 @@ func TestFragmentCreate_DefaultBehavior(t *testing.T) {
 		t.Error("Expected fragment to contain data-la-spec=\"v0.2\"")
 	}
 	
-	if !strings.Contains(fragmentContent, `data-la-fragment-url="https://example.com/people/alice/posts/1"`) {
+	if !strings.Contains(fragmentContent, `data-la-fragment-url="https://example.com/people/alice/frc/posts/1"`) {
 		t.Error("Expected fragment to contain correct data-la-fragment-url")
 	}
 	
@@ -479,7 +479,7 @@ func TestFragmentCreate_DefaultBehavior(t *testing.T) {
 		t.Error("Expected fragment to contain correct data-la-publisher-claim")
 	}
 	
-	if !strings.Contains(fragmentContent, `data-la-resource-attestation-url="https://example.com/people/alice/posts/1/_la_resource.json"`) {
+	if !strings.Contains(fragmentContent, `data-la-resource-attestation-url="https://example.com/people/alice/frc/posts/1/_la_resource.json"`) {
 		t.Error("Expected fragment to contain correct data-la-resource-attestation-url")
 	}
 	

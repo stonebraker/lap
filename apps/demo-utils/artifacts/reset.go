@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/stonebraker/lap/sdks/go/pkg/lap/canonical"
@@ -72,7 +73,13 @@ func ResetArtifacts(base, root, keysDir string) error {
 	}
 
 	// Write the namespace attestation
-	naOutputPath := filepath.Join(root, "_la_namespace.json")
+	// If root ends with "frc", go up one level to place NA at alice level
+	var naOutputPath string
+	if strings.HasSuffix(root, "frc") {
+		naOutputPath = filepath.Join(filepath.Dir(root), "_la_namespace.json")
+	} else {
+		naOutputPath = filepath.Join(root, "_la_namespace.json")
+	}
 	if err := os.MkdirAll(filepath.Dir(naOutputPath), 0755); err != nil {
 		return fmt.Errorf("mkdir %s: %w", filepath.Dir(naOutputPath), err)
 	}
@@ -94,8 +101,8 @@ func ResetArtifacts(base, root, keysDir string) error {
 		outPath := filepath.Join(postDir, "index.htmx")
 		
 		// Construct URLs for this post
-		fragmentURL := fmt.Sprintf("%s/people/alice/posts/%d", base, postNum)
-		resourceAttestationURL := fmt.Sprintf("%s/people/alice/posts/%d/_la_resource.json", base, postNum)
+		fragmentURL := fmt.Sprintf("%s/people/alice/frc/posts/%d", base, postNum)
+		resourceAttestationURL := fmt.Sprintf("%s/people/alice/frc/posts/%d/_la_resource.json", base, postNum)
 		
 		// Generate resource attestation first
 		fmt.Fprintf(os.Stderr, "generating resource attestation for post %d...\n", postNum)
@@ -114,7 +121,7 @@ func ResetArtifacts(base, root, keysDir string) error {
 	}
 	
 	// Step 3: Update the host file with all three fragments
-	hostPath := filepath.Join(root, "posts", "index.html")
+	hostPath := filepath.Join(root, "posts", "index.htmx")
 	if _, err := os.Stat(hostPath); err == nil {
 		fmt.Fprintf(os.Stderr, "updating host file %s...\n", hostPath)
 		
@@ -135,7 +142,7 @@ func ResetArtifacts(base, root, keysDir string) error {
 			replacementHTML := string(fragmentData)
 			
 			// Update host file
-			fragmentURL := fmt.Sprintf("%s/people/alice/posts/%d", base, postNum)
+			fragmentURL := fmt.Sprintf("%s/people/alice/frc/posts/%d", base, postNum)
 			updatedHTML, updated := ReplaceArticleByDataLaFragmentURL(string(hostHTML), fragmentURL, replacementHTML)
 			if updated {
 				hostHTML = []byte(updatedHTML)

@@ -27,7 +27,7 @@ go run ./apps/client-server/cmd/client-server
 
 ### 2. Visit the demo
 
--   **Alice's posts**: http://localhost:8080/people/alice/posts/
+-   **Alice's posts**: http://localhost:8080/people/alice/frc/posts/
 -   **LAP Play page**: http://localhost:8081
 
 ### 3. What you'll see
@@ -39,6 +39,22 @@ go run ./apps/client-server/cmd/client-server
 ## Requirements
 
 -   Go 1.22+
+
+## Building
+
+To build all binaries for the project:
+
+```bash
+go run build.go
+```
+
+This will create all binaries in the `bin/` directory:
+
+-   `lapctl` - CLI tools
+-   `publisherapi` - Alice's content server
+-   `client-server` - Demo page server
+-   `verifier` - CLI verifier
+-   `verifier-service` - HTTP verifier service
 
 ## Learn More
 
@@ -66,7 +82,10 @@ demo-keys/         # Demo keys (Alice & Westley)
 ### lapctl CLI
 
 ```bash
-# Build
+# Build all binaries (recommended)
+go run build.go
+
+# Or build just lapctl
 go build -o bin/lapctl ./apps/tools-cli/cmd/lapctl
 
 # Reset demo artifacts
@@ -87,7 +106,13 @@ import "github.com/stonebraker/lap/sdks/go/pkg/lap"
 
 ### Detailed CLI Commands
 
-Build the tools CLI:
+Build all binaries (recommended):
+
+```bash
+go run build.go
+```
+
+Or build individual tools:
 
 ```bash
 go build -o bin/lapctl ./apps/tools-cli/cmd/lapctl
@@ -113,8 +138,8 @@ Create a Resource Attestation (RA) for an HTML file:
 
 ```bash
 bin/lapctl ra-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
-  -url http://localhost:8080/people/alice/posts/1 \
+  -in apps/server/static/publisherapi/people/alice/frc/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/frc/posts/1 \
   -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
   -namespace-attestation-url http://localhost:8080/people/alice/_la_namespace.json
 ```
@@ -143,10 +168,10 @@ Create a fragment (index.htmx) from `index.html`:
 
 ```bash
 bin/lapctl fragment-create \
-  -in apps/server/static/publisherapi/people/alice/posts/1/content.htmx \
-  -url http://localhost:8080/people/alice/posts/1 \
+  -in apps/server/static/publisherapi/people/alice/frc/posts/1/content.htmx \
+  -url http://localhost:8080/people/alice/frc/posts/1 \
   -publisher-claim ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677 \
-  -resource-attestation-url http://localhost:8080/people/alice/posts/1/_la_resource.json \
+  -resource-attestation-url http://localhost:8080/people/alice/frc/posts/1/_la_resource.json \
   -namespace-attestation-url http://localhost:8080/people/alice/_la_namespace.json
 ```
 
