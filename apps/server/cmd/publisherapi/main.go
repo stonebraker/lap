@@ -26,9 +26,6 @@ func main() {
 	mux := chi.NewRouter()
 	
 	// Add PUT handler for frc posts
-	mux.Put("/people/alice/frc/posts/{postID}/", func(w http.ResponseWriter, r *http.Request) {
-		handleFrcPostUpdate(w, r, *dir)
-	})
 	mux.Put("/people/alice/frc/posts/{postID}", func(w http.ResponseWriter, r *http.Request) {
 		handleFrcPostUpdate(w, r, *dir)
 	})
@@ -116,7 +113,7 @@ func handleFrcPostUpdate(w http.ResponseWriter, r *http.Request, baseDir string)
 	// Return success response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, `{"success": true, "message": "Fragment updated successfully", "path": "/people/alice/frc/posts/%s/"}`, postID)
+	fmt.Fprintf(w, `{"success": true, "message": "Fragment updated successfully", "path": "/people/alice/frc/posts/%s"}`, postID)
 }
 
 // handleFrcResourceAttestationUpdate handles PUT requests to update frc resource attestation files
