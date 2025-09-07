@@ -57,6 +57,8 @@ type ProcessedFragment struct {
 	PreviewContent   template.HTML
 	PreviewRaw       string
 	DecodeError      string
+	FullFragmentHTML template.HTML
+	CanonicalFragmentHTML template.HTML
 }
 
 // ProfileData holds the profile information extracted from the profile fragment
@@ -235,6 +237,9 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 		RawHTML: fragmentHTML,
 	}
 	
+	// Sanitize the full fragment HTML for safe rendering
+	processed.FullFragmentHTML = template.HTML(sanitizeHTML(fragmentHTML))
+	
 	// Extract preview content (the content inside la-preview section)
 	// Use DOTALL flag to match across newlines
 	previewRegex := regexp.MustCompile(`(?s)<section class="la-preview">(.*?)</section>`)
@@ -248,6 +253,7 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 	// If verification failed, don't decode canonical content
 	if verification.Error != "" || !verification.Verified {
 		processed.CanonicalContent = processed.PreviewContent
+		processed.CanonicalFragmentHTML = processed.FullFragmentHTML
 		return processed
 	}
 	
@@ -257,6 +263,7 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 	if len(matches) < 2 {
 		processed.DecodeError = "Could not find base64 canonical content in href attribute"
 		processed.CanonicalContent = processed.PreviewContent
+		processed.CanonicalFragmentHTML = processed.FullFragmentHTML
 		return processed
 	}
 	
@@ -266,6 +273,7 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 	if err != nil {
 		processed.DecodeError = fmt.Sprintf("Failed to decode base64 content: %v", err)
 		processed.CanonicalContent = processed.PreviewContent
+		processed.CanonicalFragmentHTML = processed.FullFragmentHTML
 		return processed
 	}
 	
@@ -275,7 +283,22 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 	sanitizedHTML := sanitizeHTML(canonicalHTML)
 	processed.CanonicalContent = template.HTML(sanitizedHTML)
 	
+	// Create canonical fragment: replace preview section with canonical content
+	canonicalFragment := createCanonicalFragment(fragmentHTML, canonicalHTML)
+	processed.CanonicalFragmentHTML = template.HTML(sanitizeHTML(canonicalFragment))
+	
 	return processed
+}
+
+// createCanonicalFragment creates a full LAP fragment with canonical content substituted into the preview section
+func createCanonicalFragment(fragmentHTML, canonicalHTML string) string {
+	// Use regex to find and replace the preview section content
+	previewRegex := regexp.MustCompile(`(?s)<section class="la-preview">(.*?)</section>`)
+	
+	// Replace the preview section content with the canonical content
+	canonicalFragment := previewRegex.ReplaceAllString(fragmentHTML, fmt.Sprintf(`<section class="la-preview">%s</section>`, canonicalHTML))
+	
+	return canonicalFragment
 }
 
 // sanitizeHTML performs basic HTML sanitization to prevent XSS
