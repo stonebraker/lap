@@ -54,25 +54,32 @@
         <script src="/people/westley/components/la-profile.js"></script>
         <script>
             function copyFragment(button) {
-                // Get the raw fragment HTML from the data attribute
-                const fragmentData = button.getAttribute("data-fragment");
-                if (!fragmentData) {
+                // Get the complete fragment element from the DOM
+                const fragmentElement = button
+                    .closest(".bg-gray-800")
+                    .querySelector("article[data-la-spec]");
+
+                if (!fragmentElement) {
+                    console.error("No fragment element found");
                     return;
                 }
+
+                // Get the complete fragment HTML with all LAP metadata
+                const fragmentHTML = fragmentElement.outerHTML;
 
                 // Copy to clipboard
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard
-                        .writeText(fragmentData)
+                        .writeText(fragmentHTML)
                         .then(() => {
                             showCopied(button);
                         })
                         .catch((err) => {
                             console.error("Failed to copy: ", err);
-                            fallbackCopy(fragmentData, button);
+                            fallbackCopy(fragmentHTML, button);
                         });
                 } else {
-                    fallbackCopy(fragmentData, button);
+                    fallbackCopy(fragmentHTML, button);
                 }
             }
 
