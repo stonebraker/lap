@@ -40,6 +40,22 @@ go run ./apps/client-server/cmd/client-server
 
 -   Go 1.22+
 
+## Building
+
+To build all binaries for the project:
+
+```bash
+go run build.go
+```
+
+This will create all binaries in the `bin/` directory:
+
+-   `lapctl` - CLI tools
+-   `publisherapi` - Alice's content server
+-   `client-server` - Demo page server
+-   `verifier` - CLI verifier
+-   `verifier-service` - HTTP verifier service
+
 ## Learn More
 
 -   **[Complete Specification](docs/v0.2/overview.md)** - Full protocol details
@@ -66,7 +82,10 @@ demo-keys/         # Demo keys (Alice & Westley)
 ### lapctl CLI
 
 ```bash
-# Build
+# Build all binaries (recommended)
+go run build.go
+
+# Or build just lapctl
 go build -o bin/lapctl ./apps/tools-cli/cmd/lapctl
 
 # Reset demo artifacts
@@ -87,7 +106,13 @@ import "github.com/stonebraker/lap/sdks/go/pkg/lap"
 
 ### Detailed CLI Commands
 
-Build the tools CLI:
+Build all binaries (recommended):
+
+```bash
+go run build.go
+```
+
+Or build individual tools:
 
 ```bash
 go build -o bin/lapctl ./apps/tools-cli/cmd/lapctl
