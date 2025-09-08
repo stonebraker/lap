@@ -18,6 +18,7 @@ import (
 
 	"github.com/stonebraker/lap/apps/client-server/internal/httpx"
 	"github.com/stonebraker/lap/apps/demo-utils/artifacts"
+	"github.com/stonebraker/lap/sdks/go/pkg/lap/sanitize"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -59,6 +60,7 @@ type ProcessedFragment struct {
 	DecodeError      string
 	FullFragmentHTML template.HTML
 	CanonicalFragmentHTML template.HTML
+	SanitizationRemovedContent bool
 }
 
 // ProfileData holds the profile information extracted from the profile fragment
@@ -231,14 +233,51 @@ func verifyFragment(fragmentHTML string, fragmentURL string) *VerificationResult
 	return &result
 }
 
+// sanitizeAndDetectChanges sanitizes content and returns whether any content was removed
+func sanitizeAndDetectChanges(content []byte) (string, bool, error) {
+	originalContent := string(content)
+	sanitized, err := sanitize.SanitizeCanonicalContent(content)
+	if err != nil {
+		return "", false, err
+	}
+
+	// Check if content was removed by comparing lengths
+	originalLen := len(originalContent)
+	sanitizedLen := len(sanitized)
+
+	// If sanitized content is significantly shorter, content was likely removed
+	removedContent := sanitizedLen < int(float64(originalLen)*0.9) // 10% threshold
+
+	// Log what was removed if content was sanitized
+	if removedContent {
+		log.Printf("🚨 SANITIZATION: Dangerous content removed")
+		log.Printf("   Original length: %d characters", originalLen)
+		log.Printf("   Sanitized length: %d characters", sanitizedLen)
+		log.Printf("   Removed: %d characters (%.1f%%)", originalLen-sanitizedLen, float64(originalLen-sanitizedLen)/float64(originalLen)*100)
+		log.Printf("   Original content: %s", truncateString(originalContent, 200))
+		log.Printf("   Sanitized content: %s", truncateString(sanitized, 200))
+	}
+
+	return sanitized, removedContent, nil
+}
+
+// truncateString truncates a string to maxLen and adds "..." if truncated
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
+}
+
 // processFragment extracts and processes the canonical content from the fragment
 func processFragment(fragmentHTML string, verification *VerificationResult) *ProcessedFragment {
 	processed := &ProcessedFragment{
 		RawHTML: fragmentHTML,
 	}
 	
-	// Sanitize the full fragment HTML for safe rendering
-	processed.FullFragmentHTML = template.HTML(sanitizeHTML(fragmentHTML))
+	// Don't sanitize the full fragment HTML - preserve LAP metadata attributes
+	// Only sanitize the content within the la-preview section
+	processed.FullFragmentHTML = template.HTML(fragmentHTML)
 	
 	// Extract preview content (the content inside la-preview section)
 	// Use DOTALL flag to match across newlines
@@ -247,7 +286,15 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 		previewRaw := strings.TrimSpace(matches[1])
 		processed.PreviewRaw = previewRaw
 		// Sanitize and render the preview content
-		processed.PreviewContent = template.HTML(sanitizeHTML(previewRaw))
+		sanitizedPreview, previewRemoved, err := sanitizeAndDetectChanges([]byte(previewRaw))
+		if err != nil {
+			log.Printf("Warning: Failed to sanitize preview content: %v", err)
+			sanitizedPreview = previewRaw
+		}
+		processed.PreviewContent = template.HTML(sanitizedPreview)
+		if previewRemoved {
+			processed.SanitizationRemovedContent = true
+		}
 	}
 	
 	// If verification failed, don't decode canonical content
@@ -280,12 +327,20 @@ func processFragment(fragmentHTML string, verification *VerificationResult) *Pro
 	// Store the raw canonical HTML and sanitize for rendering
 	canonicalHTML := string(canonicalBytes)
 	processed.CanonicalRaw = canonicalHTML
-	sanitizedHTML := sanitizeHTML(canonicalHTML)
-	processed.CanonicalContent = template.HTML(sanitizedHTML)
+	sanitizedCanonical, canonicalRemoved, err := sanitizeAndDetectChanges(canonicalBytes)
+	if err != nil {
+		log.Printf("Warning: Failed to sanitize canonical content: %v", err)
+		sanitizedCanonical = canonicalHTML
+	}
+	processed.CanonicalContent = template.HTML(sanitizedCanonical)
+	if canonicalRemoved {
+		processed.SanitizationRemovedContent = true
+	}
 	
 	// Create canonical fragment: replace preview section with canonical content
-	canonicalFragment := createCanonicalFragment(fragmentHTML, canonicalHTML)
-	processed.CanonicalFragmentHTML = template.HTML(sanitizeHTML(canonicalFragment))
+	// Don't sanitize the entire fragment - preserve LAP metadata attributes
+	canonicalFragment := createCanonicalFragment(fragmentHTML, sanitizedCanonical)
+	processed.CanonicalFragmentHTML = template.HTML(canonicalFragment)
 	
 	return processed
 }
@@ -301,23 +356,6 @@ func createCanonicalFragment(fragmentHTML, canonicalHTML string) string {
 	return canonicalFragment
 }
 
-// sanitizeHTML performs basic HTML sanitization to prevent XSS
-func sanitizeHTML(htmlContent string) string {
-	// For this demo, we'll do basic sanitization
-	// In production, you'd want a proper HTML sanitizer library
-	
-	// Remove any script tags completely
-	scriptRegex := regexp.MustCompile(`(?i)<script[^>]*>.*?</script>`)
-	htmlContent = scriptRegex.ReplaceAllString(htmlContent, "")
-	
-	// Remove any on* event attributes
-	eventRegex := regexp.MustCompile(`(?i)\s+on\w+\s*=\s*["'][^"']*["']`)
-	htmlContent = eventRegex.ReplaceAllString(htmlContent, "")
-	
-	// For this demo, we'll trust the content since it's from our own test data
-	// In production, you'd want more comprehensive sanitization
-	return htmlContent
-}
 
 // fetchResourceAttestation fetches the resource attestation JSON from the given URL
 func fetchResourceAttestation(attestationURL string) string {
