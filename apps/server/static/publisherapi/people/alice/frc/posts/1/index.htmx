@@ -3,18 +3,18 @@
   data-la-fragment-url="http://localhost:8080/people/alice/frc/posts/1"
 >
   <section class="la-preview">
-    <article data-type="post">
+    <article>
         <header>
-            <h2 data-prop="title">Post 1</h2>
-            <p data-prop="published_date">Today • 9:14 AM</p>
-            <meta property="created_at" content="1755868440" />
+            <h2>Post 1</h2>
+            <p>Today • 9:14 AM</p>
         </header>
-        <main data-prop="body">
+        <div>
             <p>
                 Just made a big pot of Harissa for dinner! Armenian chicken and rice
                 porridge is the best comfort food.
             </p>
-        </main>
+        </div>
+        <a href="file.txt">A Linkssss</a>
     </article>
 
   </section>
@@ -24,7 +24,7 @@
     data-la-publisher-claim="ac20898edf97b5a24c59749ec26ea7bc95cc1d2859ef6a194ceb7eeb2c709677"
     data-la-resource-attestation-url="http://localhost:8080/people/alice/frc/posts/1/_la_resource.json"
     data-la-namespace-attestation-url="http://localhost:8080/people/alice/_la_namespace.json"
-    href="data:text/html;base64,PGFydGljbGUgZGF0YS10eXBlPSJwb3N0Ij4KICAgIDxoZWFkZXI+CiAgICAgICAgPGgyIGRhdGEtcHJvcD0idGl0bGUiPlBvc3QgMTwvaDI+CiAgICAgICAgPHAgZGF0YS1wcm9wPSJwdWJsaXNoZWRfZGF0ZSI+VG9kYXkg4oCiIDk6MTQgQU08L3A+CiAgICAgICAgPG1ldGEgcHJvcGVydHk9ImNyZWF0ZWRfYXQiIGNvbnRlbnQ9IjE3NTU4Njg0NDAiIC8+CiAgICA8L2hlYWRlcj4KICAgIDxtYWluIGRhdGEtcHJvcD0iYm9keSI+CiAgICAgICAgPHA+CiAgICAgICAgICAgIEp1c3QgbWFkZSBhIGJpZyBwb3Qgb2YgSGFyaXNzYSBmb3IgZGlubmVyISBBcm1lbmlhbiBjaGlja2VuIGFuZCByaWNlCiAgICAgICAgICAgIHBvcnJpZGdlIGlzIHRoZSBiZXN0IGNvbWZvcnQgZm9vZC4KICAgICAgICA8L3A+CiAgICA8L21haW4+CjwvYXJ0aWNsZT4K"
+    href="data:text/html;base64,PGFydGljbGU+CiAgICA8aGVhZGVyPgogICAgICAgIDxoMj5Qb3N0IDE8L2gyPgogICAgICAgIDxwPlRvZGF5IOKAoiA5OjE0IEFNPC9wPgogICAgPC9oZWFkZXI+CiAgICA8ZGl2PgogICAgICAgIDxwPgogICAgICAgICAgICBKdXN0IG1hZGUgYSBiaWcgcG90IG9mIEhhcmlzc2EgZm9yIGRpbm5lciEgQXJtZW5pYW4gY2hpY2tlbiBhbmQgcmljZQogICAgICAgICAgICBwb3JyaWRnZSBpcyB0aGUgYmVzdCBjb21mb3J0IGZvb2QuCiAgICAgICAgPC9wPgogICAgPC9kaXY+CiAgICA8YSBocmVmPSJmaWxlLnR4dCI+QSBMaW5rPC9hPgo8L2FydGljbGU+Cg=="
     hidden
   />
 </article>

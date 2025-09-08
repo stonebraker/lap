@@ -1,13 +1,13 @@
-<article data-type="post">
+<article>
     <header>
-        <h2 data-prop="title">Post 1</h2>
-        <p data-prop="published_date">Today • 9:14 AM</p>
-        <meta property="created_at" content="1755868440" />
+        <h2>Post 1</h2>
+        <p>Today • 9:14 AM</p>
     </header>
-    <main data-prop="body">
+    <div>
         <p>
             Just made a big pot of Harissa for dinner! Armenian chicken and rice
             porridge is the best comfort food.
         </p>
-    </main>
+    </div>
+    <a href="file.txt">A Link</a>
 </article>
